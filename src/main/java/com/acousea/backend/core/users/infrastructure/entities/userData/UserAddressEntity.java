@@ -1,4 +1,4 @@
-package com.acousea.backend.core.users.infrastructure.entities;
+package com.acousea.backend.core.users.infrastructure.entities.userData;
 
 
 import com.acousea.backend.core.users.domain.userData.UserAddress;
@@ -31,6 +31,10 @@ public class UserAddressEntity {
         this.state = state;
         this.postalCode = postalCode;
         this.country = country;
+    }
+
+    public UserAddressEntity() {
+
     }
 
     // Getters, setters, and constructors

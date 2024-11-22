@@ -1,10 +1,13 @@
 package com.acousea.backend;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.platform.suite.api.SelectPackages;
+import org.junit.platform.suite.api.Suite;
 
-@SpringBootTest
-class AcouseaBackendApplicationTests {
+
+@Suite
+@SelectPackages("com.acousea.backend")
+public class AllTestsSuite {
 
 	@Test
 	void contextLoads() {

@@ -1,4 +1,4 @@
-package com.acousea.backend.core.users.infrastructure.entities;
+package com.acousea.backend.core.users.infrastructure.entities.userData;
 
 
 import com.acousea.backend.core.users.domain.constants.Gender;
@@ -38,7 +38,7 @@ public class UserInfoEntity {
     }
 
     public UserInfoEntity() {
-        
+
     }
 
     public static UserInfoEntity fromDomain(UserInfo userInfo) {

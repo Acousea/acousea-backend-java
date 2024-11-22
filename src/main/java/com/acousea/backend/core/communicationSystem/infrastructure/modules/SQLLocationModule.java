@@ -1,4 +1,4 @@
-package com.acousea.backend.core.communicationSystem.infrastructure;
+package com.acousea.backend.core.communicationSystem.infrastructure.modules;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,7 +31,7 @@ public class SQLLocationModule {
         this.longitude = longitude;
     }
 
-    // Getters y setters...
+    
 
     public UUID getNodeId() {
         return nodeId;

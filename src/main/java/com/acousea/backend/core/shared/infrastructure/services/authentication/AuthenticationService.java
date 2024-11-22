@@ -5,12 +5,12 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthenticationChecker {
+public class AuthenticationService {
 
     private final SessionService sessionService;
     private final HttpSession session;
 
-    public AuthenticationChecker(SessionService sessionService, HttpSession session) {
+    public AuthenticationService(SessionService sessionService, HttpSession session) {
         this.sessionService = sessionService;
         this.session = session;
     }

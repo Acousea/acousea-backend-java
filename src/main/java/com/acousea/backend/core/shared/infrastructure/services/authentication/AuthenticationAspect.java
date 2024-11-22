@@ -1,42 +1,44 @@
 package com.acousea.backend.core.shared.infrastructure.services.authentication;
 
-import com.acousea.backend.core.shared.application.services.authentication.AuthenticationService;
+import com.acousea.backend.core.shared.application.services.authentication.SessionService;
 import com.acousea.backend.core.shared.domain.annotations.authentication.RequiresAuthentication;
 import jakarta.servlet.http.HttpSession;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
 
 @Aspect
 @Component
 public class AuthenticationAspect {
 
-    @Autowired
-    private AuthenticationService authenticationService;
+    private final SessionService sessionService;
 
-    @Autowired
-    private HttpSession session;
+    private final HttpSession session;
 
-    @Before("@annotation(com.acousea.backend.core.shared.domain.annotations.authentication.RequiresAuthentication)")
-    public void checkAuthentication() throws Throwable {
+    public AuthenticationAspect(SessionService sessionService, HttpSession session) {
+        this.sessionService = sessionService;
+        this.session = session;
+    }
+
+    @Around("@annotation(requiresAuthentication)")
+    public Object checkAuthentication(ProceedingJoinPoint joinPoint, @NotNull RequiresAuthentication requiresAuthentication) throws Throwable {
         String sessionId = session.getId();
-        MethodSignature signature = (MethodSignature) MethodSignature.class.cast(MethodSignature.class.cast(joinPoint.getSignature()).getMethod());
-        Method method = signature.getMethod();
+        String requiredRole = requiresAuthentication.role();
 
-        RequiresAuthentication annotation = method.getAnnotation(RequiresAuthentication.class);
-        String requiredRole = annotation.role();
-
-        if (!authenticationService.isAuthenticated(sessionId)) {
-            throw new SecurityException("Usuario no autenticado");
+        // Authentication verification
+        if (!sessionService.isAuthenticated(sessionId)) {
+            throw new SecurityException("User not authenticated");
         }
 
-        if (!requiredRole.isEmpty() && !authenticationService.hasRoles(sessionId, requiredRole)) {
-            throw new SecurityException("Acceso denegado: se requiere el rol " + requiredRole);
+        // Role verification
+        if (!requiredRole.isEmpty() && !sessionService.hasRole(sessionId, requiredRole)) {
+            throw new SecurityException("Access denied. Role " + requiredRole + " is required");
         }
+
+        // Proceed with the method execution
+        return joinPoint.proceed();
     }
 }
-

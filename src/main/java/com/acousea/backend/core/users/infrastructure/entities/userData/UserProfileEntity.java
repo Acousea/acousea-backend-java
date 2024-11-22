@@ -1,4 +1,4 @@
-package com.acousea.backend.core.users.infrastructure.entities;
+package com.acousea.backend.core.users.infrastructure.entities.userData;
 
 import com.acousea.backend.core.users.domain.constants.Language;
 import com.acousea.backend.core.users.domain.userData.UserProfile;
@@ -21,6 +21,10 @@ public class UserProfileEntity {
     public UserProfileEntity(String profileImageUrl, Language preferredLanguage) {
         this.profileImageUrl = profileImageUrl;
         this.preferredLanguage = preferredLanguage;
+    }
+
+    public UserProfileEntity() {
+
     }
 
     public static UserProfileEntity fromDomain(UserProfile profile) {

@@ -1,4 +1,4 @@
-package com.acousea.backend.core.shared.application;
+package com.acousea.backend.core.shared.application.events;
 
 import com.acousea.backend.core.shared.domain.events.DomainEvent;
 

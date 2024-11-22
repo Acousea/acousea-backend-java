@@ -1,4 +1,4 @@
-package com.acousea.backend.core.users.infrastructure.entities;
+package com.acousea.backend.core.users.infrastructure.entities.userData;
 
 
 import com.acousea.backend.core.users.domain.userData.UserStatus;
@@ -42,6 +42,10 @@ public class UserStatusEntity {
         this.lastLogin = lastLogin;
         this.loginAttempts = loginAttempts;
         this.passwordChangedAt = passwordChangedAt;
+    }
+
+    public UserStatusEntity() {
+
     }
 
     public static UserStatusEntity fromDomain(UserStatus status) {

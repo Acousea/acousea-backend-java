@@ -1,3 +1,7 @@
+### DOTENV ###
+.env
+
+### Java ###
 HELP.md
 .gradle
 build/
@@ -35,3 +39,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+### SQLITE databases ###
+*.sqlite

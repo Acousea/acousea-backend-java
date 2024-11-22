@@ -1,6 +1,6 @@
 package com.acousea.backend.core.shared.infrastructure.services.authentication;
 
-import com.acousea.backend.core.shared.application.services.authentication.AuthenticationService;
+import com.acousea.backend.core.shared.application.services.authentication.SessionService;
 import com.acousea.backend.core.users.domain.User;
 import com.acousea.backend.core.users.domain.constants.UserRole;
 
@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 
-public class InMemoryAuthenticationService implements AuthenticationService {
+public class InMemorySessionService implements SessionService {
 
     private static final String SESSION_PREFIX = "session:";
     private final ConcurrentMap<String, User> sessions = new ConcurrentHashMap<>();
@@ -28,13 +28,12 @@ public class InMemoryAuthenticationService implements AuthenticationService {
         }
         return false;
     }
-
-    // Métodos adicionales para gestionar las sesiones en memoria (opcional)
-
+    @Override
     public void createSession(String sessionId, User user) {
         sessions.put(SESSION_PREFIX + sessionId, user);
     }
 
+    @Override
     public void deleteSession(String sessionId) {
         sessions.remove(SESSION_PREFIX + sessionId);
     }

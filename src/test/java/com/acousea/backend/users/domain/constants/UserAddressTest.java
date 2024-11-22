@@ -1,17 +1,18 @@
-package com.acousea.backend.constants;
+package com.acousea.backend.users.domain.constants;
 
 
-import com.acousea.backend.core.communicationSystem.domain.constants.Address;
+import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
+@SpringBootTest
 public class UserAddressTest {
 
     @Test
     public void testGetValue() {
-        assertEquals(0x00, Address.BACKEND.getValue());
+        assertEquals(0x00, Address.RESERVED_BACKEND.getValue());
         assertEquals(0x01, Address.LOCALIZER_NODE.getValue());
         assertEquals(0x02, Address.DRIFTER_NODE.getValue());
         assertEquals(0x03, Address.PI3.getValue());

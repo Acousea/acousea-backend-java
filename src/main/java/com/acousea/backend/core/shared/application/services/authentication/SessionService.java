@@ -4,9 +4,10 @@ import com.acousea.backend.core.users.domain.User;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface AuthenticationService {
+public interface SessionService {
     boolean isAuthenticated(String sessionId);
     boolean hasRole(String sessionId, String role);
     void createSession(String id, User user);
+    void deleteSession(String id);
 }
 

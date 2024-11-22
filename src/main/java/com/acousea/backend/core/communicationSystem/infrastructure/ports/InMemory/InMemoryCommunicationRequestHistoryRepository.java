@@ -1,19 +1,24 @@
-package com.acousea.backend.core.communicationSystem.infrastructure.ports;
+package com.acousea.backend.core.communicationSystem.infrastructure.ports.InMemory;
 
 import com.acousea.backend.core.communicationSystem.application.ports.CommunicationRequestHistoryRepository;
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationRequest;
-import com.acousea.backend.core.communicationSystem.domain.constants.RequestStatus;
+import com.acousea.backend.core.communicationSystem.domain.communication.constants.RequestStatus;
+import com.acousea.backend.core.shared.infrastructure.ports.InMemoryIRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-public class InMemoryCommunicationRequestHistoryRepository implements CommunicationRequestHistoryRepository {
+@Repository
+public class InMemoryCommunicationRequestHistoryRepository
+        extends InMemoryIRepository<CommunicationRequest, UUID>
+        implements CommunicationRequestHistoryRepository {
 
     private final Map<CommunicationRequest, RequestStatus> requestMap = new LinkedHashMap<>();
 
-    @Override
-    public void addCommunicationRequest(CommunicationRequest request) {
-        requestMap.put(request, RequestStatus.PENDING);
+    public InMemoryCommunicationRequestHistoryRepository() {
+        super(CommunicationRequest::getId);
     }
+
 
     @Override
     public CommunicationRequest getLatestResolvedCommunicationRequestForOpCode(int opCode) {
@@ -49,11 +54,6 @@ public class InMemoryCommunicationRequestHistoryRepository implements Communicat
                 .map(Map.Entry::getKey)
                 .max(Comparator.comparing(CommunicationRequest::getCreatedAt))
                 .orElse(null);
-    }
-
-    @Override
-    public List<CommunicationRequest> getAllCommunicationRequests() {
-        return new ArrayList<>(requestMap.keySet());
     }
 
     @Override

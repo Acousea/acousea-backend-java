@@ -1,4 +1,4 @@
-package com.acousea.backend.core.communicationSystem.infrastructure.modules;
+package com.acousea.backend.core.communicationSystem.infrastructure;
 
 import jakarta.persistence.*;
 
@@ -9,6 +9,10 @@ public class SQLModule {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int moduleId;
+
+    @ManyToOne
+    @JoinColumn(name = "node_id")
+    private SQLNodeDeviceInfo node;
 
     @Column(name = "module_name")
     private String moduleName;
@@ -22,6 +26,8 @@ public class SQLModule {
         this.moduleId = moduleId;
         this.moduleName = moduleName;
     }
+
+
 
     public int getModuleId() {
         return moduleId;

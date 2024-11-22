@@ -31,7 +31,28 @@ public class SQLBatteryModule {
         this.batteryStatus = batteryStatus;
     }
 
-    // Getters y setters...
 
-    public UUID getNodeId()
+    public UUID getNodeId() {
+        return nodeId;
+    }
 
+    public void setNodeId(UUID nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public int getBatteryPercentage() {
+        return batteryPercentage;
+    }
+
+    public void setBatteryPercentage(int batteryPercentage) {
+        this.batteryPercentage = batteryPercentage;
+    }
+
+    public int getBatteryStatus() {
+        return batteryStatus;
+    }
+
+    public void setBatteryStatus(int batteryStatus) {
+        this.batteryStatus = batteryStatus;
+    }
+}

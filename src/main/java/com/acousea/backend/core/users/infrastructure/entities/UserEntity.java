@@ -1,7 +1,11 @@
-package com.acousea.backend.core.users.infrastructure;
+package com.acousea.backend.core.users.infrastructure.entities;
 
 import com.acousea.backend.core.users.domain.User;
 import com.acousea.backend.core.users.domain.constants.UserRole;
+import com.acousea.backend.core.users.infrastructure.entities.userData.UserAddressEntity;
+import com.acousea.backend.core.users.infrastructure.entities.userData.UserInfoEntity;
+import com.acousea.backend.core.users.infrastructure.entities.userData.UserProfileEntity;
+import com.acousea.backend.core.users.infrastructure.entities.userData.UserStatusEntity;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -49,6 +53,10 @@ public class UserEntity {
         this.role = role;
     }
 
+    public UserEntity() {
+
+    }
+
     public static UserEntity fromDomain(User user) {
         return new UserEntity(
                 user.username(),
@@ -63,7 +71,7 @@ public class UserEntity {
 
     public User toDomain() {
         return new User(
-                id.toString(),
+                id,
                 username,
                 password,
                 personalInfo.toDomain(),
@@ -72,5 +80,69 @@ public class UserEntity {
                 accountStatus.toDomain(),
                 role
         );
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public UserInfoEntity getPersonalInfo() {
+        return personalInfo;
+    }
+
+    public void setPersonalInfo(UserInfoEntity personalInfo) {
+        this.personalInfo = personalInfo;
+    }
+
+    public UserProfileEntity getProfile() {
+        return profile;
+    }
+
+    public void setProfile(UserProfileEntity profile) {
+        this.profile = profile;
+    }
+
+    public UserAddressEntity getAddress() {
+        return address;
+    }
+
+    public void setAddress(UserAddressEntity address) {
+        this.address = address;
+    }
+
+    public UserStatusEntity getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(UserStatusEntity accountStatus) {
+        this.accountStatus = accountStatus;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 }

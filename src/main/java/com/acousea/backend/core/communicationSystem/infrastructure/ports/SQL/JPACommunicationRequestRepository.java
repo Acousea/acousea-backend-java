@@ -8,7 +8,7 @@ import java.util.List;
 
 
 @Repository
-public interface SQLCommunicationRequestRepository extends JpaRepository<SQLCommunicationRequest, Long> {
+public interface JPACommunicationRequestRepository extends JpaRepository<SQLCommunicationRequest, Long> {
     List<SQLCommunicationRequest> findByOperationCodeAndStatus(int operationCode, int status);
     List<SQLCommunicationRequest> findByStatus(int status);
 }
