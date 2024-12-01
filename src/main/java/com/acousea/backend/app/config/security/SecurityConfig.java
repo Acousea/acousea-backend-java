@@ -32,7 +32,8 @@ public class SecurityConfig {
                 apiPrefix + "/users/auth/login",
                 apiPrefix + "/users/auth/logout",
                 apiPrefix + "/users/**",
-                apiPrefix + "/communication-system/**"
+                apiPrefix + "/communication-system/**",
+                apiPrefix + "/webhook/rockblock-packets"
         };
 
         System.out.println("API_WHITELIST: " + List.of(API_WHITELIST));

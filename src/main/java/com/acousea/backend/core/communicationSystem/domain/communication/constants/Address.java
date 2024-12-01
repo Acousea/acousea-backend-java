@@ -7,32 +7,32 @@ import java.util.Set;
 
 @Getter
 public class Address {
-    private static final UnsignedByte BACKEND = UnsignedByte.of(0x00); // 0b00000000
-    private static final UnsignedByte BROADCAST_ADDRESS = UnsignedByte.of(0xFF); // 0b11111111
-    private static final Set<UnsignedByte> RESERVED_ADDRESSES = Set.of(BACKEND, BROADCAST_ADDRESS);
+    private static final byte BACKEND = 0x00; // 0b00000000
+    private static final byte BROADCAST_ADDRESS = (byte) 0xFF; // 0b11111111
+    private static final Set<Byte> RESERVED_ADDRESSES = Set.of(BACKEND, BROADCAST_ADDRESS);
 
-    private final UnsignedByte value;
+    private final byte value;
 
-    private Address(UnsignedByte value) {
+    private Address(byte value) {
         this.value = value;
     }
 
     public static int getSize() {
-        return UnsignedByte.SIZE;
+        return Byte.BYTES;
     }
 
     public static Address of(int value) {
         if (isReserved(value)) {
             throw new IllegalArgumentException("Address value " + value + " is reserved.");
         }
-        if (!isValidRange(value)) {
+        if (!UnsignedByte.isValidUnsignedByte(value)) {
             throw new IllegalArgumentException("Address value " + value + " is out of the valid range.");
         }
-        return new Address(UnsignedByte.of(value));
+        return new Address(UnsignedByte.toByte(value));
     }
 
     public static boolean isReserved(int value) {
-        return RESERVED_ADDRESSES.contains(UnsignedByte.of(value));
+        return RESERVED_ADDRESSES.contains(UnsignedByte.toByte(value));
     }
 
     public static boolean isValidRange(int value) {
@@ -51,7 +51,7 @@ public class Address {
     @Override
     public String toString() {
         return "Address{" +
-                "value=" + String.format("0x%02X", value.toInt()) +
+                "value=" + String.format("0x%02X", UnsignedByte.toUnsignedInt(value)) +
                 '}';
     }
 
@@ -61,5 +61,10 @@ public class Address {
         if (o == null || getClass() != o.getClass()) return false;
         Address address = (Address) o;
         return value == address.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Byte.hashCode(value);
     }
 }

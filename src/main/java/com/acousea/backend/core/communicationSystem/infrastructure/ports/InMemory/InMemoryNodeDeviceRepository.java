@@ -3,6 +3,7 @@ package com.acousea.backend.core.communicationSystem.infrastructure.ports.InMemo
 import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient.AmbientModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
@@ -13,9 +14,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.repo
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.ReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.storage.StorageModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient.AmbientModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.ICListenHF;
-import com.acousea.backend.core.shared.domain.UnsignedByte;
 import com.acousea.backend.core.shared.infrastructure.ports.InMemoryIRepository;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
@@ -49,7 +48,11 @@ public class InMemoryNodeDeviceRepository extends InMemoryIRepository<NodeDevice
         AmbientModule ambientModule = AmbientModule.create();
         StorageModule storageModule = StorageModule.create(1000);
         OperationModeModule operationModeModule = OperationModeModule.createWithModes(
-                List.of(OperationMode.create(UnsignedByte.of(1), "Launching"))
+                List.of(
+                        OperationMode.create(1, "Launching"),
+                        OperationMode.create(2, "Working"),
+                        OperationMode.create(3, "Recovering")
+                )
         );
         ReportingModule loRaReportingModule = LoRaReportingModule.create(operationModeModule);
 
@@ -67,6 +70,7 @@ public class InMemoryNodeDeviceRepository extends InMemoryIRepository<NodeDevice
                                 locationModule.getName(), locationModule,
                                 ambientModule.getName(), ambientModule,
                                 storageModule.getName(), storageModule,
+                                operationModeModule.getName(), operationModeModule,
                                 loRaReportingModule.getName(), loRaReportingModule,
                                 iridiumReportingModuleDrifter.getName(), iridiumReportingModuleDrifter,
                                 networkModule1.getName(), networkModule1
@@ -87,6 +91,7 @@ public class InMemoryNodeDeviceRepository extends InMemoryIRepository<NodeDevice
                                 locationModule.getName(), locationModule,
                                 ambientModule.getName(), ambientModule,
                                 storageModule.getName(), storageModule,
+                                operationModeModule.getName(), operationModeModule,
                                 loRaReportingModule.getName(), loRaReportingModule,
                                 iridiumReportingModuleLocalizer.getName(), iridiumReportingModuleLocalizer,
                                 networkModule2.getName(), networkModule2

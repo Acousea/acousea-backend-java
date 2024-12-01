@@ -1,7 +1,6 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes;
 
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
-import com.acousea.backend.core.shared.domain.UnsignedByte;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class OperationModeModule extends ExtModule {
         if (nextId == -1) {
             throw new IllegalStateException("Maximum number of operation modes reached.");
         }
-        OperationMode mode = OperationMode.create(UnsignedByte.of(nextId), name);
+        OperationMode mode = OperationMode.create(nextId, name);
         operationModes.put(nextId, mode);
     }
 

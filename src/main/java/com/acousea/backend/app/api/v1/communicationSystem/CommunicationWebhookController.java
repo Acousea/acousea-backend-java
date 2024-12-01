@@ -9,10 +9,7 @@ import com.acousea.backend.core.shared.domain.httpWrappers.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("${apiPrefix}/webhook")
@@ -34,8 +31,29 @@ public class CommunicationWebhookController {
     }
 
     @PostMapping("/rockblock-packets")
-    public ResponseEntity<Result<Void>> receiveRockblockPacket(@RequestBody RockBlockMessage rockBlockMessage) {
+    public ResponseEntity<Result<String>> receiveRockblockPacket(
+            @RequestParam("imei") String imei,
+            @RequestParam("serial") String serial,
+            @RequestParam("momsn") int momsn,
+            @RequestParam("transmit_time") String transmitTime,
+            @RequestParam("iridium_latitude") double iridiumLatitude,
+            @RequestParam("iridium_longitude") double iridiumLongitude,
+            @RequestParam("iridium_cep") int iridiumCep,
+            @RequestParam("data") String data) {
         try {
+            // Crear un objeto RockBlockMessage con los parámetros recibidos
+            RockBlockMessage rockBlockMessage = new RockBlockMessage(
+                    imei,
+                    serial,
+                    momsn,
+                    transmitTime,
+                    iridiumLatitude,
+                    iridiumLongitude,
+                    iridiumCep,
+                    data
+            );
+
+            // Procesar el comando
             var command = new ProcessRockblockMessageCommand(rockblockMessageRepository, communicationService, eventBus);
             return ResponseEntity.ok(command.run(rockBlockMessage));
         } catch (Exception e) {
@@ -44,4 +62,5 @@ public class CommunicationWebhookController {
                     .body(Result.fail(422, "Error processing the message"));
         }
     }
+
 }

@@ -57,8 +57,8 @@ public final class RoutingChunk {
     }
 
     public String encode() {
-        return Integer.toHexString(sender.getValue().toInt())
-                + Integer.toHexString(receiver.getValue().toInt())
+        return Integer.toHexString(sender.getValue())
+                + Integer.toHexString(receiver.getValue())
                 + Integer.toHexString(TTL);
     }
 

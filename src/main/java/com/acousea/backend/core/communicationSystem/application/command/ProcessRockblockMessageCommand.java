@@ -8,7 +8,7 @@ import com.acousea.backend.core.shared.application.events.EventBus;
 import com.acousea.backend.core.shared.domain.httpWrappers.Command;
 import com.acousea.backend.core.shared.domain.httpWrappers.Result;
 
-public class ProcessRockblockMessageCommand extends Command<RockBlockMessage, Void> {
+public class ProcessRockblockMessageCommand extends Command<RockBlockMessage, String> {
     private final RockblockMessageRepository messagesRepository;
     private final EventBus eventBus;
 
@@ -18,7 +18,7 @@ public class ProcessRockblockMessageCommand extends Command<RockBlockMessage, Vo
     }
 
     @Override
-    public Result<Void> execute(RockBlockMessage message) {
+    public Result<String> execute(RockBlockMessage message) {
         if (message == null) {
             return Result.fail(422, "You need to specify a packet");
         }
@@ -26,7 +26,7 @@ public class ProcessRockblockMessageCommand extends Command<RockBlockMessage, Vo
         // Trigger the event only if data is > 0 and it is not a test message
         if (message.getData().isEmpty() || !message.getData().startsWith("20")) {
             System.out.println("ProcessRockblockMessageCommand::run() -> RockBlockMessage with empty data or test data");
-            return Result.success(null);
+            return Result.success("RockBlockMessage with empty data or test data");
         }
 
         // Create a CommunicationResponse from the hex data
@@ -43,7 +43,7 @@ public class ProcessRockblockMessageCommand extends Command<RockBlockMessage, Vo
         // Trigger the event
 //        eventBus.publish(...);
 
-        return Result.success(null);
+        return Result.success("RockBlockMessage processed successfully");
     }
 
 

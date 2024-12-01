@@ -25,7 +25,7 @@ public abstract class ReportingModule extends ExtModule {
 
     private void initializeReportingPeriods(OperationModeModule operationModeModule) {
         operationModeModule.getOperationModes().forEach((id, mode) -> {
-            reportingPeriodsPerOperationMode.put(mode.getId().toByte(), (short) 0);
+            reportingPeriodsPerOperationMode.put(mode.getId(), (short) 0);
         });
     }
 

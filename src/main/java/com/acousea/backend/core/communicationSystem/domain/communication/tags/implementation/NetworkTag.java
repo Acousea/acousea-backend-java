@@ -14,10 +14,10 @@ public class NetworkTag extends Tag {
 
     public static NetworkTag fromNetworkModule(NetworkModule module) {
         ByteBuffer buffer = ByteBuffer.allocate(1 + module.getRoutingTable().getPeerRoutes().size() * 2);
-        buffer.put(module.getLocalAddress().getValue().toByte());
+        buffer.put(module.getLocalAddress().getValue());
         module.getRoutingTable().getPeerRoutes().forEach((destination, nextHop) -> {
-            buffer.put(destination.getValue().toByte());
-            buffer.put(nextHop.getValue().toByte());
+            buffer.put(destination.getValue());
+            buffer.put(nextHop.getValue());
         });
         return new NetworkTag(buffer.array());
     }

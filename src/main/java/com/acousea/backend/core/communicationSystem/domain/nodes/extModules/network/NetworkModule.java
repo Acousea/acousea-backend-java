@@ -38,7 +38,7 @@ public class NetworkModule extends ExtModule {
 
 
     public static NetworkModule fromDTO(NodeDeviceDTO.ExtModulesDto.NetworkModuleDto network) {
-        NetworkModule module = new NetworkModule(Address.of(network.getLocalAddress()).getValue().toInt());
+        NetworkModule module = new NetworkModule(Address.of(network.getLocalAddress()).getValue());
         network.getRoutingTable().getPeerRoutes().forEach((destination, nextHop) -> {
             module.getRoutingTable().addRoute(Address.of(destination), Address.of(nextHop));
         });

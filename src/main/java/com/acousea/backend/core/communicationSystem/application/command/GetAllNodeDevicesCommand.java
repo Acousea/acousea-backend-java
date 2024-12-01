@@ -1,6 +1,7 @@
 package com.acousea.backend.core.communicationSystem.application.command;
 
 
+import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
 import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.shared.application.services.StorageService;
@@ -10,7 +11,7 @@ import com.acousea.backend.core.shared.domain.httpWrappers.Result;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetAllNodeDevicesCommand extends Command<Void, List<NodeDevice>> {
+public class GetAllNodeDevicesCommand extends Command<Void, List<NodeDeviceDTO>> {
     private final NodeDeviceRepository nodeDeviceRepository;
     private final StorageService storageService;
 
@@ -20,12 +21,12 @@ public class GetAllNodeDevicesCommand extends Command<Void, List<NodeDevice>> {
     }
 
     @Override
-    public Result<List<NodeDevice>> execute(Void none) {
+    public Result<List<NodeDeviceDTO>> execute(Void none) {
         List<NodeDevice> nodeDevice = nodeDeviceRepository.findAll();
-        List<NodeDevice> nodeDeviceWithIconUrl = new ArrayList<>();
+        List<NodeDevice> nodeDevicesWithIconUrl = new ArrayList<>();
 
         nodeDevice.forEach(node -> {
-            nodeDeviceWithIconUrl.add(new NodeDevice(
+            nodeDevicesWithIconUrl.add(new NodeDevice(
                     node.getId(),
                     node.getName(),
                     storageService.getFileUrl(node.getIcon()),
@@ -35,6 +36,6 @@ public class GetAllNodeDevicesCommand extends Command<Void, List<NodeDevice>> {
         });
 
 
-        return Result.success(nodeDeviceWithIconUrl);
+        return Result.success(NodeDeviceDTO.fromNodeDevices(nodeDevicesWithIconUrl));
     }
 }

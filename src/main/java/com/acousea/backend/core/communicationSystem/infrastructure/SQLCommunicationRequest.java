@@ -60,8 +60,8 @@ public class SQLCommunicationRequest {
                                    byte ttl,
                                    byte[] payload) {
         this.operationCode = (byte) operationCode.getValue();
-        this.senderAddress = senderAddress.getValue().toInt();
-        this.receiverAddress = receiverAddress.getValue().toInt();
+        this.senderAddress = senderAddress.getValue();
+        this.receiverAddress = receiverAddress.getValue();
         this.ttl = ttl;
         this.payload = payload != null ? payload : new byte[0];
     }

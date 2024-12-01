@@ -5,7 +5,6 @@ import com.acousea.backend.core.communicationSystem.domain.communication.tags.Ta
 import com.acousea.backend.core.communicationSystem.domain.communication.tags.TagType;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModeModule;
-import com.acousea.backend.core.shared.domain.UnsignedByte;
 
 import java.nio.ByteBuffer;
 import java.util.stream.Collectors;
@@ -20,7 +19,7 @@ public class OperationModeTag extends Tag {
     public static OperationModeTag fromOperationModeModule(OperationModeModule module) {
         ByteBuffer buffer = ByteBuffer.allocate(module.getOperationModes().size());
         for (OperationMode operationMode : module.getOperationModes().values()) {
-            buffer.put(operationMode.getId().toByte());
+            buffer.put(operationMode.getId());
         }
         return new OperationModeTag(buffer.array());
     }
@@ -29,7 +28,7 @@ public class OperationModeTag extends Tag {
         ByteBuffer buffer = ByteBuffer.wrap(this.VALUE);
         return OperationModeModule.createWithModes(
                 IntStream.range(0, buffer.remaining())
-                        .mapToObj(i -> OperationMode.create(UnsignedByte.of(buffer.get()), "operationMode" + i))
+                        .mapToObj(i -> OperationMode.create(buffer.get(), "operationMode" + i))
                         .collect(Collectors.toList())
         );
     }
@@ -38,7 +37,7 @@ public class OperationModeTag extends Tag {
     public static OperationModeTag fromBytes(ByteBuffer buffer) {
         OperationModeModule operationModeModule = OperationModeModule.createWithModes(
                 IntStream.range(0, buffer.remaining())
-                        .mapToObj(i -> OperationMode.create(UnsignedByte.of(buffer.get()), "operationMode" + i))
+                        .mapToObj(i -> OperationMode.create(buffer.get(), "operationMode" + i))
                         .collect(Collectors.toList())
         );
         return fromOperationModeModule(operationModeModule);

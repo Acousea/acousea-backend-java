@@ -9,37 +9,43 @@ import java.util.Objects;
 @Getter
 @Setter
 public final class OperationMode {
-    private final UnsignedByte id;
+    private final byte id; // Usamos byte directamente
     private final String name;
 
-    private OperationMode(UnsignedByte id, String name) {
+    private OperationMode(byte id, String name) {
+        if (!UnsignedByte.isValidUnsignedByte(id)) {
+            throw new IllegalArgumentException("ID must be between 0 and 255, inclusive.");
+        }
         this.id = id;
         this.name = name;
     }
 
-    public static OperationMode create(UnsignedByte id, String name) {
-        return new OperationMode(id, name);
+    public static OperationMode create(int id, String name) {
+        return new OperationMode(UnsignedByte.toByte(id), name);
     }
 
+    public static OperationMode create(byte id, String name) {
+        return new OperationMode(id, name);
+    }
 
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (OperationMode) obj;
+        OperationMode that = (OperationMode) obj;
         return this.id == that.id &&
                 Objects.equals(this.name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(UnsignedByte.toUnsignedInt(id), name);
     }
 
     @Override
     public String toString() {
         return "OperationMode[" +
-                "id=" + id + ", " +
+                "id=" + UnsignedByte.toUnsignedInt(id) + ", " +
                 "name=" + name + ']';
     }
 }

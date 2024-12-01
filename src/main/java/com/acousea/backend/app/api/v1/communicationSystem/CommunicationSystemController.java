@@ -44,7 +44,7 @@ public class CommunicationSystemController {
     }
 
     @GetMapping("/node-device/all")
-    public ResponseEntity<Result<List<NodeDevice>>> getAllNodesStatus() {
+    public ResponseEntity<Result<List<NodeDeviceDTO>>> getAllNodesStatus() {
         GetAllNodeDevicesCommand query = new GetAllNodeDevicesCommand(
                 nodeDeviceRepository, storageService
         );
