@@ -1,11 +1,11 @@
 package com.acousea.backend.core.communicationSystem.domain.communication;
 
-import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.OperationCode;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.RoutingChunk;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.Payload;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.SetNodeConfigurationPayload;
+import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,11 +23,11 @@ public class CommunicationRequest extends CommunicationPacket {
         this.createdAt = createdAt;
     }
 
-    public static CommunicationRequest createUpdateNodeDeviceRequest(Address nodeAddress, NodeDeviceDTO dto) {
+    public static CommunicationRequest createUpdateNodeDeviceRequest(Address nodeAddress, NodeDevice nodeDevice) {
         return new CommunicationRequest(
                 OperationCode.SET_NODE_DEVICE_CONFIG,
                 RoutingChunk.fromBackendToNode(nodeAddress),
-                SetNodeConfigurationPayload.fromNodeDeviceDTO(dto),
+                SetNodeConfigurationPayload.fromNodeDevice(nodeDevice),
                 LocalDateTime.now()
         );
     }

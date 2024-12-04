@@ -19,7 +19,7 @@ public abstract class Command<QueryParams, QueryResult> {
             System.out.println("NullPointerException: " + e.getMessage());
             return Result.fail(404, e.getMessage());
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("Exception: " + e.getCause() + " -> " + e.getMessage());
             return Result.fail(-1, e.getMessage());
         }
     }

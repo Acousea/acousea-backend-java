@@ -2,6 +2,7 @@ package com.acousea.backend.app.config;
 
 import com.acousea.backend.core.communicationSystem.application.ports.CommunicationRequestHistoryRepository;
 import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
+import com.acousea.backend.core.communicationSystem.infrastructure.mocks.MockNodeDevices;
 import com.acousea.backend.core.communicationSystem.infrastructure.ports.InMemory.InMemoryCommunicationRequestHistoryRepository;
 import com.acousea.backend.core.communicationSystem.infrastructure.ports.InMemory.InMemoryNodeDeviceRepository;
 import com.acousea.backend.core.shared.application.services.StorageService;
@@ -36,13 +37,14 @@ public class DevConfig {
         return new LocalStorageService(storageDirectory);
     }
 
+
     @Bean // Must inject Environment to get the value of the property
-    public NodeDeviceRepository nodeDeviceRepository(Environment environment){
-        return new InMemoryNodeDeviceRepository(environment);
+    public NodeDeviceRepository nodeDeviceRepository(Environment environment) {
+        return new InMemoryNodeDeviceRepository(new MockNodeDevices(environment));
     }
 
     @Bean
-    public CommunicationRequestHistoryRepository communicationRequestHistoryRepository(){
+    public CommunicationRequestHistoryRepository communicationRequestHistoryRepository() {
         return new InMemoryCommunicationRequestHistoryRepository();
     }
 

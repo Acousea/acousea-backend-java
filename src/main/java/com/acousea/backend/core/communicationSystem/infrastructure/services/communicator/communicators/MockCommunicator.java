@@ -7,17 +7,11 @@ import com.acousea.backend.core.communicationSystem.domain.communication.Communi
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationResult;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.CommunicationStatus;
-import com.acousea.backend.core.communicationSystem.domain.communication.constants.IridiumErrorCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.UUID;
 
 @Component

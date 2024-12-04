@@ -11,12 +11,11 @@ import java.time.ZoneOffset;
 @Getter
 @Setter
 public class RTCModule extends ExtModule {
+    public static final String name = "rtc";
     private LocalDateTime currentTime;
 
     public RTCModule(LocalDateTime currentTime) {
-        super("rtc");
         this.currentTime = currentTime;
-
     }
 
     // Método para crear una instancia con la hora actual
@@ -39,7 +38,7 @@ public class RTCModule extends ExtModule {
         return getMinSize();
     }
 
-    public static int getMinSize(){
+    public static int getMinSize() {
         return Long.BYTES;
     }
 }

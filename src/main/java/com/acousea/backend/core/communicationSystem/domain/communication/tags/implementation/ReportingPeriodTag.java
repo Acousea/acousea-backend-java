@@ -2,6 +2,7 @@ package com.acousea.backend.core.communicationSystem.domain.communication.tags.i
 
 import com.acousea.backend.core.communicationSystem.domain.communication.tags.Tag;
 import com.acousea.backend.core.communicationSystem.domain.communication.tags.TagType;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.ReportingModule;
@@ -14,7 +15,7 @@ import java.nio.ByteBuffer;
 public class ReportingPeriodTag extends Tag {
 
     private ReportingPeriodTag(byte[] value) {
-        super(TagType.REPORTING_PERIODS, value);
+        super(TagType.REPORTING, value);
     }
 
     public static ReportingPeriodTag fromReportingModule(ReportingModule module) {
@@ -24,7 +25,7 @@ public class ReportingPeriodTag extends Tag {
 
         module.getReportingPeriodsPerOperationMode()
                 .forEach((modeId, period) -> {
-                    buffer.put(modeId);
+                    buffer.put(modeId.getId());
                     buffer.putShort(period);
                 });
 
@@ -43,7 +44,7 @@ public class ReportingPeriodTag extends Tag {
         while (buffer.hasRemaining()) {
             byte modeId = buffer.get();
             short period = buffer.getShort();
-            module.setReportingPeriod(modeId, period);
+            module.setReportingPeriod(OperationMode.create(modeId, "no_name"), period);
         }
         return module;
     }
@@ -60,7 +61,7 @@ public class ReportingPeriodTag extends Tag {
         while (buffer.hasRemaining()) {
             byte modeId = buffer.get();
             short period = buffer.getShort();
-            module.setReportingPeriod(modeId, period);
+            module.setReportingPeriod(OperationMode.create(modeId, "no_name"), period);
         }
 
         return fromReportingModule(module);

@@ -11,16 +11,13 @@ public class InMemoryCommunicationRequestLoggerService implements CommunicationR
     private final CommunicationRequestHistoryRepository communicationRequestHistoryRepository;
 
 
-    public InMemoryCommunicationRequestLoggerService(
-            CommunicationRequestHistoryRepository communicationRequestHistoryRepository) {
+    public InMemoryCommunicationRequestLoggerService(CommunicationRequestHistoryRepository communicationRequestHistoryRepository) {
         this.communicationRequestHistoryRepository = communicationRequestHistoryRepository;
     }
 
 
     @Override
     public void log(CommunicationRequest packet) {
-
         communicationRequestHistoryRepository.save(packet);
-
     }
 }

@@ -28,7 +28,6 @@ public class SetNodeDeviceConfigurationCommand extends Command<NodeDeviceDTO, Co
         this.nodeDeviceRepository = nodeDeviceRepository;
         this.storageService = storageService;
         this.communicationService = communicationService;
-
     }
 
     @Override
@@ -41,13 +40,32 @@ public class SetNodeDeviceConfigurationCommand extends Command<NodeDeviceDTO, Co
                 () -> new NullPointerException("Network module not found")
         );
 
+        // TODO: Set the new parameters to the nodeDevice so it automatically checks if the configuration is valid
+        //  but do NOT SAVE the nodeDevice to the repository yet. The new configuration will be saved only if
+        //  the communication is successful
+
+        if (dto.getExtModules().getNetwork() != null) {
+            NetworkModule newNetworkModule = NetworkModule.fromDTO(dto.getExtModules().getNetwork());
+            nodeDevice.getExtModules().put(NetworkModule.name, newNetworkModule);
+        }
+
+//        if (dto.getExtModules().getOperationModes() != null) {
+//            OperationModeModule newOperationModeModule = OperationModeModule.fromDTO(dto.getExtModules().getOperationModes());
+//            nodeDevice.getExtModules().put(OperationModeModule.name, newOperationModeModule);
+//        }
+
+//        if (dto.getExtModules().getIridiumReporting() != null) {
+//            OperationModeModule newOperationModeModule = OperationModeModule.fromDTO(dto.getExtModules().getOperationModes());
+//            nodeDevice.getExtModules().put(OperationModeModule.name, newOperationModeModule);
+//        }
+
+
         // Build the Communication Request and send it
         CommunicationRequest request = CommunicationRequest.createUpdateNodeDeviceRequest(
                 networkModule.getLocalAddress(),
-                dto
+                nodeDevice
         );
 
-        // TODO: Check the existence of each module on the node
         return Result.success(communicationService.send(request));
     }
 }

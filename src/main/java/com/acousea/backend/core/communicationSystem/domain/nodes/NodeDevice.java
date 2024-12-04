@@ -35,6 +35,7 @@ public class NodeDevice {
         this.pamModules = pamModules;
     }
 
+
     // Método para obtener un módulo específico
     public <T extends ExtModule> Optional<T> getModule(Class<T> moduleType) {
         return extModules.values().stream()

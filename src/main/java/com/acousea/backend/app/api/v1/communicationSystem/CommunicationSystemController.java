@@ -57,11 +57,19 @@ public class CommunicationSystemController {
         return ResponseEntity.ok(Result.success(nodeDevice));
     }
 
-    @PutMapping("/node-device")
+    @PutMapping("/node-device/set")
     public ResponseEntity<Result<CommunicationResult>> setNodeDeviceConfiguration(@RequestBody NodeDeviceDTO nodeDevice) {
         SetNodeDeviceConfigurationCommand query = new SetNodeDeviceConfigurationCommand(
                 nodeDeviceRepository, storageService, communicationService
         );
         return ResponseEntity.ok(query.run(nodeDevice));
+    }
+
+    @PutMapping("/node-device/update")
+    public ResponseEntity<Result<CommunicationResult>> getUpdatedNodeDeviceConfiguration() {
+//        SetNodeDeviceConfigurationCommand query = new SetNodeDeviceConfigurationCommand(
+//                nodeDeviceRepository, storageService, communicationService
+//        );
+        return ResponseEntity.ok(Result.success(null));
     }
 }

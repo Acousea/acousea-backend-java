@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 
 public class AmbientTag extends Tag {
     public AmbientTag(byte[] value) {
-        super(TagType.TEMPERATURE, value
+        super(TagType.AMBIENT, value
         );
     }
 

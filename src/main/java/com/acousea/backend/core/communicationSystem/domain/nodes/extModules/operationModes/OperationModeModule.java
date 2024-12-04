@@ -9,12 +9,10 @@ import java.util.Map;
 
 @Getter
 public class OperationModeModule extends ExtModule {
+    public static final String name = "operationMode";
     private static final int MAX_MODES = 256; // Número máximo de modos permitidos
     private final Map<Integer, OperationMode> operationModes = new HashMap<>(); // Mapa para almacenar modos
 
-    public OperationModeModule() {
-        super("operationMode");
-    }
 
     @Override
     public int getFullSize() {

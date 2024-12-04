@@ -1,10 +1,9 @@
 package com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation;
 
-import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.Payload;
-import com.acousea.backend.core.communicationSystem.domain.communication.payload.PayloadFactory;
 import com.acousea.backend.core.communicationSystem.domain.communication.tags.Tag;
 import com.acousea.backend.core.communicationSystem.domain.communication.tags.TagFactory;
+import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -22,15 +21,8 @@ public class SetNodeConfigurationPayload implements Payload {
         this.tags = tags;
     }
 
-    public static SetNodeConfigurationPayload fromNodeDeviceDTO(@NotNull NodeDeviceDTO dto) {
-        List<Tag> tags = new ArrayList<>();
-        if (dto.getExtModules() == null) {
-            return null;
-        }
-        // TODO: Create factory method to create all tags from DTO
-//        PayloadFactory.from(dto);
-
-        // TODO: Add the rest of the tags
+    public static SetNodeConfigurationPayload fromNodeDevice(@NotNull NodeDevice nodeDevice) {
+        List<Tag> tags = TagFactory.createTags(nodeDevice);
         return new SetNodeConfigurationPayload(tags);
     }
 

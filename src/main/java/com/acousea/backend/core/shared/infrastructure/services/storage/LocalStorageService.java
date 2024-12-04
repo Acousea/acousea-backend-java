@@ -2,7 +2,6 @@ package com.acousea.backend.core.shared.infrastructure.services.storage;
 
 import com.acousea.backend.core.shared.application.services.StorageService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;

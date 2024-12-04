@@ -31,13 +31,13 @@ public class ProcessRockblockMessageCommand extends Command<RockBlockMessage, St
 
         // Create a CommunicationResponse from the hex data
         try {
-            CommunicationResponse communicationResponse = CommunicationResponse.fromRockblockMessage(message);
+            CommunicationResponse communicationResponse = CommunicationResponse.fromRockBlockMessage(message);
             RockBlockMessage save = messagesRepository.save(message);
-
         } catch (Exception e) {
             System.out.println("ProcessRockblockMessageCommand::run() -> Error creating CommunicationResponse from RockBlockMessage: " + e.getMessage());
             return Result.fail(422, "Error creating CommunicationResponse from RockBlockMessage: " + e.getMessage());
         }
+
         // TODO: Decode CommunicationResponse into a Specific Response
 
         // Trigger the event

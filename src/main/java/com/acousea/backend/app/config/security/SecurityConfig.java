@@ -2,9 +2,11 @@ package com.acousea.backend.app.config.security;
 
 import jakarta.annotation.PostConstruct;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,6 +25,13 @@ public class SecurityConfig {
     private String apiPrefix;
 
     private String[] API_WHITELIST;
+
+    private Environment environment;
+
+    @Autowired
+    public SecurityConfig(Environment environment) {
+        this.environment = environment;
+    }
 
     @PostConstruct
     public void init() {
@@ -62,7 +71,8 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(@NotNull CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:4200")  // Permitir solicitudes desde localhost:4200
+//                        .allowedOrigins(environment.getProperty("cors.allowedOrigins"))  // Origenes permitidos
+                        .allowedOriginPatterns(environment.getProperty("cors.allowedOriginPatterns"))  // Patrones de origen permitidos
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // Métodos HTTP permitidos
                         .allowedHeaders("*")  // Permitir todos los encabezados
                         .allowCredentials(true);  // Permitir el uso de credenciales (cookies, etc.)

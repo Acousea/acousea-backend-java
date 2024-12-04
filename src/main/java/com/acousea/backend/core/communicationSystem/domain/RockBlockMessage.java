@@ -15,11 +15,11 @@ public class RockBlockMessage {
     private final String transmitTime;
     private final double iridiumLatitude;
     private final double iridiumLongitude;
-    private final int iridiumCep;
+    private final double iridiumCep;
     private final String data;
 
     public RockBlockMessage(String imei, String serial, int momsn, String transmitTime,
-                            double iridiumLatitude, double iridiumLongitude, int iridiumCep, String data) {
+                            double iridiumLatitude, double iridiumLongitude, double iridiumCep, String data) {
         this.id = UUID.randomUUID();
         this.imei = imei;
         this.serial = serial;

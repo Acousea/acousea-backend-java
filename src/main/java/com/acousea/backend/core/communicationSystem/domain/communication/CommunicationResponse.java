@@ -13,7 +13,7 @@ public class CommunicationResponse extends CommunicationPacket {
         super(operationCode, routingChunk, payload, checksum);
     }
 
-    public static CommunicationResponse fromRockblockMessage(RockBlockMessage rockBlockMessage) throws InvalidPacketException {
+    public static CommunicationResponse fromRockBlockMessage(RockBlockMessage rockBlockMessage) throws InvalidPacketException {
         byte[] responseData = HexFormat.of().parseHex(rockBlockMessage.getData());
         return (CommunicationResponse) CommunicationResponse.fromBytes(responseData);
     }

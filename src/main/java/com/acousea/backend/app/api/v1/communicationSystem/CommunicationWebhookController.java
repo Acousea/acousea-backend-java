@@ -38,7 +38,7 @@ public class CommunicationWebhookController {
             @RequestParam("transmit_time") String transmitTime,
             @RequestParam("iridium_latitude") double iridiumLatitude,
             @RequestParam("iridium_longitude") double iridiumLongitude,
-            @RequestParam("iridium_cep") int iridiumCep,
+            @RequestParam("iridium_cep") double iridiumCep,
             @RequestParam("data") String data) {
         try {
             // Crear un objeto RockBlockMessage con los parámetros recibidos

@@ -7,11 +7,12 @@ import lombok.Setter;
 @Setter
 @Getter
 public class IridiumReportingModule extends ReportingModule {
+    public static final String name = "IridiumReporting";
     public static final byte TECHNOLOGY_ID = 0x02;
     private final String imei;
 
     public IridiumReportingModule(OperationModeModule operationModeModule, String imei) {
-        super("IridiumReporting", TECHNOLOGY_ID, operationModeModule);
+        super(TECHNOLOGY_ID, operationModeModule);
         this.imei = imei;
     }
 

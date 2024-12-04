@@ -8,11 +8,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AmbientModule extends ExtModule {
+    public static final String name = "ambient";
     private int temperature;
     private int humidity;
 
     public AmbientModule(int temperature, int humidity) {
-        super("ambient");
         this.temperature = temperature;
         this.humidity = humidity;
     }

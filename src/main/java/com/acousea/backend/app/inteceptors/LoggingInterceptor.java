@@ -22,7 +22,9 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception ex) {
-        logger.info("Request completed: {}", response.getStatus());
+        logger.info("Request from = {} completed: {}",
+                request.getRemoteAddr(),
+                response.getStatus());
     }
 }
 

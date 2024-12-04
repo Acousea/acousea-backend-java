@@ -6,7 +6,6 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtM
 import lombok.Getter;
 import lombok.Setter;
 
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,11 +13,11 @@ import java.util.Optional;
 @Setter
 @Getter
 public class NetworkModule extends ExtModule {
+    public static final String name = "network";
     private final Address localAddress;
     private final RoutingTable routingTable;
 
     public NetworkModule(int localAddress) {
-        super("network");
         this.localAddress = Address.of(localAddress);
         this.routingTable = new RoutingTable();
     }

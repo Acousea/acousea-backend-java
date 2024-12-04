@@ -103,8 +103,6 @@ public class CommunicationPacket {
         sb.append(payload.encode());
         sb.append(String.format("%04x", checksum));
         return sb.toString();
-
-
     }
 }
 

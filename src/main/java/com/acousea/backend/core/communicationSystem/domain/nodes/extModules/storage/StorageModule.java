@@ -7,11 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StorageModule extends ExtModule {
+    public static final String name = "storage";
     private int storageUsedMegabytes;
     private int storageTotalMegabytes;
 
     public StorageModule(int storageUsedMegabytes, int storageTotalMegabytes) {
-        super("storage");
         this.storageUsedMegabytes = storageUsedMegabytes;
         this.storageTotalMegabytes = storageTotalMegabytes;
 

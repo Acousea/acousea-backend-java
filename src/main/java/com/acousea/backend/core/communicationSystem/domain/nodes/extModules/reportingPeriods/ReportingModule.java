@@ -3,6 +3,7 @@ package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rep
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModeModule;
+import com.acousea.backend.core.shared.domain.UnsignedByte;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -10,12 +11,13 @@ import java.util.Map;
 
 @Getter
 public abstract class ReportingModule extends ExtModule {
+
     private final byte technologyId; // ID de la tecnología
-    private final Map<Byte, Short> reportingPeriodsPerOperationMode = new HashMap<>(); // Mapa de modo de operación y periodo
+    private final Map<OperationMode, Short> reportingPeriodsPerOperationMode = new HashMap<>(); // Mapa de modo de operación y periodo
 
 
-    protected ReportingModule(String name, byte technologyId, OperationModeModule operationModeModule) {
-        super(name);
+    protected ReportingModule(byte technologyId, OperationModeModule operationModeModule) {
+
         this.technologyId = technologyId;
         // Asegurar que cada modo de operación tenga un periodo de reporte inicializado
         if (operationModeModule != null) {
@@ -25,16 +27,21 @@ public abstract class ReportingModule extends ExtModule {
 
     private void initializeReportingPeriods(OperationModeModule operationModeModule) {
         operationModeModule.getOperationModes().forEach((id, mode) -> {
-            reportingPeriodsPerOperationMode.put(mode.getId(), (short) 0);
+            reportingPeriodsPerOperationMode.put(mode, (short) 0);
         });
     }
 
-    public void setReportingPeriod(byte modeId, int period) {
-        reportingPeriodsPerOperationMode.put(modeId, (short) period);
+    public void setReportingPeriod(OperationMode mode, int period) {
+        reportingPeriodsPerOperationMode.put(mode, (short) period);
     }
 
     public int getReportingPeriod(byte modeId) {
-        return reportingPeriodsPerOperationMode.getOrDefault(modeId, (short) 0);
+        int unsignedId = UnsignedByte.toUnsignedInt(modeId);
+        OperationMode mode = reportingPeriodsPerOperationMode.keySet().stream()
+                .filter(m -> m.getId() == unsignedId)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Operation mode ID not found: " + modeId));
+        return reportingPeriodsPerOperationMode.get(mode);
     }
 
     @Override

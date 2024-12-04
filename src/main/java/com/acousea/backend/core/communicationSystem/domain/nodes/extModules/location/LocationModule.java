@@ -9,11 +9,11 @@ import java.nio.ByteBuffer;
 @Setter
 @Getter
 public class LocationModule extends ExtModule {
+    public static final String name = "location";
     private final double latitude;
     private final double longitude;
 
     public LocationModule(double latitude, double longitude) {
-        super("location");
         this.latitude = latitude;
         this.longitude = longitude;
     }

@@ -41,7 +41,19 @@ public class ICListenLoggingConfig {
     }
 
     public static ICListenLoggingConfig createDefault() {
-        return new ICListenLoggingConfig(UUID.randomUUID(), 0, 1000, 0, 0, 0, 0, 0, 0, 0, 0, LocalDateTime.now());
+        return new ICListenLoggingConfig(
+                UUID.randomUUID(),
+                0,
+                1000,
+                0,
+                0,
+                0,
+                1000,
+                0,
+                0,
+                0,
+                0,
+                LocalDateTime.now());
     }
 
     // Métodos Getters y Setters

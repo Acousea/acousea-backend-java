@@ -6,6 +6,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambi
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
@@ -91,7 +92,7 @@ public class NodeDeviceDTO {
 
             public static LocationModuleDto fromLocationModule(LocationModule value) {
                 LocationModuleDto dto = new LocationModuleDto();
-                dto.setName(value.getName());
+                dto.setName(LocationModule.name);
                 dto.setLatitude(value.getLatitude());
                 dto.setLongitude(value.getLongitude());
                 return dto;
@@ -106,7 +107,7 @@ public class NodeDeviceDTO {
 
             public static StorageModuleDto fromStorageModule(StorageModule value) {
                 StorageModuleDto dto = new StorageModuleDto();
-                dto.setName(value.getName());
+                dto.setName(StorageModule.name);
                 dto.setStorageUsedMegabytes(value.getStorageUsedMegabytes());
                 dto.setStorageTotalMegabytes(value.getStorageTotalMegabytes());
                 return dto;
@@ -121,7 +122,7 @@ public class NodeDeviceDTO {
 
             public static BatteryModuleDto fromBatteryModule(BatteryModule value) {
                 BatteryModuleDto dto = new BatteryModuleDto();
-                dto.setName(value.getName());
+                dto.setName(BatteryModule.name);
                 dto.setBatteryPercentage(value.getBatteryPercentage());
                 dto.setBatteryStatus(value.getBatteryStatus().getValue());
                 return dto;
@@ -136,7 +137,7 @@ public class NodeDeviceDTO {
 
             public static AmbientModuleDTO fromTemperatureModule(AmbientModule value) {
                 AmbientModuleDTO dto = new AmbientModuleDTO();
-                dto.setName(value.getName());
+                dto.setName(AmbientModule.name);
                 dto.setTemperature((double) value.getTemperature());
                 dto.setHumidity((double) value.getHumidity());
                 return dto;
@@ -144,18 +145,37 @@ public class NodeDeviceDTO {
         }
 
         @Data
+        public static class ReportingPeriodDto {
+            private OperationMode key;
+            private Short value;
+
+            public ReportingPeriodDto(OperationMode key, Short value) {
+                this.key = key;
+                this.value = value;
+            }
+        }
+
+        @Data
         public static class IridiumReportingModuleDto {
             private String name;
             private Integer technologyId;
-            private Map<Byte, Short> reportingPeriods;
+            private List<ReportingPeriodDto> reportingPeriods;
             private String imei;
 
             public static IridiumReportingModuleDto fromIridiumReportingModule(IridiumReportingModule value) {
                 IridiumReportingModuleDto dto = new IridiumReportingModuleDto();
-                dto.setName(value.getName());
+                dto.setName(IridiumReportingModule.name);
                 dto.setTechnologyId((int) value.getTechnologyId());
-                dto.setReportingPeriods(value.getReportingPeriodsPerOperationMode());
                 dto.setImei(value.getImei());
+
+                // Convertir el Map a List<ReportingPeriodDto>
+                List<ReportingPeriodDto> reportingPeriodList = value.getReportingPeriodsPerOperationMode()
+                        .entrySet()
+                        .stream()
+                        .map(entry -> new ReportingPeriodDto(entry.getKey(), entry.getValue()))
+                        .toList();
+
+                dto.setReportingPeriods(reportingPeriodList);
                 return dto;
             }
         }
@@ -164,13 +184,21 @@ public class NodeDeviceDTO {
         public static class LoRaReportingModuleDto {
             private String name;
             private Integer technologyId;
-            private Map<Byte, Short> reportingPeriods;
+            private List<ReportingPeriodDto> reportingPeriods;
 
             public static LoRaReportingModuleDto fromLoRaReportingModule(LoRaReportingModule value) {
                 LoRaReportingModuleDto dto = new LoRaReportingModuleDto();
-                dto.setName(value.getName());
+                dto.setName(LoRaReportingModule.name);
                 dto.setTechnologyId((int) value.getTechnologyId());
-                dto.setReportingPeriods(value.getReportingPeriodsPerOperationMode());
+
+                // Convertir el Map a List<ReportingPeriodDto>
+                List<ReportingPeriodDto> reportingPeriodList = value.getReportingPeriodsPerOperationMode()
+                        .entrySet()
+                        .stream()
+                        .map(entry -> new ReportingPeriodDto(entry.getKey(), entry.getValue()))
+                        .toList();
+
+                dto.setReportingPeriods(reportingPeriodList);
                 return dto;
             }
         }
@@ -182,7 +210,7 @@ public class NodeDeviceDTO {
 
             public static RtcModuleDto fromRtcModule(RTCModule value) {
                 RtcModuleDto dto = new RtcModuleDto();
-                dto.setName(value.getName());
+                dto.setName(RTCModule.name);
                 dto.setCurrentTime(value.getCurrentTime().toString());
                 return dto;
 
@@ -197,7 +225,7 @@ public class NodeDeviceDTO {
 
             public static NetworkModuleDto fromNetworkModule(NetworkModule value) {
                 NetworkModuleDto dto = new NetworkModuleDto();
-                dto.setName(value.getName());
+                dto.setName(NetworkModule.name);
                 dto.setLocalAddress((int) value.getLocalAddress().getValue());
                 dto.setRoutingTable(RoutingTableDto.fromRoutingTable(value.getRoutingTable()));
                 return dto;
@@ -246,8 +274,7 @@ public class NodeDeviceDTO {
             PamModuleDto dto = new PamModuleDto();
             dto.setSerialNumber(pamModule.getSerialNumber());
             dto.setName(pamModule.getName());
-            if (pamModule instanceof ICListenHF) {
-                ICListenHF icListenHF = (ICListenHF) pamModule;
+            if (pamModule instanceof ICListenHF icListenHF) {
                 dto.setStatus(StatusDto.fromStatus(icListenHF.getStatus()));
                 dto.setLoggingConfig(LoggingConfigDto.fromLoggingConfig(icListenHF.getLoggingConfig()));
                 dto.setStreamingConfig(StreamingConfigDto.fromStreamingConfig(icListenHF.getStreamingConfig()));
@@ -279,46 +306,46 @@ public class NodeDeviceDTO {
 
         @Data
         public static class LoggingConfigDto {
-            private WaveformConfigDTO waveformConfig;
-            private FFTConfigDTO fftConfig;
+            private WaveformConfigDTO wav;
+            private FFTConfigDTO fft;
             private LocalDateTime timestamp;
 
             @Data
             public static class WaveformConfigDTO {
                 private Integer gain;
-                private Integer waveformSampleRate;
-                private Integer waveformLoggingMode;
-                private Integer waveformLogLength;
+                private Integer sampleRate;
                 private Integer bitDepth;
+                private Integer loggingMode;
+                private Integer logLength;
             }
 
             @Data
             public static class FFTConfigDTO {
-                private Integer fftSampleRate;
-                private Integer fftProcessingType;
+                private Integer processingType;
+                private Integer sampleRate;
                 private Integer fftsAccumulated;
-                private Integer fftLoggingMode;
-                private Integer fftLogLength;
+                private Integer loggingMode;
+                private Integer logLength;
             }
 
             public static LoggingConfigDto fromLoggingConfig(ICListenLoggingConfig loggingConfig) {
                 LoggingConfigDto dto = new LoggingConfigDto();
-                dto.setWaveformConfig(
+                dto.setWav(
                         new WaveformConfigDTO() {{
                             setGain(loggingConfig.getGain());
-                            setWaveformSampleRate(loggingConfig.getWaveformSampleRate());
-                            setWaveformLoggingMode(loggingConfig.getWaveformLoggingMode());
-                            setWaveformLogLength(loggingConfig.getWaveformLogLength());
+                            setSampleRate(loggingConfig.getWaveformSampleRate());
+                            setLoggingMode(loggingConfig.getWaveformLoggingMode());
+                            setLogLength(loggingConfig.getWaveformLogLength());
                             setBitDepth(loggingConfig.getBitDepth());
                         }}
                 );
-                dto.setFftConfig(
+                dto.setFft(
                         new FFTConfigDTO() {{
-                            setFftSampleRate(loggingConfig.getFftSampleRate());
-                            setFftProcessingType(loggingConfig.getFftProcessingType());
+                            setSampleRate(loggingConfig.getFftSampleRate());
+                            setProcessingType(loggingConfig.getFftProcessingType());
                             setFftsAccumulated(loggingConfig.getFftsAccumulated());
-                            setFftLoggingMode(loggingConfig.getFftLoggingMode());
-                            setFftLogLength(loggingConfig.getFftLogLength());
+                            setLoggingMode(loggingConfig.getFftLoggingMode());
+                            setLogLength(loggingConfig.getFftLogLength());
                         }}
                 );
                 dto.setTimestamp(loggingConfig.getTimestamp());
@@ -328,34 +355,53 @@ public class NodeDeviceDTO {
 
         @Data
         public static class StreamingConfigDto {
-            private Boolean recordWaveform;
-            private Boolean processWaveform;
-            private Integer waveformProcessingType;
-            private Integer waveformInterval;
-            private Integer waveformDuration;
-            private Boolean recordFFT;
-            private Boolean processFFT;
-            private Integer fftProcessingType;
-            private Integer fftInterval;
-            private Integer fftDuration;
+            private WaveformConfigDTO wav;
+            private FFTConfigDTO fft;
             private String timestamp;
+
+            @Data
+            public static class WaveformConfigDTO {
+                private Boolean recordWaveform;
+                private Boolean processWaveform;
+                private Integer waveformProcessingType;
+                private Integer waveformInterval;
+                private Integer waveformDuration;
+            }
+
+            @Data
+            public static class FFTConfigDTO {
+                private Boolean recordFFT;
+                private Boolean processFFT;
+                private Integer fftProcessingType;
+                private Integer fftInterval;
+                private Integer fftDuration;
+            }
 
             public static StreamingConfigDto fromStreamingConfig(ICListenStreamingConfig streamingConfig) {
                 StreamingConfigDto dto = new StreamingConfigDto();
-                dto.setRecordWaveform(streamingConfig.isRecordWaveform());
-                dto.setProcessWaveform(streamingConfig.isProcessWaveform());
-                dto.setWaveformProcessingType(streamingConfig.getWaveformProcessingType());
-                dto.setWaveformInterval(streamingConfig.getWaveformInterval());
-                dto.setWaveformDuration(streamingConfig.getWaveformDuration());
-                dto.setRecordFFT(streamingConfig.isRecordFFT());
-                dto.setProcessFFT(streamingConfig.isProcessFFT());
-                dto.setFftProcessingType(streamingConfig.getFftProcessingType());
-                dto.setFftInterval(streamingConfig.getFftInterval());
-                dto.setFftDuration(streamingConfig.getFftDuration());
+                dto.setWav(
+                        new WaveformConfigDTO() {{
+                            setRecordWaveform(streamingConfig.isRecordWaveform());
+                            setProcessWaveform(streamingConfig.isProcessWaveform());
+                            setWaveformProcessingType(streamingConfig.getWaveformProcessingType());
+                            setWaveformInterval(streamingConfig.getWaveformInterval());
+                            setWaveformDuration(streamingConfig.getWaveformDuration());
+                        }}
+                );
+                dto.setFft(
+                        new FFTConfigDTO() {{
+                            setRecordFFT(streamingConfig.isRecordFFT());
+                            setProcessFFT(streamingConfig.isProcessFFT());
+                            setFftProcessingType(streamingConfig.getFftProcessingType());
+                            setFftInterval(streamingConfig.getFftInterval());
+                            setFftDuration(streamingConfig.getFftDuration());
+                        }}
+                );
                 dto.setTimestamp(streamingConfig.getTimestamp().toString());
                 return dto;
             }
         }
+
 
         @Data
         public static class RecordingStatsDto {
