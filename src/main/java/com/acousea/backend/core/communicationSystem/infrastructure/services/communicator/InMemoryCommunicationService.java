@@ -18,8 +18,16 @@ public class InMemoryCommunicationService implements CommunicationService {
     private EventBus eventBus;
 
 
-    public InMemoryCommunicationService(EventBus eventBus) {
+    public InMemoryCommunicationService(EventBus eventBus,
+                                        Map<String, Communicator> communicators) {
         this.eventBus = eventBus;
+        this.communicators.putAll(communicators);
+        this.selectedCommunicator = this.communicators.get("mockCommunicator") != null ? "mockCommunicator" : null;
+        if (this.selectedCommunicator == null) {
+            throw new IllegalArgumentException(InMemoryCommunicationService.class.getName() + "Communicator not found: mockCommunicator");
+        }
+        System.out.println(InMemoryCommunicationService.class.getSimpleName() + " -> communicators: " + communicators
+                + "\nand selectedCommunicator: " + selectedCommunicator);
     }
 
     @Override
@@ -43,6 +51,10 @@ public class InMemoryCommunicationService implements CommunicationService {
         Communicator communicator = communicators.get(selectedCommunicator);
         if (communicator == null) {
             throw new IllegalStateException("Selected communicator is not available: " + selectedCommunicator);
+        }
+
+        if (packet.getPayload().getBytesSize() <= 0) {
+            return CommunicationResult.success("No packet sent. Payload size is 0");
         }
 
         return communicator.send(packet);

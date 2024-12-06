@@ -19,7 +19,7 @@ public class NodeDevice {
     @NotNull
     private final UUID id;
     @NotNull
-    private final String name;
+    private String name;
     @NotNull
     private String icon; // Campo nuevo para almacenar la URL completa del icono
     @NotNull

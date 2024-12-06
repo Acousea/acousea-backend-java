@@ -22,9 +22,9 @@ public class Address {
     }
 
     public static Address of(int value) {
-        if (isReserved(value)) {
-            throw new IllegalArgumentException("Address value " + value + " is reserved.");
-        }
+//        if (isReserved(value)) {
+//            throw new IllegalArgumentException("Address value " + value + " is reserved.");
+//        }
         if (!UnsignedByte.isValidUnsignedByte(value)) {
             throw new IllegalArgumentException("Address value " + value + " is out of the valid range.");
         }

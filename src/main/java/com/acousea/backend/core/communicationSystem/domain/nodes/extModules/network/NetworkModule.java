@@ -22,6 +22,11 @@ public class NetworkModule extends ExtModule {
         this.routingTable = new RoutingTable();
     }
 
+    public NetworkModule(Address localAddress, RoutingTable routingTable) {
+        this.localAddress = localAddress;
+        this.routingTable = routingTable;
+    }
+
     @Override
     public int getFullSize() {
         return Address.getSize() + (routingTable.getPeerRoutes().size() * Byte.BYTES * 2);
@@ -36,7 +41,7 @@ public class NetworkModule extends ExtModule {
     }
 
 
-    public static NetworkModule fromDTO(NodeDeviceDTO.ExtModulesDto.NetworkModuleDto network) {
+    public static NetworkModule fromDTO(NodeDeviceDTO.ExtModuleDto.NetworkModuleDto network) {
         NetworkModule module = new NetworkModule(Address.of(network.getLocalAddress()).getValue());
         network.getRoutingTable().getPeerRoutes().forEach((destination, nextHop) -> {
             module.getRoutingTable().addRoute(Address.of(destination), Address.of(nextHop));

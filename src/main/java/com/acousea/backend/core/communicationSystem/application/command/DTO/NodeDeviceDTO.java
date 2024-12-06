@@ -1,5 +1,7 @@
 package com.acousea.backend.core.communicationSystem.application.command.DTO;
 
+import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
+import com.acousea.backend.core.communicationSystem.domain.communication.constants.BatteryStatus;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient.AmbientModule;
@@ -7,6 +9,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.batt
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModeModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
@@ -17,11 +20,15 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.icli
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenRecordingStats;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStatus;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStreamingConfig;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -30,8 +37,18 @@ public class NodeDeviceDTO {
     private String id;
     private String name;
     private String icon;
-    private ExtModulesDto extModules;
+    private Map<String, ExtModuleDto> extModules;
     private List<PamModuleDto> pamModules;
+
+    public NodeDevice toNodeDevice() {
+        return new NodeDevice(
+                UUID.fromString(this.id),
+                this.name,
+                this.icon,
+                (this.extModules != null) ? ExtModuleDto.toExtModules(this.extModules) : new HashMap<>(),
+                (this.pamModules != null) ? this.pamModules.stream().map(PamModuleDto::toPamModule).toList() : List.of()
+        );
+    }
 
     public static List<NodeDeviceDTO> fromNodeDevices(List<NodeDevice> nodeDevicesWithIconUrl) {
         return nodeDevicesWithIconUrl.stream()
@@ -44,51 +61,95 @@ public class NodeDeviceDTO {
         dto.setId(nodeDevice.getId().toString());
         dto.setName(nodeDevice.getName());
         dto.setIcon(nodeDevice.getIcon());
-        dto.setExtModules(ExtModulesDto.fromExtModules(nodeDevice.getExtModules()));
+        dto.setExtModules(ExtModuleDto.fromExtModules(nodeDevice.getExtModules()));
         dto.setPamModules(PamModuleDto.fromPamModules(nodeDevice.getPamModules()));
         return dto;
     }
 
-    @Data
-    public static class ExtModulesDto {
-        private LocationModuleDto location;
-        private StorageModuleDto storage;
-        private BatteryModuleDto battery;
-        private AmbientModuleDTO ambient;
-        private IridiumReportingModuleDto iridiumReporting;
-        private LoRaReportingModuleDto loRaReporting;
-        private RtcModuleDto rtc;
-        private NetworkModuleDto network;
+    @SuppressWarnings("unchecked")
+    public <T> T getExtModule(String moduleName, Class<T> type) {
+        Object module = extModules.get(moduleName);
+        if (module == null) {
+            throw new IllegalArgumentException("Module not found: " + moduleName);
+        }
+        if (!type.isInstance(module)) {
+            throw new IllegalArgumentException("Module " + moduleName + " is not of type " + type.getName());
+        }
+        return (T) module;
+    }
 
-        public static ExtModulesDto fromExtModules(Map<String, ExtModule> extModules) {
-            ExtModulesDto dto = new ExtModulesDto();
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.EXISTING_PROPERTY,
+            property = "name",
+            visible = true
+    )
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = ExtModuleDto.BatteryModuleDto.class, name = BatteryModule.name),
+            @JsonSubTypes.Type(value = ExtModuleDto.AmbientModuleDTO.class, name = AmbientModule.name),
+            @JsonSubTypes.Type(value = ExtModuleDto.LocationModuleDto.class, name = LocationModule.name),
+            @JsonSubTypes.Type(value = ExtModuleDto.NetworkModuleDto.class, name = NetworkModule.name),
+            @JsonSubTypes.Type(value = ExtModuleDto.RtcModuleDto.class, name = RTCModule.name),
+            @JsonSubTypes.Type(value = ExtModuleDto.StorageModuleDto.class, name = StorageModule.name),
+            @JsonSubTypes.Type(value = ExtModuleDto.IridiumReportingModuleDto.class, name = IridiumReportingModule.name),
+            @JsonSubTypes.Type(value = ExtModuleDto.LoRaReportingModuleDto.class, name = LoRaReportingModule.name)
+            // Add other module DTO classes here
+    })
+    @Data
+    public static class ExtModuleDto {
+        public static Map<String, ExtModule> toExtModules(Map<String, ExtModuleDto> extModules) {
+            Map<String, ExtModule> extModuleMap = new HashMap<>();
             extModules.forEach((key, value) -> {
-                if (value instanceof LocationModule) {
-                    dto.setLocation(LocationModuleDto.fromLocationModule((LocationModule) value));
-                } else if (value instanceof StorageModule) {
-                    dto.setStorage(StorageModuleDto.fromStorageModule((StorageModule) value));
-                } else if (value instanceof BatteryModule) {
-                    dto.setBattery(BatteryModuleDto.fromBatteryModule((BatteryModule) value));
+                if (value instanceof BatteryModuleDto) {
+                    extModuleMap.put(key, ((BatteryModuleDto) value).toBatteryModule());
+                } else if (value instanceof AmbientModuleDTO) {
+                    extModuleMap.put(key, ((AmbientModuleDTO) value).toAmbientModule());
+                } else if (value instanceof IridiumReportingModuleDto) {
+                    extModuleMap.put(key, ((IridiumReportingModuleDto) value).toIridiumReportingModule());
+                } else if (value instanceof LoRaReportingModuleDto) {
+                    extModuleMap.put(key, ((LoRaReportingModuleDto) value).toLoRaReportingModule());
+                } else if (value instanceof RtcModuleDto) {
+                    extModuleMap.put(key, ((RtcModuleDto) value).toRtcModule());
+                } else if (value instanceof NetworkModuleDto) {
+                    extModuleMap.put(key, ((NetworkModuleDto) value).toNetworkModule());
+                } else if (value instanceof StorageModuleDto) {
+                    extModuleMap.put(key, ((StorageModuleDto) value).toStorageModule());
+                } else if (value instanceof LocationModuleDto) {
+                    extModuleMap.put(key, ((LocationModuleDto) value).toLocationModule());
+                }
+            });
+            return extModuleMap;
+        }
+
+        public static Map<String, ExtModuleDto> fromExtModules(Map<String, ExtModule> extModules) {
+            Map<String, ExtModuleDto> dto = new HashMap<>();
+            extModules.forEach((key, value) -> {
+                if (value instanceof BatteryModule) {
+                    dto.put(BatteryModule.name, BatteryModuleDto.fromBatteryModule((BatteryModule) value));
                 } else if (value instanceof AmbientModule) {
-                    dto.setAmbient(AmbientModuleDTO.fromTemperatureModule((AmbientModule) value));
+                    dto.put(AmbientModule.name, AmbientModuleDTO.fromTemperatureModule((AmbientModule) value));
                 } else if (value instanceof IridiumReportingModule) {
-                    dto.setIridiumReporting(IridiumReportingModuleDto.fromIridiumReportingModule((IridiumReportingModule) value));
+                    dto.put(IridiumReportingModule.name, IridiumReportingModuleDto.fromIridiumReportingModule((IridiumReportingModule) value));
                 } else if (value instanceof LoRaReportingModule) {
-                    dto.setLoRaReporting(LoRaReportingModuleDto.fromLoRaReportingModule((LoRaReportingModule) value));
+                    dto.put(LoRaReportingModule.name, LoRaReportingModuleDto.fromLoRaReportingModule((LoRaReportingModule) value));
                 } else if (value instanceof RTCModule) {
-                    dto.setRtc(RtcModuleDto.fromRtcModule((RTCModule) value));
+                    dto.put(RTCModule.name, RtcModuleDto.fromRtcModule((RTCModule) value));
                 } else if (value instanceof NetworkModule) {
-                    dto.setNetwork(NetworkModuleDto.fromNetworkModule((NetworkModule) value));
+                    dto.put(NetworkModule.name, NetworkModuleDto.fromNetworkModule((NetworkModule) value));
+                } else if (value instanceof StorageModule) {
+                    dto.put(StorageModule.name, StorageModuleDto.fromStorageModule((StorageModule) value));
+                } else if (value instanceof LocationModule) {
+                    dto.put(LocationModule.name, LocationModuleDto.fromLocationModule((LocationModule) value));
                 }
             });
             return dto;
         }
 
         @Data
-        public static class LocationModuleDto {
+        public static class LocationModuleDto extends ExtModuleDto {
             private String name;
-            private Double latitude;
-            private Double longitude;
+            private Float latitude;
+            private Float longitude;
 
             public static LocationModuleDto fromLocationModule(LocationModule value) {
                 LocationModuleDto dto = new LocationModuleDto();
@@ -97,10 +158,17 @@ public class NodeDeviceDTO {
                 dto.setLongitude(value.getLongitude());
                 return dto;
             }
+
+            public LocationModule toLocationModule() {
+                return new LocationModule(
+                        this.latitude,
+                        this.longitude
+                );
+            }
         }
 
         @Data
-        public static class StorageModuleDto {
+        public static class StorageModuleDto extends ExtModuleDto {
             private String name;
             private Integer storageUsedMegabytes;
             private Integer storageTotalMegabytes;
@@ -112,10 +180,17 @@ public class NodeDeviceDTO {
                 dto.setStorageTotalMegabytes(value.getStorageTotalMegabytes());
                 return dto;
             }
+
+            public StorageModule toStorageModule() {
+                return new StorageModule(
+                        this.storageUsedMegabytes,
+                        this.storageTotalMegabytes
+                );
+            }
         }
 
         @Data
-        public static class BatteryModuleDto {
+        public static class BatteryModuleDto extends ExtModuleDto {
             private String name;
             private Integer batteryPercentage;
             private Integer batteryStatus;
@@ -127,20 +202,34 @@ public class NodeDeviceDTO {
                 dto.setBatteryStatus(value.getBatteryStatus().getValue());
                 return dto;
             }
+
+            public BatteryModule toBatteryModule() {
+                return new BatteryModule(
+                        this.batteryPercentage,
+                        BatteryStatus.fromInt(this.batteryStatus)
+                );
+            }
         }
 
         @Data
-        public static class AmbientModuleDTO {
+        public static class AmbientModuleDTO extends ExtModuleDto {
             private String name;
-            private Double temperature;
-            private Double humidity;
+            private Integer temperature;
+            private Integer humidity;
 
             public static AmbientModuleDTO fromTemperatureModule(AmbientModule value) {
                 AmbientModuleDTO dto = new AmbientModuleDTO();
                 dto.setName(AmbientModule.name);
-                dto.setTemperature((double) value.getTemperature());
-                dto.setHumidity((double) value.getHumidity());
+                dto.setTemperature(value.getTemperature());
+                dto.setHumidity(value.getHumidity());
                 return dto;
+            }
+
+            public AmbientModule toAmbientModule() {
+                return new AmbientModule(
+                        this.temperature,
+                        this.humidity
+                );
             }
         }
 
@@ -156,7 +245,7 @@ public class NodeDeviceDTO {
         }
 
         @Data
-        public static class IridiumReportingModuleDto {
+        public static class IridiumReportingModuleDto extends ExtModuleDto {
             private String name;
             private Integer technologyId;
             private List<ReportingPeriodDto> reportingPeriods;
@@ -178,10 +267,17 @@ public class NodeDeviceDTO {
                 dto.setReportingPeriods(reportingPeriodList);
                 return dto;
             }
+
+            public IridiumReportingModule toIridiumReportingModule() {
+                return new IridiumReportingModule(
+                        OperationModeModule.fromDTO(this.reportingPeriods),
+                        this.imei
+                );
+            }
         }
 
         @Data
-        public static class LoRaReportingModuleDto {
+        public static class LoRaReportingModuleDto extends ExtModuleDto {
             private String name;
             private Integer technologyId;
             private List<ReportingPeriodDto> reportingPeriods;
@@ -201,10 +297,16 @@ public class NodeDeviceDTO {
                 dto.setReportingPeriods(reportingPeriodList);
                 return dto;
             }
+
+            public LoRaReportingModule toLoRaReportingModule() {
+                return new LoRaReportingModule(
+                        OperationModeModule.fromDTO(this.reportingPeriods)
+                );
+            }
         }
 
         @Data
-        public static class RtcModuleDto {
+        public static class RtcModuleDto extends ExtModuleDto {
             private String name;
             private String currentTime;
 
@@ -213,12 +315,17 @@ public class NodeDeviceDTO {
                 dto.setName(RTCModule.name);
                 dto.setCurrentTime(value.getCurrentTime().toString());
                 return dto;
+            }
 
+            public RTCModule toRtcModule() {
+                return new RTCModule(
+                        LocalDateTime.parse(this.currentTime)
+                );
             }
         }
 
         @Data
-        public static class NetworkModuleDto {
+        public static class NetworkModuleDto extends ExtModuleDto {
             private String name;
             private Integer localAddress;
             private RoutingTableDto routingTable;
@@ -229,6 +336,13 @@ public class NodeDeviceDTO {
                 dto.setLocalAddress((int) value.getLocalAddress().getValue());
                 dto.setRoutingTable(RoutingTableDto.fromRoutingTable(value.getRoutingTable()));
                 return dto;
+            }
+
+            public NetworkModule toNetworkModule() {
+                return new NetworkModule(
+                        Address.of(this.localAddress),
+                        this.routingTable.toRoutingTable()
+                );
             }
 
             @Data
@@ -251,8 +365,23 @@ public class NodeDeviceDTO {
                     dto.setDefaultGateway((int) routingTable.getDefaultGateway().getValue());
                     return dto;
                 }
+
+                public NetworkModule.RoutingTable toRoutingTable() {
+                    NetworkModule.RoutingTable routingTable = new NetworkModule.RoutingTable();
+
+                    // Convertir el Map<Integer, Integer> a Map<Address, Address>
+                    this.peerRoutes.forEach((key, value) ->
+                            routingTable.addRoute(Address.of(key), Address.of(value))
+                    );
+
+                    // Establecer el defaultGateway
+                    routingTable.setDefaultGateway(Address.of(this.defaultGateway));
+
+                    return routingTable;
+                }
             }
         }
+
     }
 
     @Data
@@ -283,6 +412,15 @@ public class NodeDeviceDTO {
             return dto;
         }
 
+        public PamModule toPamModule() {
+            ICListenHF module = new ICListenHF(this.serialNumber);
+            module.setStatus(this.status.toStatus());
+            module.setLoggingConfig(this.loggingConfig.toLoggingConfig());
+            module.setStreamingConfig(this.streamingConfig.toStreamingConfig());
+            module.setRecordingStats(this.recordingStats.toRecordingStats());
+            return module;
+        }
+
         @Data
         public static class StatusDto {
             private Integer unitStatus;
@@ -302,6 +440,18 @@ public class NodeDeviceDTO {
                 dto.setTimestamp(status.getTimestamp());
                 return dto;
             }
+
+            public ICListenStatus toStatus() {
+                return new ICListenStatus(
+                        UUID.randomUUID(),
+                        this.unitStatus,
+                        this.batteryStatus,
+                        this.batteryPercentage,
+                        this.temperature,
+                        this.humidity,
+                        this.timestamp
+                );
+            }
         }
 
         @Data
@@ -309,6 +459,23 @@ public class NodeDeviceDTO {
             private WaveformConfigDTO wav;
             private FFTConfigDTO fft;
             private LocalDateTime timestamp;
+
+            public ICListenLoggingConfig toLoggingConfig() {
+                return new ICListenLoggingConfig(
+                        UUID.randomUUID(),
+                        this.wav.getGain(),
+                        this.wav.getSampleRate(),
+                        this.wav.getLoggingMode(),
+                        this.wav.getLogLength(),
+                        this.wav.getBitDepth(),
+                        this.fft.getSampleRate(),
+                        this.fft.getProcessingType(),
+                        this.fft.getFftsAccumulated(),
+                        this.fft.getLoggingMode(),
+                        this.fft.getLogLength(),
+                        this.timestamp
+                );
+            }
 
             @Data
             public static class WaveformConfigDTO {
@@ -358,6 +525,23 @@ public class NodeDeviceDTO {
             private WaveformConfigDTO wav;
             private FFTConfigDTO fft;
             private String timestamp;
+
+            public ICListenStreamingConfig toStreamingConfig() {
+                return new ICListenStreamingConfig(
+                        UUID.randomUUID(),
+                        this.wav.getRecordWaveform(),
+                        this.wav.getProcessWaveform(),
+                        this.wav.getWaveformProcessingType(),
+                        this.wav.getWaveformInterval(),
+                        this.wav.getWaveformDuration(),
+                        this.fft.getRecordFFT(),
+                        this.fft.getProcessFFT(),
+                        this.fft.getFftProcessingType(),
+                        this.fft.getFftInterval(),
+                        this.fft.getFftDuration(),
+                        LocalDateTime.parse(this.timestamp)
+                );
+            }
 
             @Data
             public static class WaveformConfigDTO {
@@ -417,6 +601,16 @@ public class NodeDeviceDTO {
                 dto.setRecordedMinutes(recordingStats.getRecordedMinutes());
                 dto.setNumberOfFiles(recordingStats.getNumberOfFiles());
                 return dto;
+            }
+
+            public ICListenRecordingStats toRecordingStats() {
+                return new ICListenRecordingStats(
+                        UUID.randomUUID(),
+                        LocalDateTime.parse(this.epochTime),
+                        this.numberOfClicks,
+                        this.recordedMinutes,
+                        this.numberOfFiles
+                );
             }
         }
     }

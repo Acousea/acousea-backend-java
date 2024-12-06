@@ -56,12 +56,6 @@ public final class RoutingChunk {
                 TTL == that.TTL;
     }
 
-    public String encode() {
-        return Integer.toHexString(sender.getValue())
-                + Integer.toHexString(receiver.getValue())
-                + Integer.toHexString(TTL);
-    }
-
     public Address sender() {
         return sender;
     }
@@ -79,4 +73,12 @@ public final class RoutingChunk {
         return Objects.hash(sender, receiver, TTL);
     }
 
+
+    public byte[] toBytes() {
+        ByteBuffer buffer = ByteBuffer.allocate(getSize());
+        buffer.put(sender.getValue());
+        buffer.put(receiver.getValue());
+        buffer.put(TTL);
+        return buffer.array();
+    }
 }

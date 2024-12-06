@@ -94,7 +94,7 @@ public class TagFactory {
         TagType tagType = TagType.fromValue(typeCode);
 
         int tagLength = buffer.get();
-        if (tagLength < buffer.remaining()) {
+        if (buffer.remaining() < tagLength) {
             throw new IllegalArgumentException("Invalid byte array for " + tagType);
         }
 
@@ -104,7 +104,9 @@ public class TagFactory {
         }
 
         buffer.limit(buffer.position() + tagLength);
-        return tagCreatorFromBytes.create(buffer);
+        Tag tag =  tagCreatorFromBytes.create(buffer);
+        buffer.limit(buffer.capacity());
+        return tag;
     }
 
     public static List<Tag> createTags(ByteBuffer buffer) {

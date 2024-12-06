@@ -6,7 +6,6 @@ import com.acousea.backend.core.communicationSystem.application.services.Communi
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationRequest;
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationResult;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
-import com.acousea.backend.core.communicationSystem.domain.communication.constants.CommunicationStatus;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.IridiumErrorCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
@@ -45,7 +44,7 @@ public class IridiumCommunicator implements Communicator {
     @Override
     public CommunicationResult send(CommunicationRequest packet) {
         logger.log(packet);
-        String imei = getImei(null, packet.getRoutingChunk().receiver());
+        String imei = getImeiByNetworkAddress(packet.getRoutingChunk().receiver());
         String url = String.format("%s?imei=%s&username=%s&password=%s&data=%s",
                 BASE_URL, imei, username, password, packet.encode());
 
@@ -59,13 +58,13 @@ public class IridiumCommunicator implements Communicator {
             assert response.body() != null;
             return handleResponse(response.body().string());
         } catch (IOException e) {
-            return new CommunicationResult(CommunicationStatus.FAILED, "Failed to send message", IridiumErrorCode.SYSTEM_ERROR.getCode());
+            return CommunicationResult.failed("Failed to send message", IridiumErrorCode.SYSTEM_ERROR.getCode());
         }
     }
 
     @Override
     public CommunicationResult flushRequestQueue(UUID nodeId) {
-        String imei = getImei(nodeId, null);
+        String imei = getImeiByNodeId(nodeId);
         String url = String.format("%s?imei=%s&username=%s&password=%s&flush=yes", BASE_URL, imei, username, password);
         Request request = new Request.Builder()
                 .url(url)
@@ -76,8 +75,16 @@ public class IridiumCommunicator implements Communicator {
         try (Response response = new OkHttpClient().newCall(request).execute()) {
             return handleResponse(response.body().string());
         } catch (IOException e) {
-            return new CommunicationResult(CommunicationStatus.FAILED, "Failed to flush localizer queue", IridiumErrorCode.SYSTEM_ERROR.getCode());
+            return CommunicationResult.failed("Failed to flush localizer queue", IridiumErrorCode.SYSTEM_ERROR.getCode());
         }
+    }
+
+    private String getImeiByNodeId(UUID nodeId) {
+        return getImei(nodeId, null);
+    }
+
+    private String getImeiByNetworkAddress(Address networkAddress) {
+        return getImei(null, networkAddress);
     }
 
     private String getImei(UUID nodeId, Address networkAddress) {
@@ -96,13 +103,13 @@ public class IridiumCommunicator implements Communicator {
         String status = parts[0];
         if ("OK".equals(status)) {
             String mtId = parts[1];
-            return new CommunicationResult(CommunicationStatus.SUCCESS, "Message sent successfully");
+            return CommunicationResult.success("Message sent successfully");
         } else if ("FAILED".equals(status)) {
             int errorCode = Integer.parseInt(parts[1]);
             String errorDescription = parts[2];
-            return new CommunicationResult(CommunicationStatus.FAILED, errorDescription, errorCode);
+            return CommunicationResult.failed(errorDescription, errorCode);
         } else {
-            return new CommunicationResult(CommunicationStatus.UNKNOWN, "Unknown error");
+            return CommunicationResult.unknown("Unknown error");
         }
     }
 

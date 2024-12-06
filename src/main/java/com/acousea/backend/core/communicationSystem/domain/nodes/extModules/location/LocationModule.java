@@ -10,10 +10,10 @@ import java.nio.ByteBuffer;
 @Getter
 public class LocationModule extends ExtModule {
     public static final String name = "location";
-    private final double latitude;
-    private final double longitude;
+    private final float latitude;
+    private final float longitude;
 
-    public LocationModule(double latitude, double longitude) {
+    public LocationModule(float latitude, float longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -23,11 +23,11 @@ public class LocationModule extends ExtModule {
     }
 
     public static LocationModule fromBytes(ByteBuffer value) {
-        if (value.remaining() < Double.BYTES * 2) {
+        if (value.remaining() < Float.BYTES * 2) {
             throw new IllegalArgumentException("Invalid byte array for LocationModule");
         }
-        double latitude = value.getDouble();
-        double longitude = value.getDouble();
+        float latitude = value.getFloat();
+        float longitude = value.getFloat();
         return new LocationModule(latitude, longitude);
     }
 
@@ -37,6 +37,6 @@ public class LocationModule extends ExtModule {
     }
 
     public static int getMinSize() {
-        return Double.BYTES * 2;
+        return Float.BYTES * 2;
     }
 }

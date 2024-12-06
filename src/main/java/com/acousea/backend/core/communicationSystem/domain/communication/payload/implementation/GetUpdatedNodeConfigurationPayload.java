@@ -1,5 +1,7 @@
 package com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation;
 
+import com.acousea.backend.core.communicationSystem.application.command.DTO.GetUpdatedNodeDeviceConfigurationDTO;
+import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationPacket;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.Payload;
 import com.acousea.backend.core.communicationSystem.domain.communication.tags.TagType;
 import com.acousea.backend.core.communicationSystem.domain.exceptions.InvalidPacketException;
@@ -19,16 +21,26 @@ public class GetUpdatedNodeConfigurationPayload implements Payload {
         this.tagTypes = tagTypes;
     }
 
-    @Override
-    public String encode() {
-        StringBuilder builder = new StringBuilder();
-        tagTypes.forEach(tagType -> builder.append(tagType.getValue()));
-        return builder.toString();
+    public static Payload fromDTO(GetUpdatedNodeDeviceConfigurationDTO dto) {
+        List<TagType> tagTypes = new ArrayList<>();
+        dto.getRequestedModules().forEach(module -> {
+            try {
+                tagTypes.add(TagType.fromModuleName(module));
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid tag type: " + e.getMessage());
+            }
+        });
+        return new GetUpdatedNodeConfigurationPayload(tagTypes);
     }
 
     @Override
-    public int getFullLength() {
-        return tagTypes.size();
+    public short getBytesSize() {
+        int size = tagTypes.size() * TagType.getAmountOfBytes();
+        // Check if size fits in short
+        if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE)  {
+            throw new IllegalArgumentException(GetUpdatedNodeConfigurationPayload.class.getSimpleName() + "Payload size is too big");
+        }
+        return (short) size;
     }
 
     @Override

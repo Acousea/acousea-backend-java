@@ -1,17 +1,26 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes;
 
+import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Getter
 public class OperationModeModule extends ExtModule {
     public static final String name = "operationMode";
     private static final int MAX_MODES = 256; // Número máximo de modos permitidos
-    private final Map<Integer, OperationMode> operationModes = new HashMap<>(); // Mapa para almacenar modos
+    private final Map<Integer, OperationMode> operationModes = new TreeMap<>(); // Mapa para almacenar modos
+
+    public static OperationModeModule fromDTO(List<NodeDeviceDTO.ExtModuleDto.ReportingPeriodDto> reportingPeriods) {
+        OperationModeModule module = new OperationModeModule();
+        for (NodeDeviceDTO.ExtModuleDto.ReportingPeriodDto period : reportingPeriods) {
+            module.operationModes.put(period.getKey().getId(), period.getKey());
+        }
+        return module;
+    }
 
 
     @Override

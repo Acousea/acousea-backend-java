@@ -1,5 +1,6 @@
 package com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation;
 
+import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationPacket;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.Payload;
 import com.acousea.backend.core.communicationSystem.domain.communication.tags.Tag;
 import com.acousea.backend.core.communicationSystem.domain.communication.tags.TagFactory;
@@ -14,40 +15,27 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SetNodeConfigurationPayload implements Payload {
+public class SummaryReportPayload implements Payload {
     private List<Tag> tags;
 
-    public SetNodeConfigurationPayload(List<Tag> tags) {
+    public SummaryReportPayload(List<Tag> tags) {
         this.tags = tags;
     }
 
-    public static SetNodeConfigurationPayload fromNodeDevice(@NotNull NodeDevice nodeDevice) {
-        List<Tag> tags = TagFactory.createTags(nodeDevice);
-        return new SetNodeConfigurationPayload(tags);
-    }
-
     @Override
-    public String encode() {
-        StringBuilder builder = new StringBuilder();
-        tags.forEach(tag -> builder.append(tag.encode()));
-        return builder.toString();
-    }
-
-    @Override
-    public int getFullLength() {
-        return tags.stream().mapToInt(Tag::getFullLength).sum();
+    public short getBytesSize() {
+        int size = tags.stream().mapToInt(Tag::getFullLength).sum();
+        if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE)  {
+            throw new IllegalArgumentException(SummaryReportPayload.class.getSimpleName() + "Payload size is too big");
+        }
+        return (short) size;
     }
 
     @Override
     public byte[] toBytes() {
-        byte[] bytes = new byte[getFullLength()];
-        int offset = 0;
-        for (Tag tag : tags) {
-            byte[] tagBytes = tag.toBytes();
-            System.arraycopy(tagBytes, 0, bytes, offset, tagBytes.length);
-            offset += tagBytes.length;
-        }
-        return bytes;
+        ByteBuffer buffer = ByteBuffer.allocate(getBytesSize());
+        tags.forEach(tag -> buffer.put(tag.toBytes()));
+        return buffer.array();
     }
 
     public static Payload fromBytes(ByteBuffer buffer) {
@@ -56,6 +44,6 @@ public class SetNodeConfigurationPayload implements Payload {
             Tag tag = TagFactory.createTag(buffer);
             tags.add(tag);
         }
-        return new SetNodeConfigurationPayload(tags);
+        return new SummaryReportPayload(tags);
     }
 }

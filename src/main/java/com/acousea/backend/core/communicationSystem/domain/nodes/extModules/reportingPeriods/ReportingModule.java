@@ -46,7 +46,7 @@ public abstract class ReportingModule extends ExtModule {
 
     @Override
     public int getFullSize() {
-        return Byte.SIZE + reportingPeriodsPerOperationMode.size() * (Byte.SIZE + Short.SIZE);
+        return Byte.BYTES + reportingPeriodsPerOperationMode.size() * (Byte.BYTES + Short.BYTES);
     }
 
     public static int getMinSize() {

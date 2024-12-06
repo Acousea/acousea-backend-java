@@ -6,6 +6,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.oper
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.ReportingModule;
+import com.acousea.backend.core.shared.domain.UnsignedByte;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
@@ -23,11 +24,10 @@ public class ReportingPeriodTag extends Tag {
         byte technologyId = module.getTechnologyId();
         buffer.put(technologyId);
 
-        module.getReportingPeriodsPerOperationMode()
-                .forEach((modeId, period) -> {
-                    buffer.put(modeId.getId());
-                    buffer.putShort(period);
-                });
+        module.getReportingPeriodsPerOperationMode().forEach((modeId, period) -> {
+            buffer.put(UnsignedByte.toByte(modeId.getId()));
+            buffer.putShort(period);
+        });
 
         return new ReportingPeriodTag(buffer.array());
     }
@@ -66,6 +66,4 @@ public class ReportingPeriodTag extends Tag {
 
         return fromReportingModule(module);
     }
-
-
 }

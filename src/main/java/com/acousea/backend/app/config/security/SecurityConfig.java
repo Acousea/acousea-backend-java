@@ -36,13 +36,14 @@ public class SecurityConfig {
     @PostConstruct
     public void init() {
         API_WHITELIST = new String[]{
-                "/", "/files/**",
+                "/", "/files/**", "/ws/**",
                 apiPrefix + "/users/auth/register",
                 apiPrefix + "/users/auth/login",
                 apiPrefix + "/users/auth/logout",
                 apiPrefix + "/users/**",
                 apiPrefix + "/communication-system/**",
-                apiPrefix + "/webhook/rockblock-packets"
+                apiPrefix + "/webhook/rockblock-packets",
+                apiPrefix + "/ws/**",
         };
 
         System.out.println("API_WHITELIST: " + List.of(API_WHITELIST));

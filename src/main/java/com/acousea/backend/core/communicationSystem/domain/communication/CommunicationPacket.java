@@ -9,6 +9,7 @@ import com.acousea.backend.core.shared.domain.crc.CRCUtils;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
+import java.util.HexFormat;
 
 /**
  * Packet Structure:
@@ -20,6 +21,11 @@ import java.nio.ByteBuffer;
 
 @Getter
 public class CommunicationPacket {
+
+    public static class MaxSizes {
+        public static final int PACKET_SIZE = 260; // Iridium MO: 340 bytes, Iridium MT: 260 bytes
+        public static final int MAX_PAYLOAD_SIZE = PACKET_SIZE - 9; // 7 bytes for the auxiliary fields
+    }
     private static final byte SYNC_BYTE = 0x20; // 1 byte
     private final OperationCode operationCode; // 1 byte
     private final RoutingChunk routingChunk; // 3 bytes (1 bytes sender, 1 byte receiver, 1 byte ttl)
@@ -37,7 +43,8 @@ public class CommunicationPacket {
 
         // Calcula el CRC y lo agrega al final del buffer
         byte[] packetBytes = this.toBytes();
-        this.checksum = ByteBuffer.wrap(packetBytes, packetBytes.length - 2, 2).getShort();
+        // Get the last two bytes of the packetBytes as the CRC
+        this.checksum = ByteBuffer.wrap(packetBytes).getShort(packetBytes.length - 2);
     }
 
     public CommunicationPacket(
@@ -52,31 +59,28 @@ public class CommunicationPacket {
     }
 
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(5 + payload.getFullLength() + 2); // +2 para el CRC de 16 bits
+        ByteBuffer buffer = ByteBuffer.allocate((Byte.BYTES * 7) + payload.getBytesSize() + (Byte.BYTES * 2)); // +2 para el CRC de 16 bits
         buffer.put(SYNC_BYTE);
         buffer.put((byte) operationCode.getValue());
-        buffer.put((byte) payload.getFullLength());
+        buffer.put(routingChunk.toBytes());
+        buffer.putShort(payload.getBytesSize());
         buffer.put(payload.toBytes());
         // Calcula el CRC y lo agrega al final del buffer
-        int crc = CRCUtils.calculateCRC(buffer.array());
-        buffer.putShort((short) crc);
-
+        short crc = CRCUtils.calculate16BitCRC(buffer.array());
+        buffer.putShort(crc);
         return buffer.array();
     }
 
     public static CommunicationPacket fromBytes(byte[] data) throws InvalidPacketException {
         ByteBuffer buffer = ByteBuffer.wrap(data);
 
-        // Check the CRC before parsing the packet
-        int calculatedCRC = CRCUtils.calculateCRC(data);
         short receivedCRC = buffer.getShort(buffer.capacity() - 2);
-
-        if (receivedCRC != calculatedCRC) {
-            throw new InvalidPacketException("Invalid Packet received -> CRC validation failed");
+        if (!CRCUtils.verifyCRC(buffer)) {
+            throw new InvalidPacketException(CommunicationPacket.class.getSimpleName() + " -> Invalid CRC");
         }
 
-        // Reset the buffer to the beginning
-        buffer.limit(buffer.capacity() - 2);
+        // Remove the CRC from the buffer
+        buffer = buffer.slice( 0, buffer.capacity() - 2);
         byte syncByte = buffer.get();
         if (syncByte != SYNC_BYTE) {
             throw new IllegalArgumentException("Invalid sync byte");
@@ -84,7 +88,7 @@ public class CommunicationPacket {
         OperationCode operationCode = OperationCode.fromValue(buffer.get());
         RoutingChunk routingChunk = RoutingChunk.fromBytes(buffer);
 
-        int payloadLength = buffer.get();
+        int payloadLength = buffer.getShort();
         if (buffer.remaining() != payloadLength) {
             throw new InvalidPacketException("Invalid payload length");
         }
@@ -96,13 +100,7 @@ public class CommunicationPacket {
     }
 
     public String encode() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%02x", SYNC_BYTE));
-        sb.append(String.format("%02x", (int) (operationCode.getValue())));
-        sb.append(routingChunk.encode());
-        sb.append(payload.encode());
-        sb.append(String.format("%04x", checksum));
-        return sb.toString();
+        return HexFormat.of().formatHex(this.toBytes());
     }
 }
 

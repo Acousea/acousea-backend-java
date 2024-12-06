@@ -13,14 +13,26 @@ public class CommunicationResult {
     private Integer errorCode;
     private String message;
 
-    public CommunicationResult(CommunicationStatus status, String message) {
+    private CommunicationResult(CommunicationStatus status, String message) {
         this(status, message, null);
     }
 
-    public CommunicationResult(CommunicationStatus status, String message, Integer errorCode) {
+    private CommunicationResult(CommunicationStatus status, String message, Integer errorCode) {
         this.status = status;
         this.errorCode = errorCode;
         this.message = message;
+    }
+
+    public static CommunicationResult success(String message) {
+        return new CommunicationResult(CommunicationStatus.SUCCESS, message);
+    }
+
+    public static CommunicationResult failed(String message, Integer errorCode) {
+        return new CommunicationResult(CommunicationStatus.FAILED, message, errorCode);
+    }
+
+    public static CommunicationResult unknown(String message) {
+        return new CommunicationResult(CommunicationStatus.UNKNOWN, message);
     }
 
     @Override

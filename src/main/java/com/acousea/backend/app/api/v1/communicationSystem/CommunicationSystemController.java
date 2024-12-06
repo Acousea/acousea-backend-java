@@ -1,9 +1,11 @@
 package com.acousea.backend.app.api.v1.communicationSystem;
 
 
+import com.acousea.backend.core.communicationSystem.application.command.DTO.GetUpdatedNodeDeviceConfigurationDTO;
 import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
 import com.acousea.backend.core.communicationSystem.application.command.GetAllNodeDevicesCommand;
 import com.acousea.backend.core.communicationSystem.application.command.GetNodeDeviceCommand;
+import com.acousea.backend.core.communicationSystem.application.command.GetUpdatedNodeDeviceConfigurationCommand;
 import com.acousea.backend.core.communicationSystem.application.command.SetNodeDeviceConfigurationCommand;
 import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
 import com.acousea.backend.core.communicationSystem.application.services.CommunicationService;
@@ -29,7 +31,7 @@ public class CommunicationSystemController {
             CommunicationService communicationService,
             NodeDeviceRepository nodeDeviceRepository,
             StorageService storageService
-            ) {
+    ) {
         this.communicationService = communicationService;
         this.nodeDeviceRepository = nodeDeviceRepository;
         this.storageService = storageService;
@@ -57,19 +59,27 @@ public class CommunicationSystemController {
         return ResponseEntity.ok(Result.success(nodeDevice));
     }
 
-    @PutMapping("/node-device/set")
-    public ResponseEntity<Result<CommunicationResult>> setNodeDeviceConfiguration(@RequestBody NodeDeviceDTO nodeDevice) {
+    @PutMapping("/node-device/set/{id}")
+    public ResponseEntity<Result<CommunicationResult>> setNodeDeviceConfiguration(
+            @PathVariable String id,
+            @RequestBody NodeDeviceDTO dto
+    ) {
+        dto.setId(id);
         SetNodeDeviceConfigurationCommand query = new SetNodeDeviceConfigurationCommand(
                 nodeDeviceRepository, storageService, communicationService
         );
-        return ResponseEntity.ok(query.run(nodeDevice));
+        return ResponseEntity.ok(query.run(dto));
     }
 
-    @PutMapping("/node-device/update")
-    public ResponseEntity<Result<CommunicationResult>> getUpdatedNodeDeviceConfiguration() {
-//        SetNodeDeviceConfigurationCommand query = new SetNodeDeviceConfigurationCommand(
-//                nodeDeviceRepository, storageService, communicationService
-//        );
-        return ResponseEntity.ok(Result.success(null));
+    @PutMapping("/node-device/update/{id}")
+    public ResponseEntity<Result<CommunicationResult>> getUpdatedNodeDeviceConfiguration(
+            @PathVariable String id,
+            @RequestBody GetUpdatedNodeDeviceConfigurationDTO dto
+    ) {
+        dto.setNodeId(id);
+        GetUpdatedNodeDeviceConfigurationCommand query = new GetUpdatedNodeDeviceConfigurationCommand(
+                nodeDeviceRepository, communicationService
+        );
+        return ResponseEntity.ok(query.run(dto));
     }
 }

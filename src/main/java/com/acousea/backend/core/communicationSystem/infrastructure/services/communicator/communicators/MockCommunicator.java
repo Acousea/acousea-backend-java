@@ -6,7 +6,6 @@ import com.acousea.backend.core.communicationSystem.application.services.Communi
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationRequest;
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationResult;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
-import com.acousea.backend.core.communicationSystem.domain.communication.constants.CommunicationStatus;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import org.springframework.core.env.Environment;
@@ -39,20 +38,30 @@ public class MockCommunicator implements Communicator {
     @Override
     public CommunicationResult send(CommunicationRequest packet) {
         logger.log(packet);
-        String imei = getImei(null, packet.getRoutingChunk().receiver());
-        String url = String.format("%s?imei=%s&username=%s&password=%s&data=%s",
-                BASE_URL, imei, username, password, packet.encode());
+        String imei = getImeiByNetworkAddress(packet.getRoutingChunk().receiver());
+        String url = String.format(
+                "%s?imei=%s&username=%s&password=%s&data=%s",
+                BASE_URL, imei, username, password, packet.encode()
+        );
 
         System.out.println("MockCommunicator.send -> url: " + url);
 
-        return new CommunicationResult(CommunicationStatus.SUCCESS, "MOCK: Message sent successfully");
+        return CommunicationResult.success("MOCK: Message sent successfully");
     }
 
     @Override
     public CommunicationResult flushRequestQueue(UUID nodeId) {
-        String imei = getImei(nodeId, null);
+        String imei = getImeiByNodeId(nodeId);
         String url = String.format("%s?imei=%s&username=%s&password=%s&flush=yes", BASE_URL, imei, username, password);
-        return new CommunicationResult(CommunicationStatus.SUCCESS, "MOCK: Request queue flushed successfully");
+        return CommunicationResult.success("MOCK: Request queue flushed successfully");
+    }
+
+    private String getImeiByNodeId(UUID nodeId) {
+        return getImei(nodeId, null);
+    }
+
+    private String getImeiByNetworkAddress(Address networkAddress) {
+        return getImei(null, networkAddress);
     }
 
     private String getImei(UUID nodeId, Address networkAddress) {

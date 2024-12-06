@@ -15,7 +15,13 @@ public class CommunicationResponse extends CommunicationPacket {
 
     public static CommunicationResponse fromRockBlockMessage(RockBlockMessage rockBlockMessage) throws InvalidPacketException {
         byte[] responseData = HexFormat.of().parseHex(rockBlockMessage.getData());
-        return (CommunicationResponse) CommunicationResponse.fromBytes(responseData);
+        CommunicationPacket packet = CommunicationPacket.fromBytes(responseData);
+        return new CommunicationResponse(
+                packet.getOperationCode(),
+                packet.getRoutingChunk(),
+                packet.getPayload(),
+                packet.getChecksum()
+        );
     }
 
 }

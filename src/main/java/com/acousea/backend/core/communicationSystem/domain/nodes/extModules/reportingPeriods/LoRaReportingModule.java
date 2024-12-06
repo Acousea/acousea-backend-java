@@ -8,10 +8,10 @@ import lombok.Setter;
 @Setter
 @Getter
 public class LoRaReportingModule extends ReportingModule {
-    public static final String name = "LoRaReporting";
+    public static final String name = "loRaReporting";
     public static final byte TECHNOLOGY_ID = 0x01;
 
-    private LoRaReportingModule(OperationModeModule operationModeModule) {
+    public LoRaReportingModule(OperationModeModule operationModeModule) {
         super(TECHNOLOGY_ID, operationModeModule);
     }
 

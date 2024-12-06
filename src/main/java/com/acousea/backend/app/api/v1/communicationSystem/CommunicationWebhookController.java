@@ -2,35 +2,42 @@ package com.acousea.backend.app.api.v1.communicationSystem;
 
 import com.acousea.backend.core.communicationSystem.application.command.ProcessRockblockMessageCommand;
 import com.acousea.backend.core.communicationSystem.application.ports.RockblockMessageRepository;
-import com.acousea.backend.core.communicationSystem.application.services.CommunicationService;
+import com.acousea.backend.core.communicationSystem.application.services.CommunicationResponseProcessor;
 import com.acousea.backend.core.communicationSystem.domain.RockBlockMessage;
 import com.acousea.backend.core.shared.application.events.EventBus;
+import com.acousea.backend.core.shared.application.notifications.NotificationService;
 import com.acousea.backend.core.shared.domain.httpWrappers.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${apiPrefix}/webhook")
+@RequestMapping("${apiPrefix}/rockblock")
 public class CommunicationWebhookController {
 
-    private final CommunicationService communicationService;
-    private final EventBus eventBus;
+    private final CommunicationResponseProcessor communicationResponseProcessor;
     private final RockblockMessageRepository rockblockMessageRepository;
+    private final NotificationService notificationService;
+    private final EventBus eventBus;
 
     @Autowired
     public CommunicationWebhookController(
-            CommunicationService communicationService,
-            EventBus eventBus,
-            RockblockMessageRepository rockblockMessageRepository
+            CommunicationResponseProcessor communicationResponseProcessor,
+            RockblockMessageRepository rockblockMessageRepository,
+            NotificationService notificationService,
+            EventBus eventBus
     ) {
-        this.communicationService = communicationService;
-        this.eventBus = eventBus;
+        this.communicationResponseProcessor = communicationResponseProcessor;
         this.rockblockMessageRepository = rockblockMessageRepository;
+        this.notificationService = notificationService;
+        this.eventBus = eventBus;
     }
 
-    @PostMapping("/rockblock-packets")
+    @PostMapping("/webhook")
     public ResponseEntity<Result<String>> receiveRockblockPacket(
             @RequestParam("imei") String imei,
             @RequestParam("serial") String serial,
@@ -54,7 +61,11 @@ public class CommunicationWebhookController {
             );
 
             // Procesar el comando
-            var command = new ProcessRockblockMessageCommand(rockblockMessageRepository, communicationService, eventBus);
+            var command = new ProcessRockblockMessageCommand(
+                    rockblockMessageRepository,
+                    communicationResponseProcessor,
+                    notificationService,
+                    eventBus);
             return ResponseEntity.ok(command.run(rockBlockMessage));
         } catch (Exception e) {
             System.out.println("RockBlockMessage processing error: " + e.getMessage());

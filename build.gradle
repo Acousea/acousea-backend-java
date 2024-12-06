@@ -29,33 +29,12 @@ dependencies {
 	// AWS
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
-	// REDIS
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.data:spring-data-redis'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.session:spring-session-data-redis'
-
 	// Lombok
 	implementation 'org.projectlombok:lombok:1.18.28'
 	annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
-
-
-	// JUnit 5 tests
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
-	testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
-	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.2'
-	testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport:5.10.2'
-	testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
-	testImplementation 'org.junit.platform:junit-platform-runner:1.10.2'
-	testImplementation 'org.junit.platform:junit-platform-suite-api:1.10.2'
-	testImplementation 'org.junit.platform:junit-platform-suite-engine:1.10.2'
-
 	// AOP
 	implementation 'org.springframework:spring-aop:'
-
-
-//	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 
 	// Spring security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -66,10 +45,38 @@ dependencies {
 	// Reactive programming and async support
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-	// Test dependencies for JUnit
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// REDIS
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//	implementation 'org.springframework.data:spring-data-redis'
+//	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//	implementation 'org.springframework.session:spring-session-data-redis'
 
+	// Lettuce
+	implementation 'io.lettuce:lettuce-core:6.5.1.RELEASE'
+
+	// JUnit 5 tests
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+	testImplementation 'org.junit.platform:junit-platform-runner:1.10.2'
+	testImplementation 'org.junit.platform:junit-platform-suite-api:1.10.2'
+	testImplementation 'org.junit.platform:junit-platform-suite-engine:1.10.2'
+}
+
+def currentProfile;
+
+
+
+if (project.hasProperty('spring.profiles.active') && project.property('spring.profiles.active') == 'prod') {
+	currentProfile = 'production';
+	println("Current profile is ${currentProfile}")
+//	apply from: rootProject.file('gradle/build_prod.gradle');
+
+} else if (project.hasProperty('spring.profiles.active') && project.property('spring.profiles.active') == 'dev') {
+	currentProfile = 'development';
+	println("Current profile is ${currentProfile}")
+//	apply from: rootProject.file('gradle/build_dev.gradle');
+} else {
+	currentProfile = 'default';
+	println("Current profile is ${currentProfile}")
 }
 
 tasks.named('test') {

@@ -29,6 +29,10 @@ public enum TagType {
         this.value = value;
     }
 
+    public static int getAmountOfBytes() {
+        return Byte.BYTES;
+    }
+
     public static TagType fromValue(byte code) throws InvalidPacketException {
         char charCode = (char) code;
         for (TagType tagType : TagType.values()) {

@@ -29,6 +29,6 @@ public class BatteryModule extends ExtModule {
     }
 
     public static int getMinSize() {
-        return Byte.SIZE + Byte.SIZE;
+        return Byte.BYTES + Byte.BYTES;
     }
 }

@@ -1,6 +1,8 @@
 package com.acousea.backend.core.shared.domain.crc;
 
 
+import java.nio.ByteBuffer;
+
 public class CRCUtils {
 
     // Polinomio CRC-16-CCITT estándar
@@ -9,6 +11,10 @@ public class CRCUtils {
 
     private CRCUtils() {
         // Constructor privado para evitar instanciación
+    }
+
+    public static short calculate16BitCRC(byte[] data) {
+        return (short) calculateCRC(data);
     }
 
     public static int calculateCRC(byte[] data) {
@@ -26,25 +32,23 @@ public class CRCUtils {
         return crc & 0xFFFF; // Asegura que el CRC esté en un rango de 16 bits
     }
 
-    public static boolean verifyCRC(byte[] data) {
-        int length = data.length;
-        if (length < 2) {
+    public static boolean verifyCRC(ByteBuffer buffer) {
+        if (buffer.remaining() < 2) {
             throw new IllegalArgumentException("Data length must be at least 2 bytes for CRC verification.");
         }
 
         // Extraer el CRC del paquete (últimos dos bytes)
-        int receivedCRC = ((data[length - 2] & 0xFF) << 8) | (data[length - 1] & 0xFF);
+        int receivedCRC = buffer.getShort(buffer.capacity() - 2) & 0xFFFF;
 
         // Calcular el CRC del paquete excluyendo los últimos dos bytes
-        int calculatedCRC = calculateCRC(subArray(data, 0, length - 2));
-
+        byte[] data = new byte[buffer.capacity()];
+        // Set the last two bytes to 0
+        buffer.get(data, 0, buffer.capacity() - 2);
+        buffer.rewind();
+        int calculatedCRC = calculateCRC(data);
         return receivedCRC == calculatedCRC;
     }
 
-    private static byte[] subArray(byte[] array, int start, int end) {
-        byte[] result = new byte[end - start];
-        System.arraycopy(array, start, result, 0, end - start);
-        return result;
-    }
+
 }
 

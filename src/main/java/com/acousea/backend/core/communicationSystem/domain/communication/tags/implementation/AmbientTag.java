@@ -8,15 +8,14 @@ import java.nio.ByteBuffer;
 
 public class AmbientTag extends Tag {
     public AmbientTag(byte[] value) {
-        super(TagType.AMBIENT, value
-        );
+        super(TagType.AMBIENT, value);
     }
 
     public static AmbientTag fromAmbientModule(AmbientModule module) {
         return new AmbientTag(
-                ByteBuffer.allocate(Integer.BYTES * 2)
-                        .putInt(module.getTemperature())
-                        .putInt(module.getHumidity())
+                ByteBuffer.allocate(Byte.BYTES * 2)
+                        .put((byte) module.getTemperature())
+                        .put((byte) module.getHumidity())
                         .array());
     }
 
@@ -26,11 +25,11 @@ public class AmbientTag extends Tag {
     }
 
     public static AmbientTag fromBytes(ByteBuffer buffer) {
-        if (buffer.remaining() < Integer.BYTES * 2) {
+        if (buffer.remaining() < Byte.BYTES * 2) {
             throw new IllegalArgumentException("Invalid byte array for AmbientTag");
         }
-        int temperature = buffer.getInt();
-        int humidity = buffer.getInt();
+        int temperature = buffer.get();
+        int humidity = buffer.get();
         return fromAmbientModule(new AmbientModule(temperature, humidity));
     }
 }

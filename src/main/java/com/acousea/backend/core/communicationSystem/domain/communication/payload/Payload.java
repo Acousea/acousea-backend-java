@@ -2,9 +2,7 @@ package com.acousea.backend.core.communicationSystem.domain.communication.payloa
 
 
 public interface Payload {
-    public String encode();
-
-    int getFullLength();
+    short getBytesSize();
 
     byte[] toBytes();
 }

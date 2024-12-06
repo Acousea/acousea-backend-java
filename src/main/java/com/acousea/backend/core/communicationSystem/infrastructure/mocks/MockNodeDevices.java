@@ -52,7 +52,7 @@ public class MockNodeDevices {
         IridiumReportingModule iridiumReportingModuleDrifter = IridiumReportingModule.create(operationModeModule, environment.getProperty("drifter.imei"));
 
         return List.of(new NodeDevice(
-                        UUID.randomUUID(),
+                        UUID.fromString("00000000-0000-0000-0000-000000000001"),
                         "Drifter",
                         "buoy.svg",
                         new HashMap<>(Map.of(
@@ -71,7 +71,7 @@ public class MockNodeDevices {
                         ))
                 ),
                 new NodeDevice(
-                        UUID.randomUUID(),
+                        UUID.fromString("00000000-0000-0000-0000-000000000002"),
                         "Localizer",
                         "compass.svg",
                         new HashMap<>(Map.of(
