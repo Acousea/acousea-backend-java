@@ -26,7 +26,7 @@ import java.util.Map;
 
 @Service
 public class CommunicationResponseProcessor {
-    private final NodeDeviceRepository nodeDeviceRepository;
+
 
     // Interfaz funcional para el procesamiento de tags
     @FunctionalInterface
@@ -62,19 +62,8 @@ public class CommunicationResponseProcessor {
             }
     );
 
-    public CommunicationResponseProcessor(NodeDeviceRepository nodeDeviceRepository) {
-        this.nodeDeviceRepository = nodeDeviceRepository;
-    }
 
-    private NodeDevice getNodeDevice(Address address) {
-        return nodeDeviceRepository.findByNetworkAddress(address).orElseThrow(
-                () -> new RuntimeException(this.getClass().getSimpleName() + " NodeDevice not found for address: " + address)
-        );
-    }
-
-    public void processNodeDeviceConfigurationResponse(RoutingChunk routingChunk, NewNodeConfigurationPayload payload) {
-        NodeDevice nodeDevice = getNodeDevice(routingChunk.receiver());
-
+    public void processNodeDeviceConfigurationResponse(NodeDevice nodeDevice, NewNodeConfigurationPayload payload) {
         payload.getTags().forEach(tag -> {
                 try {
                     TagType tagType = TagType.fromValue(tag.getTYPE());
@@ -92,7 +81,7 @@ public class CommunicationResponseProcessor {
         System.out.println("Processing SetNodeDeviceConfigurationPayload");
     }
 
-    public void processSummaryReportResponse(RoutingChunk routingChunk, SummaryReportPayload payload) {
+    public void processSummaryReportResponse(NodeDevice nodeDevice,SummaryReportPayload payload) {
 
     }
 

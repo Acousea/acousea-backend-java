@@ -3,7 +3,7 @@ package com.acousea.backend.app.api.v1.users;
 import com.acousea.backend.core.shared.application.http.TestCommand;
 import com.acousea.backend.core.shared.application.services.authentication.SessionService;
 import com.acousea.backend.core.shared.application.utils.PasswordHasher;
-import com.acousea.backend.core.shared.domain.httpWrappers.Result;
+import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 import com.acousea.backend.core.shared.infrastructure.services.authentication.AuthenticationService;
 import com.acousea.backend.core.users.application.http.*;
 import com.acousea.backend.core.users.application.http.params.LoginUserParams;
@@ -35,44 +35,44 @@ public class UserController {
 
 
     @PostMapping("/auth/register")
-    public ResponseEntity<Result<Boolean>> registerUser(@RequestBody RegisterUserParams registerUserParams) {
+    public ResponseEntity<ApiResult<Boolean>> registerUser(@RequestBody RegisterUserParams registerUserParams) {
         RegisterUserCommand query = new RegisterUserCommand(userRepository, passwordHasher);
-        Result<Boolean> response = query.run(registerUserParams);
+        ApiResult<Boolean> response = query.run(registerUserParams);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<Result<User>> loginUser(@RequestBody LoginUserParams loginUserParams) {
+    public ResponseEntity<ApiResult<User>> loginUser(@RequestBody LoginUserParams loginUserParams) {
         LoginUserCommand query = new LoginUserCommand(userRepository, passwordHasher, sessionService, session);
-        Result<User> response = query.run(loginUserParams);
+        ApiResult<User> response = query.run(loginUserParams);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/auth/logout")
-    public ResponseEntity<Result<Boolean>> logoutUser() {
+    public ResponseEntity<ApiResult<Boolean>> logoutUser() {
         LogoutUserCommand query = new LogoutUserCommand(sessionService, session);
-        Result<Boolean> response = query.run(null);
+        ApiResult<Boolean> response = query.run(null);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/validate-username")
-    public ResponseEntity<Result<Boolean>> validateUsername(@RequestParam String username) {
+    public ResponseEntity<ApiResult<Boolean>> validateUsername(@RequestParam String username) {
         ValidateUsernameCommand query = new ValidateUsernameCommand(userRepository);
-        Result<Boolean> response = query.run(username);
+        ApiResult<Boolean> response = query.run(username);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/validate-email")
-    public ResponseEntity<Result<Boolean>> validateEmail(@RequestParam String email) {
+    public ResponseEntity<ApiResult<Boolean>> validateEmail(@RequestParam String email) {
         ValidateEmailCommand query = new ValidateEmailCommand(userRepository);
-        Result<Boolean> response = query.run(email);
+        ApiResult<Boolean> response = query.run(email);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/test")
-    public ResponseEntity<Result<Boolean>> testAdmin() {
+    public ResponseEntity<ApiResult<Boolean>> testAdmin() {
         TestCommand query = new TestCommand(authenticationService);
-        Result<Boolean> response = query.run(null);
+        ApiResult<Boolean> response = query.run(null);
         return ResponseEntity.ok(response);
     }
 

@@ -2,9 +2,12 @@ package com.acousea.backend.app.config;
 
 import com.acousea.backend.core.communicationSystem.application.ports.CommunicationRequestHistoryRepository;
 import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
+import com.acousea.backend.core.communicationSystem.application.ports.RockblockMessageRepository;
 import com.acousea.backend.core.communicationSystem.infrastructure.mocks.MockNodeDevices;
+import com.acousea.backend.core.communicationSystem.infrastructure.mocks.MockRockBlockMessages;
 import com.acousea.backend.core.communicationSystem.infrastructure.ports.InMemory.InMemoryCommunicationRequestHistoryRepository;
 import com.acousea.backend.core.communicationSystem.infrastructure.ports.InMemory.InMemoryNodeDeviceRepository;
+import com.acousea.backend.core.communicationSystem.infrastructure.ports.InMemory.InMemoryRockblockMessageRepository;
 import com.acousea.backend.core.shared.application.services.StorageService;
 import com.acousea.backend.core.shared.application.services.authentication.SessionService;
 import com.acousea.backend.core.shared.infrastructure.services.authentication.InMemorySessionService;
@@ -41,6 +44,11 @@ public class DevConfig {
     @Bean // Must inject Environment to get the value of the property
     public NodeDeviceRepository nodeDeviceRepository(Environment environment) {
         return new InMemoryNodeDeviceRepository(new MockNodeDevices(environment));
+    }
+
+    @Bean
+    public RockblockMessageRepository rockblockMessageRepository(Environment environment) {
+        return new InMemoryRockblockMessageRepository(new MockRockBlockMessages(environment));
     }
 
     @Bean

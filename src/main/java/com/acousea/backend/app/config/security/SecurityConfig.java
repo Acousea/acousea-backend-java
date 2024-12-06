@@ -42,7 +42,7 @@ public class SecurityConfig {
                 apiPrefix + "/users/auth/logout",
                 apiPrefix + "/users/**",
                 apiPrefix + "/communication-system/**",
-                apiPrefix + "/webhook/rockblock-packets",
+                apiPrefix + "/rockblock/**",
                 apiPrefix + "/ws/**",
         };
 

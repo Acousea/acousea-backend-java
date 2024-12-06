@@ -12,7 +12,7 @@ import com.acousea.backend.core.communicationSystem.application.services.Communi
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationResult;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.shared.application.services.StorageService;
-import com.acousea.backend.core.shared.domain.httpWrappers.Result;
+import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +38,7 @@ public class CommunicationSystemController {
     }
 
     @GetMapping("/node-device")
-    public ResponseEntity<Result<NodeDevice>> getNodeStatus(@RequestParam String id) {
+    public ResponseEntity<ApiResult<NodeDevice>> getNodeStatus(@RequestParam String id) {
         GetNodeDeviceCommand query = new GetNodeDeviceCommand(
                 nodeDeviceRepository, storageService
         );
@@ -46,7 +46,7 @@ public class CommunicationSystemController {
     }
 
     @GetMapping("/node-device/all")
-    public ResponseEntity<Result<List<NodeDeviceDTO>>> getAllNodesStatus() {
+    public ResponseEntity<ApiResult<List<NodeDeviceDTO>>> getAllNodesStatus() {
         GetAllNodeDevicesCommand query = new GetAllNodeDevicesCommand(
                 nodeDeviceRepository, storageService
         );
@@ -54,13 +54,13 @@ public class CommunicationSystemController {
     }
 
     @PostMapping("/node-device")
-    public ResponseEntity<Result<NodeDevice>> createNodeDevice(@RequestBody NodeDevice nodeDevice) {
+    public ResponseEntity<ApiResult<NodeDevice>> createNodeDevice(@RequestBody NodeDevice nodeDevice) {
         nodeDeviceRepository.save(nodeDevice);
-        return ResponseEntity.ok(Result.success(nodeDevice));
+        return ResponseEntity.ok(ApiResult.success(nodeDevice));
     }
 
     @PutMapping("/node-device/set/{id}")
-    public ResponseEntity<Result<CommunicationResult>> setNodeDeviceConfiguration(
+    public ResponseEntity<ApiResult<CommunicationResult>> setNodeDeviceConfiguration(
             @PathVariable String id,
             @RequestBody NodeDeviceDTO dto
     ) {
@@ -72,7 +72,7 @@ public class CommunicationSystemController {
     }
 
     @PutMapping("/node-device/update/{id}")
-    public ResponseEntity<Result<CommunicationResult>> getUpdatedNodeDeviceConfiguration(
+    public ResponseEntity<ApiResult<CommunicationResult>> getUpdatedNodeDeviceConfiguration(
             @PathVariable String id,
             @RequestBody GetUpdatedNodeDeviceConfigurationDTO dto
     ) {

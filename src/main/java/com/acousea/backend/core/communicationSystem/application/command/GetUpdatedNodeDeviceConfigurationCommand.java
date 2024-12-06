@@ -9,7 +9,7 @@ import com.acousea.backend.core.communicationSystem.domain.communication.Communi
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
 import com.acousea.backend.core.shared.domain.httpWrappers.Command;
-import com.acousea.backend.core.shared.domain.httpWrappers.Result;
+import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 
 import java.util.UUID;
 
@@ -27,7 +27,7 @@ public class GetUpdatedNodeDeviceConfigurationCommand extends Command<GetUpdated
     }
 
     @Override
-    public Result<CommunicationResult> execute(GetUpdatedNodeDeviceConfigurationDTO dto) {
+    public ApiResult<CommunicationResult> execute(GetUpdatedNodeDeviceConfigurationDTO dto) {
         System.out.println("UpdateNodeDeviceCommand.execute -> node: " + dto);
         NodeDevice nodeDevice = nodeDeviceRepository.findById(UUID.fromString(dto.getNodeId())).orElseThrow(
                 () -> new NullPointerException("Node not found")
@@ -44,6 +44,6 @@ public class GetUpdatedNodeDeviceConfigurationCommand extends Command<GetUpdated
         );
 
 
-        return Result.success(communicationService.send(request));
+        return ApiResult.success(communicationService.send(request));
     }
 }

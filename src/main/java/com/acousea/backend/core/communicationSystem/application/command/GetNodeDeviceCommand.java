@@ -5,7 +5,7 @@ import com.acousea.backend.core.communicationSystem.application.ports.NodeDevice
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.shared.application.services.StorageService;
 import com.acousea.backend.core.shared.domain.httpWrappers.Command;
-import com.acousea.backend.core.shared.domain.httpWrappers.Result;
+import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,16 +21,16 @@ public class GetNodeDeviceCommand extends Command<String, NodeDevice> {
     }
 
     @Override
-    public Result<NodeDevice> execute(String id) {
+    public ApiResult<NodeDevice> execute(String id) {
         Optional<NodeDevice> nodeDeviceInfo = nodeDeviceRepository.findById(UUID.fromString(id));
         if (nodeDeviceInfo.isEmpty()) {
-            return Result.fail(404, "Node not found");
+            return ApiResult.fail(404, "Node not found");
         }
 
         // Obtener la URL completa usando StorageService
         String iconUrl = storageService.getFileUrl(nodeDeviceInfo.get().getIcon());
         if (iconUrl == null) {
-            return Result.fail(500, "Error getting icon URL");
+            return ApiResult.fail(500, "Error getting icon URL");
         }
 
         var node = new NodeDevice(
@@ -40,6 +40,6 @@ public class GetNodeDeviceCommand extends Command<String, NodeDevice> {
                 nodeDeviceInfo.get().getExtModules(),
                 nodeDeviceInfo.get().getPamModules()
         );
-        return Result.success(node);
+        return ApiResult.success(node);
     }
 }

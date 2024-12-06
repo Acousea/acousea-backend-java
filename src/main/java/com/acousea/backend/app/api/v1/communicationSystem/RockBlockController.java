@@ -1,44 +1,49 @@
 package com.acousea.backend.app.api.v1.communicationSystem;
 
 import com.acousea.backend.core.communicationSystem.application.command.ProcessRockblockMessageCommand;
+import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
 import com.acousea.backend.core.communicationSystem.application.ports.RockblockMessageRepository;
 import com.acousea.backend.core.communicationSystem.application.services.CommunicationResponseProcessor;
 import com.acousea.backend.core.communicationSystem.domain.RockBlockMessage;
 import com.acousea.backend.core.shared.application.events.EventBus;
-import com.acousea.backend.core.shared.application.notifications.NotificationService;
-import com.acousea.backend.core.shared.domain.httpWrappers.Result;
+import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("${apiPrefix}/rockblock")
-public class CommunicationWebhookController {
+public class RockBlockController {
 
     private final CommunicationResponseProcessor communicationResponseProcessor;
     private final RockblockMessageRepository rockblockMessageRepository;
-    private final NotificationService notificationService;
     private final EventBus eventBus;
+    private final NodeDeviceRepository nodeDeviceRepository;
 
     @Autowired
-    public CommunicationWebhookController(
+    public RockBlockController(
             CommunicationResponseProcessor communicationResponseProcessor,
             RockblockMessageRepository rockblockMessageRepository,
-            NotificationService notificationService,
-            EventBus eventBus
-    ) {
+            EventBus eventBus,
+            NodeDeviceRepository nodeDeviceRepository) {
         this.communicationResponseProcessor = communicationResponseProcessor;
         this.rockblockMessageRepository = rockblockMessageRepository;
-        this.notificationService = notificationService;
         this.eventBus = eventBus;
+        this.nodeDeviceRepository = nodeDeviceRepository;
+    }
+
+    @GetMapping("/messages/paginated")
+    public ResponseEntity<ApiResult<List<RockBlockMessage>>> getPaginatedMessages(
+            @RequestParam("page") int page,
+            @RequestParam("rows_per_page") int rowsPerPage) {
+        return ResponseEntity.ok(ApiResult.success(rockblockMessageRepository.getPaginatedMessages(page, rowsPerPage)));
     }
 
     @PostMapping("/webhook")
-    public ResponseEntity<Result<String>> receiveRockblockPacket(
+    public ResponseEntity<ApiResult<String>> receiveRockblockPacket(
             @RequestParam("imei") String imei,
             @RequestParam("serial") String serial,
             @RequestParam("momsn") int momsn,
@@ -64,13 +69,13 @@ public class CommunicationWebhookController {
             var command = new ProcessRockblockMessageCommand(
                     rockblockMessageRepository,
                     communicationResponseProcessor,
-                    notificationService,
+                    nodeDeviceRepository,
                     eventBus);
             return ResponseEntity.ok(command.run(rockBlockMessage));
         } catch (Exception e) {
             System.out.println("RockBlockMessage processing error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .body(Result.fail(422, "Error processing the message"));
+                    .body(ApiResult.fail(422, "Error processing the message"));
         }
     }
 

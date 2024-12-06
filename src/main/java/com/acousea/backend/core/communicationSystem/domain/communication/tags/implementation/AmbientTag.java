@@ -21,7 +21,7 @@ public class AmbientTag extends Tag {
 
     public AmbientModule toAmbientModule() {
         ByteBuffer buffer = ByteBuffer.wrap(this.VALUE);
-        return new AmbientModule(buffer.getInt(), buffer.getInt());
+        return new AmbientModule(buffer.get(), buffer.get());
     }
 
     public static AmbientTag fromBytes(ByteBuffer buffer) {

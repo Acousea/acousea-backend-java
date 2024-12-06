@@ -1,7 +1,7 @@
 package com.acousea.backend.core.shared.application.http;
 
 import com.acousea.backend.core.shared.domain.httpWrappers.Command;
-import com.acousea.backend.core.shared.domain.httpWrappers.Result;
+import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 import com.acousea.backend.core.shared.infrastructure.services.authentication.AuthenticationService;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +17,8 @@ public class TestCommand extends Command<String, Boolean> {
     }
 
     @Override
-    public Result<Boolean> execute(String username) {
+    public ApiResult<Boolean> execute(String username) {
         authenticationService.checkAuthentication("USER");
-        return Result.success(true);
+        return ApiResult.success(true);
     }
 }

@@ -8,10 +8,9 @@ import com.acousea.backend.core.communicationSystem.domain.communication.Communi
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationResult;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import com.acousea.backend.core.shared.application.services.StorageService;
 import com.acousea.backend.core.shared.domain.httpWrappers.Command;
-import com.acousea.backend.core.shared.domain.httpWrappers.Result;
+import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 
 import java.util.UUID;
 
@@ -32,7 +31,7 @@ public class SetNodeDeviceConfigurationCommand extends Command<NodeDeviceDTO, Co
     }
 
     @Override
-    public Result<CommunicationResult> execute(NodeDeviceDTO dto) {
+    public ApiResult<CommunicationResult> execute(NodeDeviceDTO dto) {
         System.out.println("SetNodeDeviceCommand.execute -> node: " + dto);
         NodeDevice nodeDevice = nodeDeviceRepository.findById(UUID.fromString(dto.getId())).orElseThrow(
                 () -> new NullPointerException("Node not found")
@@ -62,6 +61,6 @@ public class SetNodeDeviceConfigurationCommand extends Command<NodeDeviceDTO, Co
                 nodeChanges
         );
 
-        return Result.success(communicationService.send(request));
+        return ApiResult.success(communicationService.send(request));
     }
 }

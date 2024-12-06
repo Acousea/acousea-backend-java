@@ -6,7 +6,7 @@ import com.acousea.backend.core.communicationSystem.application.ports.NodeDevice
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.shared.application.services.StorageService;
 import com.acousea.backend.core.shared.domain.httpWrappers.Command;
-import com.acousea.backend.core.shared.domain.httpWrappers.Result;
+import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class GetAllNodeDevicesCommand extends Command<Void, List<NodeDeviceDTO>>
     }
 
     @Override
-    public Result<List<NodeDeviceDTO>> execute(Void none) {
+    public ApiResult<List<NodeDeviceDTO>> execute(Void none) {
         List<NodeDevice> nodeDevice = nodeDeviceRepository.findAll();
         List<NodeDevice> nodeDevicesWithIconUrl = new ArrayList<>();
 
@@ -36,6 +36,6 @@ public class GetAllNodeDevicesCommand extends Command<Void, List<NodeDeviceDTO>>
         });
 
 
-        return Result.success(NodeDeviceDTO.fromNodeDevices(nodeDevicesWithIconUrl));
+        return ApiResult.success(NodeDeviceDTO.fromNodeDevices(nodeDevicesWithIconUrl));
     }
 }

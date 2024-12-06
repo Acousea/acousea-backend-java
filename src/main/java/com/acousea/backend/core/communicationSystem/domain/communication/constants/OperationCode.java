@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 public enum OperationCode {
-    SUMMARY_REPORT('S'),
-    SUMMARY_SIMPLE_REPORT('s'),
-    SET_NODE_DEVICE_CONFIG('C'),
-    GET_UPDATED_NODE_DEVICE_CONFIG('U');
+    SUMMARY_REPORT('S'), // 53
+    SUMMARY_SIMPLE_REPORT('s'), // 73
+    SET_NODE_DEVICE_CONFIG('C'), // 43
+    GET_UPDATED_NODE_DEVICE_CONFIG('U'); // 55
 
 
     private final char value;

@@ -18,9 +18,12 @@ public class InMemoryNodeDeviceRepository extends InMemoryIRepository<NodeDevice
     @Override
     public Optional<NodeDevice> findByNetworkAddress(Address networkAddress) {
         return this.findAll().stream()
-                .filter(nodeDevice -> nodeDevice.getExtModules().values().stream()
-                        .anyMatch(module -> module instanceof NetworkModule && ((NetworkModule) module).getLocalAddress() == networkAddress))
+                .filter(
+                        nodeDevice -> ((NetworkModule) nodeDevice.getExtModules().get(NetworkModule.name)).
+                                getLocalAddress().equals(networkAddress))
                 .findFirst();
+
+
     }
 
     public InMemoryNodeDeviceRepository(MockNodeDevices mockNodeDevices) {

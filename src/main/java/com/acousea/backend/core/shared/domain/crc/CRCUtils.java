@@ -32,6 +32,7 @@ public class CRCUtils {
         return crc & 0xFFFF; // Asegura que el CRC esté en un rango de 16 bits
     }
 
+    // FIXME: Do not calculate CRC using the last two bytes as zero
     public static boolean verifyCRC(ByteBuffer buffer) {
         if (buffer.remaining() < 2) {
             throw new IllegalArgumentException("Data length must be at least 2 bytes for CRC verification.");

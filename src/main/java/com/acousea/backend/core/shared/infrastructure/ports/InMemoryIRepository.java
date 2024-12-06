@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 public class InMemoryIRepository<T, ID> implements IRepository<T, ID> {
 
-    private final Map<ID, T> storage = new ConcurrentHashMap<>();  // Almacenamiento en memoria
+    protected final Map<ID, T> storage = new ConcurrentHashMap<>();  // Almacenamiento en memoria
     private final Function<T, ID> idExtractor;                      // Función para extraer el ID de la entidad
 
     public InMemoryIRepository(Function<T, ID> idExtractor) {
