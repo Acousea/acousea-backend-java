@@ -340,7 +340,7 @@ public class NodeDeviceDTO {
 
             public NetworkModule toNetworkModule() {
                 return new NetworkModule(
-                        Address.of(this.localAddress),
+                        Address.fromValue(this.localAddress),
                         this.routingTable.toRoutingTable()
                 );
             }
@@ -371,11 +371,11 @@ public class NodeDeviceDTO {
 
                     // Convertir el Map<Integer, Integer> a Map<Address, Address>
                     this.peerRoutes.forEach((key, value) ->
-                            routingTable.addRoute(Address.of(key), Address.of(value))
+                            routingTable.addRoute(Address.fromValue(key), Address.fromValue(value))
                     );
 
                     // Establecer el defaultGateway
-                    routingTable.setDefaultGateway(Address.of(this.defaultGateway));
+                    routingTable.setDefaultGateway(Address.fromValue(this.defaultGateway));
 
                     return routingTable;
                 }

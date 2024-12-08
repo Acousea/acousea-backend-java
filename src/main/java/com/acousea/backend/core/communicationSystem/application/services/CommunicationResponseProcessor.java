@@ -1,13 +1,9 @@
 package com.acousea.backend.core.communicationSystem.application.services;
 
-import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
-import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
-import com.acousea.backend.core.communicationSystem.domain.communication.constants.RoutingChunk;
-import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.GetUpdatedNodeConfigurationPayload;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.NewNodeConfigurationPayload;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.SummaryReportPayload;
-import com.acousea.backend.core.communicationSystem.domain.communication.tags.TagType;
-import com.acousea.backend.core.communicationSystem.domain.communication.tags.implementation.*;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.exceptions.InvalidPacketException;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient.AmbientModule;
@@ -31,57 +27,58 @@ public class CommunicationResponseProcessor {
     // Interfaz funcional para el procesamiento de tags
     @FunctionalInterface
     private interface TagProcessor {
-        void process(NodeDevice nodeDevice, Object tag) throws InvalidPacketException;
+        void process(NodeDevice nodeDevice, SerializableModule tag) throws InvalidPacketException;
     }
+
     // Mapeo de TagType a acciones específicas
-    private final Map<TagType, TagProcessor> tagProcessors = Map.of(
-            TagType.BATTERY, (nodeDevice, tag) ->
-                    nodeDevice.getExtModules().put(BatteryModule.name, ((BatteryTag) tag).toBatteryModule()),
-            TagType.LOCATION, (nodeDevice, tag) ->
-                    nodeDevice.getExtModules().put(LocationModule.name, ((LocationTag) tag).toLocationModule()),
-            TagType.AMBIENT, (nodeDevice, tag) ->
-                    nodeDevice.getExtModules().put(AmbientModule.name, ((AmbientTag) tag).toAmbientModule()),
-            TagType.NETWORK, (nodeDevice, tag) ->
-                    nodeDevice.getExtModules().put(NetworkModule.name, ((NetworkTag) tag).toNetworkModule()),
-            TagType.STORAGE, (nodeDevice, tag) ->
-                    nodeDevice.getExtModules().put(StorageModule.name, ((StorageTag) tag).toStorageModule()),
-            TagType.OPERATION_MODES, (nodeDevice, tag) ->
-                    nodeDevice.getExtModules().put(OperationModeModule.name, ((OperationModeTag) tag).toOperationModeModule()),
-            TagType.RTC, (nodeDevice, tag) ->
-                    nodeDevice.getExtModules().put(RTCModule.name, ((RTCTag) tag).toRTCModule()),
-            TagType.REPORTING, (nodeDevice, tag) -> {
-                ReportingModule reportingModule = ((ReportingPeriodTag) tag).toReportingModule();
+    private final Map<ModuleCode, TagProcessor> tagProcessors = Map.of(
+            ModuleCode.BATTERY, (nodeDevice, serializableModule) ->
+                    nodeDevice.getExtModules().put(BatteryModule.name, (BatteryModule) serializableModule),
+            ModuleCode.LOCATION, (nodeDevice, serializableModule) ->
+                    nodeDevice.getExtModules().put(LocationModule.name, (LocationModule) serializableModule),
+            ModuleCode.AMBIENT, (nodeDevice, serializableModule) ->
+                    nodeDevice.getExtModules().put(AmbientModule.name, (AmbientModule) serializableModule),
+            ModuleCode.NETWORK, (nodeDevice, serializableModule) ->
+                    nodeDevice.getExtModules().put(NetworkModule.name, (NetworkModule) serializableModule),
+            ModuleCode.STORAGE, (nodeDevice, serializableModule) ->
+                    nodeDevice.getExtModules().put(StorageModule.name, (StorageModule) serializableModule),
+            ModuleCode.OPERATION_MODES, (nodeDevice, serializableModule) ->
+                    nodeDevice.getExtModules().put(OperationModeModule.name, (OperationModeModule) serializableModule),
+            ModuleCode.RTC, (nodeDevice, serializableModule) ->
+                    nodeDevice.getExtModules().put(RTCModule.name, ((RTCModule) serializableModule)),
+            ModuleCode.REPORTING, (nodeDevice, tag) -> {
+                ReportingModule reportingModule = ((ReportingModule) tag);
                 switch (reportingModule.getTechnologyId()) {
                     case IridiumReportingModule.TECHNOLOGY_ID ->
                             nodeDevice.getExtModules().put(IridiumReportingModule.name, reportingModule);
                     case LoRaReportingModule.TECHNOLOGY_ID ->
                             nodeDevice.getExtModules().put(LoRaReportingModule.name, reportingModule);
                     default -> throw new IllegalArgumentException(
-                            ReportingPeriodTag.class.getName() + " -> Unknown technology id: " + reportingModule.getTechnologyId());
+                            ReportingModule.class.getName() + " -> Unknown technology id: " + reportingModule.getTechnologyId());
                 }
             }
     );
 
 
     public void processNodeDeviceConfigurationResponse(NodeDevice nodeDevice, NewNodeConfigurationPayload payload) {
-        payload.getTags().forEach(tag -> {
-                try {
-                    TagType tagType = TagType.fromValue(tag.getTYPE());
-                    TagProcessor processor = tagProcessors.get(tagType);
-                    if (processor == null) {
-                        throw new IllegalArgumentException("Unknown tag type: " + tagType);
-                    }
-                    processor.process(nodeDevice, tag);
-                } catch (InvalidPacketException e) {
-                    throw new RuntimeException("Error processing tag of type: " + tag.getTYPE(), e);
+        payload.getSerializableModules().forEach(tag -> {
+            try {
+                ModuleCode moduleCode = ModuleCode.fromValue(tag.getTYPE());
+                TagProcessor processor = tagProcessors.get(moduleCode);
+                if (processor == null) {
+                    throw new IllegalArgumentException("Unknown tag type: " + moduleCode);
                 }
+                processor.process(nodeDevice, tag);
+            } catch (InvalidPacketException e) {
+                throw new RuntimeException("Error processing tag of type: " + tag.getTYPE(), e);
+            }
 
         });
 
         System.out.println("Processing SetNodeDeviceConfigurationPayload");
     }
 
-    public void processSummaryReportResponse(NodeDevice nodeDevice,SummaryReportPayload payload) {
+    public void processSummaryReportResponse(NodeDevice nodeDevice, SummaryReportPayload payload) {
 
     }
 

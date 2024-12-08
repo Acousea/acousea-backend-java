@@ -3,7 +3,7 @@ package com.acousea.backend.core.communicationSystem.domain.communication.payloa
 import com.acousea.backend.core.communicationSystem.application.command.DTO.GetUpdatedNodeDeviceConfigurationDTO;
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationPacket;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.Payload;
-import com.acousea.backend.core.communicationSystem.domain.communication.tags.TagType;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.exceptions.InvalidPacketException;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,29 +15,29 @@ import java.util.List;
 @Getter
 @Setter
 public class GetUpdatedNodeConfigurationPayload implements Payload {
-    private List<TagType> tagTypes;
+    private List<ModuleCode> moduleCodes;
 
-    public GetUpdatedNodeConfigurationPayload(List<TagType> tagTypes) {
-        this.tagTypes = tagTypes;
+    public GetUpdatedNodeConfigurationPayload(List<ModuleCode> moduleCodes) {
+        this.moduleCodes = moduleCodes;
     }
 
     public static Payload fromDTO(GetUpdatedNodeDeviceConfigurationDTO dto) {
-        List<TagType> tagTypes = new ArrayList<>();
+        List<ModuleCode> moduleCodes = new ArrayList<>();
         dto.getRequestedModules().forEach(module -> {
             try {
-                tagTypes.add(TagType.fromModuleName(module));
+                moduleCodes.add(ModuleCode.fromModuleName(module));
             } catch (IllegalArgumentException e) {
                 System.out.println("Invalid tag type: " + e.getMessage());
             }
         });
-        return new GetUpdatedNodeConfigurationPayload(tagTypes);
+        return new GetUpdatedNodeConfigurationPayload(moduleCodes);
     }
 
     @Override
     public short getBytesSize() {
-        int size = tagTypes.size() * TagType.getAmountOfBytes();
+        int size = moduleCodes.size() * ModuleCode.getAmountOfBytes();
         // Check if size fits in short
-        if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE)  {
+        if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE) {
             throw new IllegalArgumentException(GetUpdatedNodeConfigurationPayload.class.getSimpleName() + "Payload size is too big");
         }
         return (short) size;
@@ -45,22 +45,18 @@ public class GetUpdatedNodeConfigurationPayload implements Payload {
 
     @Override
     public byte[] toBytes() {
-        byte[] bytes = new byte[tagTypes.size()];
-        for (int i = 0; i < tagTypes.size(); i++) {
-            bytes[i] = (byte) tagTypes.get(i).getValue();
+        byte[] bytes = new byte[moduleCodes.size()];
+        for (int i = 0; i < moduleCodes.size(); i++) {
+            bytes[i] = (byte) moduleCodes.get(i).getValue();
         }
         return bytes;
     }
 
-    public static Payload fromBytes(ByteBuffer buffer) {
-        List<TagType> tagTypes = new ArrayList<>();
+    public static Payload fromBytes(ByteBuffer buffer) throws InvalidPacketException {
+        List<ModuleCode> moduleCodes = new ArrayList<>();
         while (buffer.hasRemaining()) {
-            try {
-                tagTypes.add(TagType.fromValue(buffer.get()));
-            } catch (InvalidPacketException e) {
-                System.out.println("Invalid tag type: " + e.getMessage());
-            }
+            moduleCodes.add(ModuleCode.fromValue(buffer.get()));
         }
-        return new GetUpdatedNodeConfigurationPayload(tagTypes);
+        return new GetUpdatedNodeConfigurationPayload(moduleCodes);
     }
 }

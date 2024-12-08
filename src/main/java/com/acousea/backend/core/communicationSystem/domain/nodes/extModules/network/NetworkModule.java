@@ -1,35 +1,37 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network;
 
-import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@Setter
 @Getter
-public class NetworkModule extends ExtModule {
+@Setter
+public class NetworkModule extends SerializableModule implements ExtModule {
     public static final String name = "network";
-    private final Address localAddress;
-    private final RoutingTable routingTable;
-
-    public NetworkModule(int localAddress) {
-        this.localAddress = Address.of(localAddress);
-        this.routingTable = new RoutingTable();
-    }
+    private Address localAddress;
+    private RoutingTable routingTable;
 
     public NetworkModule(Address localAddress, RoutingTable routingTable) {
+        super(ModuleCode.NETWORK, serialize(localAddress, routingTable));
         this.localAddress = localAddress;
         this.routingTable = routingTable;
     }
 
+    public NetworkModule(int localAddress) {
+        this(Address.fromValue(localAddress), new RoutingTable());
+    }
+
     @Override
     public int getFullSize() {
-        return Address.getSize() + (routingTable.getPeerRoutes().size() * Byte.BYTES * 2);
+        return Address.getSize() + routingTable.getPeerRoutes().size() * 2 * Byte.BYTES + Byte.BYTES;
     }
 
     public static int getMinSize() {
@@ -40,13 +42,39 @@ public class NetworkModule extends ExtModule {
         return new NetworkModule(address);
     }
 
-
-    public static NetworkModule fromDTO(NodeDeviceDTO.ExtModuleDto.NetworkModuleDto network) {
-        NetworkModule module = new NetworkModule(Address.of(network.getLocalAddress()).getValue());
-        network.getRoutingTable().getPeerRoutes().forEach((destination, nextHop) -> {
-            module.getRoutingTable().addRoute(Address.of(destination), Address.of(nextHop));
+    private static byte[] serialize(Address localAddress, RoutingTable routingTable) {
+        int size = Address.getSize() + routingTable.getPeerRoutes().size() * 2 * Byte.BYTES + Byte.BYTES;
+        ByteBuffer buffer = ByteBuffer.allocate(size);
+        buffer.put(localAddress.getValue());
+        routingTable.getPeerRoutes().forEach((destination, nextHop) -> {
+            buffer.put(destination.getValue());
+            buffer.put(nextHop.getValue());
         });
-        return module;
+        buffer.put(routingTable.getDefaultGateway().getValue());
+        return buffer.array();
+    }
+
+    public static NetworkModule fromBytes(ByteBuffer buffer) {
+        if (buffer.remaining() < getMinSize()) {
+            throw new IllegalArgumentException("Invalid byte array for NetworkModule");
+        }
+        Address localAddress = Address.fromValue(buffer.get());
+        RoutingTable routingTable = new RoutingTable();
+        while (buffer.remaining() > Byte.BYTES) {
+            Address destination = Address.fromValue(buffer.get());
+            Address nextHop = Address.fromValue(buffer.get());
+            routingTable.addRoute(destination, nextHop);
+        }
+        routingTable.setDefaultGateway(Address.fromValue(buffer.get()));
+        return new NetworkModule(localAddress, routingTable);
+    }
+
+    @Override
+    public String toString() {
+        return "NetworkModule{" +
+                "localAddress=" + localAddress +
+                ", routingTable=" + routingTable +
+                '}';
     }
 
     @Getter
@@ -70,6 +98,14 @@ public class NetworkModule extends ExtModule {
         public void clear() {
             peerRoutes.clear();
             defaultGateway = null;
+        }
+
+        @Override
+        public String toString() {
+            return "RoutingTable{" +
+                    "peerRoutes=" + peerRoutes +
+                    ", defaultGateway=" + defaultGateway +
+                    '}';
         }
     }
 }

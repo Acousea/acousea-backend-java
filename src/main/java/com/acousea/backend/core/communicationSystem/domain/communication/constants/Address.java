@@ -21,7 +21,7 @@ public class Address {
         return Byte.BYTES;
     }
 
-    public static Address of(int value) {
+    public static Address fromValue(int value) {
 //        if (isReserved(value)) {
 //            throw new IllegalArgumentException("Address value " + value + " is reserved.");
 //        }

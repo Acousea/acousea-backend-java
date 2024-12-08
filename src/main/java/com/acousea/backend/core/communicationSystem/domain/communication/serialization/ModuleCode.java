@@ -1,4 +1,4 @@
-package com.acousea.backend.core.communicationSystem.domain.communication.tags;
+package com.acousea.backend.core.communicationSystem.domain.communication.serialization;
 
 import com.acousea.backend.core.communicationSystem.domain.exceptions.InvalidPacketException;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient.AmbientModule;
@@ -13,7 +13,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.stor
 import lombok.Getter;
 
 @Getter
-public enum TagType {
+public enum ModuleCode {
     BATTERY('B'),
     LOCATION('L'),
     NETWORK('N'),
@@ -25,7 +25,7 @@ public enum TagType {
 
     private final char value;
 
-    TagType(char value) {
+    ModuleCode(char value) {
         this.value = value;
     }
 
@@ -33,18 +33,18 @@ public enum TagType {
         return Byte.BYTES;
     }
 
-    public static TagType fromValue(byte code) throws InvalidPacketException {
+    public static ModuleCode fromValue(byte code) throws InvalidPacketException {
         char charCode = (char) code;
-        for (TagType tagType : TagType.values()) {
-            if (tagType.value == charCode) {
-                return tagType;
+        for (ModuleCode moduleCode : ModuleCode.values()) {
+            if (moduleCode.value == charCode) {
+                return moduleCode;
             }
         }
         throw new InvalidPacketException("Invalid operation code: " + code);
     }
 
 
-    public static TagType fromModuleName(String moduleName) {
+    public static ModuleCode fromModuleName(String moduleName) {
         return switch (moduleName) {
             case BatteryModule.name -> BATTERY;
             case LocationModule.name -> LOCATION;

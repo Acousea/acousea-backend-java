@@ -84,8 +84,8 @@ public class SQLCommunicationRequest {
             return new CommunicationRequest(
                     OperationCode.valueOf(OperationCode.class, String.valueOf(operationCode)),
                     new RoutingChunk(
-                            Address.of(senderAddress),
-                            Address.of(receiverAddress),
+                            Address.fromValue(senderAddress),
+                            Address.fromValue(receiverAddress),
                             (byte) ttl
                     ),
                     PayloadFactory.from(OperationCode.fromValue(this.operationCode), ByteBuffer.wrap(this.payload)),

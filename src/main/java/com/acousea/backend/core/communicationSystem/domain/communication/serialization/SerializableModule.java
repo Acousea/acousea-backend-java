@@ -1,4 +1,4 @@
-package com.acousea.backend.core.communicationSystem.domain.communication.tags;
+package com.acousea.backend.core.communicationSystem.domain.communication.serialization;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,11 +7,11 @@ import java.nio.ByteBuffer;
 
 @Getter
 @Setter
-public abstract class Tag {
+public abstract class SerializableModule {
     protected final byte TYPE; // Campo común para el tipo de parámetro
     protected final byte[] VALUE; // Campo común para el valor del parámetro
 
-    public Tag(TagType type, byte[] value) {
+    public SerializableModule(ModuleCode type, byte[] value) {
         this.TYPE = (byte) type.getValue();
         this.VALUE = value;
     }

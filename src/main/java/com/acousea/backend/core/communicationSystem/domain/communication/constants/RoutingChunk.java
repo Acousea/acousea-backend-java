@@ -29,7 +29,7 @@ public final class RoutingChunk {
         if (buffer.remaining() < getSize()) {
             throw new IllegalArgumentException("Buffer does not have enough bytes to create a RoutingChunk");
         }
-        return new RoutingChunk(Address.of(buffer.get()), Address.of(buffer.get()), buffer.get());
+        return new RoutingChunk(Address.fromValue(buffer.get()), Address.fromValue(buffer.get()), buffer.get());
     }
 
     public static RoutingChunk fromBackendToNode(Address receiver) {

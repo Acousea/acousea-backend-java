@@ -2,29 +2,26 @@ package com.acousea.backend.core.communicationSystem.domain.communication.payloa
 
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationPacket;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.Payload;
-import com.acousea.backend.core.communicationSystem.domain.communication.tags.Tag;
-import com.acousea.backend.core.communicationSystem.domain.communication.tags.TagFactory;
-import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModuleFactory;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 public class SummaryReportPayload implements Payload {
-    private List<Tag> tags;
+    private List<SerializableModule> serializableModules;
 
-    public SummaryReportPayload(List<Tag> tags) {
-        this.tags = tags;
+    public SummaryReportPayload(List<SerializableModule> serializableModules) {
+        this.serializableModules = serializableModules;
     }
 
     @Override
     public short getBytesSize() {
-        int size = tags.stream().mapToInt(Tag::getFullLength).sum();
+        int size = serializableModules.stream().mapToInt(SerializableModule::getFullLength).sum();
         if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE)  {
             throw new IllegalArgumentException(SummaryReportPayload.class.getSimpleName() + "Payload size is too big");
         }
@@ -34,16 +31,13 @@ public class SummaryReportPayload implements Payload {
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(getBytesSize());
-        tags.forEach(tag -> buffer.put(tag.toBytes()));
+        serializableModules.forEach(tag -> buffer.put(tag.toBytes()));
         return buffer.array();
     }
 
     public static Payload fromBytes(ByteBuffer buffer) {
-        List<Tag> tags = new ArrayList<>();
-        while (buffer.hasRemaining()) {
-            Tag tag = TagFactory.createTag(buffer);
-            tags.add(tag);
-        }
-        return new SummaryReportPayload(tags);
+        List<SerializableModule> serializableModules = SerializableModuleFactory.createModules(buffer);
+        serializableModules.addAll(serializableModules);
+        return new SummaryReportPayload(serializableModules);
     }
 }

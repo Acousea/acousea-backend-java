@@ -1,18 +1,26 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient;
 
 
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.nio.ByteBuffer;
+
 @Getter
 @Setter
-public class AmbientModule extends ExtModule {
+public class AmbientModule extends SerializableModule implements ExtModule {
     public static final String name = "ambient";
     private int temperature;
     private int humidity;
 
     public AmbientModule(int temperature, int humidity) {
+        super(ModuleCode.AMBIENT, ByteBuffer.allocate(Byte.BYTES * 2)
+                .put((byte) temperature)
+                .put((byte) humidity)
+                .array());
         this.temperature = temperature;
         this.humidity = humidity;
     }
@@ -30,4 +38,12 @@ public class AmbientModule extends ExtModule {
         return new AmbientModule(0, 0);
     }
 
+    public static AmbientModule fromBytes(ByteBuffer buffer) {
+        if (buffer.remaining() < Byte.BYTES * 2) {
+            throw new IllegalArgumentException("Invalid byte array for AmbientModule");
+        }
+        int temperature = buffer.get();
+        int humidity = buffer.get();
+        return new AmbientModule(temperature, humidity);
+    }
 }

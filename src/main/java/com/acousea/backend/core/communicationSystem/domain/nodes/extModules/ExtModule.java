@@ -1,11 +1,8 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules;
 
-import lombok.Getter;
-
-@Getter
-public abstract class ExtModule {
+public interface ExtModule {
 
     // Método para obtener el tamaño total del módulo
-    public abstract int getFullSize();
+    int getFullSize();
 
 }

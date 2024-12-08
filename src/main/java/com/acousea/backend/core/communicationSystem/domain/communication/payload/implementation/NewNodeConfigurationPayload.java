@@ -2,35 +2,38 @@ package com.acousea.backend.core.communicationSystem.domain.communication.payloa
 
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationPacket;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.Payload;
-import com.acousea.backend.core.communicationSystem.domain.communication.tags.Tag;
-import com.acousea.backend.core.communicationSystem.domain.communication.tags.TagFactory;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModuleFactory;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
 public class NewNodeConfigurationPayload implements Payload {
-    private List<Tag> tags;
+    private List<SerializableModule> serializableModules;
 
-    public NewNodeConfigurationPayload(List<Tag> tags) {
-        this.tags = tags;
+    public NewNodeConfigurationPayload(List<SerializableModule> serializableModules) {
+        this.serializableModules = serializableModules;
     }
 
     public static NewNodeConfigurationPayload fromNodeDevice(@NotNull NodeDevice nodeDevice) {
-        List<Tag> tags = TagFactory.createTags(nodeDevice);
-        return new NewNodeConfigurationPayload(tags);
+        List<SerializableModule> serializableModules = nodeDevice.getExtModules().values().stream()
+                .filter(SerializableModule.class::isInstance)
+                .map(SerializableModule.class::cast)
+                .collect(Collectors.toList());
+        return new NewNodeConfigurationPayload(serializableModules);
     }
 
     @Override
     public short getBytesSize() {
-        int size = tags.stream().mapToInt(Tag::getFullLength).sum();
-        if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE)  {
+        int size = serializableModules.stream().mapToInt(SerializableModule::getFullLength).sum();
+        if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE) {
             throw new IllegalArgumentException(NewNodeConfigurationPayload.class.getSimpleName() + "Payload size is too big");
         }
         return (short) size;
@@ -39,16 +42,13 @@ public class NewNodeConfigurationPayload implements Payload {
     @Override
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(getBytesSize());
-        tags.forEach(tag -> buffer.put(tag.toBytes()));
+        serializableModules.forEach(tag -> buffer.put(tag.toBytes()));
         return buffer.array();
     }
 
     public static Payload fromBytes(ByteBuffer buffer) {
-        List<Tag> tags = new ArrayList<>();
-        while (buffer.hasRemaining()) {
-            Tag tag = TagFactory.createTag(buffer);
-            tags.add(tag);
-        }
-        return new NewNodeConfigurationPayload(tags);
+        List<SerializableModule> serializableModules = SerializableModuleFactory.createModules(buffer);
+        serializableModules.addAll(serializableModules);
+        return new NewNodeConfigurationPayload(serializableModules);
     }
 }
