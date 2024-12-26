@@ -1,7 +1,7 @@
 package com.acousea.backend.app.config;
 
 import com.acousea.backend.core.communicationSystem.domain.events.ReceivedRockBlockMessageEvent;
-import com.acousea.backend.core.communicationSystem.domain.events.ReceivedSummaryReportEvent;
+import com.acousea.backend.core.communicationSystem.domain.events.ReceivedCompleteStatusReportEvent;
 import com.acousea.backend.core.communicationSystem.domain.events.UpdatedNodeConfigurationEvent;
 import com.acousea.backend.core.shared.application.events.EventBus;
 import com.acousea.backend.core.shared.application.notifications.NotificationService;
@@ -27,7 +27,7 @@ public class BaseConfig {
         eventBus.subscribe(ReceivedRockBlockMessageEvent.class, event -> {
             notificationService.sendInfoNotification("Received RockBlock message");
         });
-        eventBus.subscribe(ReceivedSummaryReportEvent.class, event -> {
+        eventBus.subscribe(ReceivedCompleteStatusReportEvent.class, event -> {
             notificationService.sendSuccessNotification(
                     "Received " + event.getPayload().nodeName() + " summary report");
         });

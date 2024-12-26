@@ -1,19 +1,6 @@
 package com.acousea.backend.core.communicationSystem.infrastructure.mocks;
 
 import com.acousea.backend.core.communicationSystem.domain.RockBlockMessage;
-import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient.AmbientModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModeModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.ReportingModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.storage.StorageModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.ICListenHF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;

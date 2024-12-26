@@ -9,10 +9,10 @@ import java.util.Objects;
 @Getter
 @Setter
 public final class OperationMode {
-    private final Integer id; // Usamos byte directamente
+    private final Short id; // Usamos byte directamente
     private final String name;
 
-    private OperationMode(Integer id, String name) {
+    private OperationMode(Short id, String name) {
         if (!UnsignedByte.isValidUnsignedByte(id)) {
             throw new IllegalArgumentException("ID must be between 0 and 255, inclusive.");
         }
@@ -20,12 +20,12 @@ public final class OperationMode {
         this.name = name;
     }
 
-    public static OperationMode create(int id, String name) {
+    public static OperationMode create(short id, String name) {
         return new OperationMode(id, name);
     }
 
     public static OperationMode create(byte id, String name) {
-        return new OperationMode(UnsignedByte.toUnsignedInt(id), name);
+        return new OperationMode((short) UnsignedByte.toUnsignedInt(id), name);
     }
 
     @Override

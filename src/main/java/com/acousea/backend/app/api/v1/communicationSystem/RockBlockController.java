@@ -67,10 +67,9 @@ public class RockBlockController {
 
             // Procesar el comando
             var command = new ProcessRockblockMessageCommand(
-                    rockblockMessageRepository,
-                    communicationResponseProcessor,
-                    nodeDeviceRepository,
-                    eventBus);
+                    rockblockMessageRepository, communicationResponseProcessor,
+                    nodeDeviceRepository, eventBus
+            );
             return ResponseEntity.ok(command.run(rockBlockMessage));
         } catch (Exception e) {
             System.out.println("RockBlockMessage processing error: " + e.getMessage());

@@ -5,7 +5,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambi
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModeModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModesModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
@@ -18,6 +18,7 @@ public enum ModuleCode {
     LOCATION('L'),
     NETWORK('N'),
     OPERATION_MODES('O'),
+    OPERATION_MODES_GRAPH('G'),
     REPORTING('P'),
     RTC('R'),
     STORAGE('S'),
@@ -49,7 +50,7 @@ public enum ModuleCode {
             case BatteryModule.name -> BATTERY;
             case LocationModule.name -> LOCATION;
             case NetworkModule.name -> NETWORK;
-            case OperationModeModule.name -> OPERATION_MODES;
+            case OperationModesModule.name -> OPERATION_MODES;
             case LoRaReportingModule.name, IridiumReportingModule.name -> REPORTING;
             case RTCModule.name -> RTC;
             case StorageModule.name -> STORAGE;

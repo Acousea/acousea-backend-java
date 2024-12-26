@@ -8,8 +8,9 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambi
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModeGraph.OperationModesGraphModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModeModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModesModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
@@ -23,6 +24,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.icli
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -91,9 +93,10 @@ public class NodeDeviceDTO {
             @JsonSubTypes.Type(value = ExtModuleDto.NetworkModuleDto.class, name = NetworkModule.name),
             @JsonSubTypes.Type(value = ExtModuleDto.RtcModuleDto.class, name = RTCModule.name),
             @JsonSubTypes.Type(value = ExtModuleDto.StorageModuleDto.class, name = StorageModule.name),
+            @JsonSubTypes.Type(value = ExtModuleDto.OperationModeModuleDto.class, name = OperationModesModule.name),
+            @JsonSubTypes.Type(value = ExtModuleDto.OperationModesGraphModuleDto.class, name = OperationModesGraphModule.name),
             @JsonSubTypes.Type(value = ExtModuleDto.IridiumReportingModuleDto.class, name = IridiumReportingModule.name),
-            @JsonSubTypes.Type(value = ExtModuleDto.LoRaReportingModuleDto.class, name = LoRaReportingModule.name)
-            // Add other module DTO classes here
+            @JsonSubTypes.Type(value = ExtModuleDto.LoRaReportingModuleDto.class, name = LoRaReportingModule.name),
     })
     @Data
     public static class ExtModuleDto {
@@ -104,6 +107,10 @@ public class NodeDeviceDTO {
                     extModuleMap.put(key, ((BatteryModuleDto) value).toBatteryModule());
                 } else if (value instanceof AmbientModuleDTO) {
                     extModuleMap.put(key, ((AmbientModuleDTO) value).toAmbientModule());
+                } else if (value instanceof OperationModeModuleDto) {
+                    extModuleMap.put(key, ((OperationModeModuleDto) value).toOperationModeModule());
+                } else if (value instanceof OperationModesGraphModuleDto) {
+                    extModuleMap.put(key, ((OperationModesGraphModuleDto) value).toOperationModesGraphModule());
                 } else if (value instanceof IridiumReportingModuleDto) {
                     extModuleMap.put(key, ((IridiumReportingModuleDto) value).toIridiumReportingModule());
                 } else if (value instanceof LoRaReportingModuleDto) {
@@ -128,6 +135,10 @@ public class NodeDeviceDTO {
                     dto.put(BatteryModule.name, BatteryModuleDto.fromBatteryModule((BatteryModule) value));
                 } else if (value instanceof AmbientModule) {
                     dto.put(AmbientModule.name, AmbientModuleDTO.fromTemperatureModule((AmbientModule) value));
+                } else if (value instanceof OperationModesModule) {
+                    dto.put(OperationModesModule.name, OperationModeModuleDto.fromOperationModeModule((OperationModesModule) value));
+                } else if (value instanceof OperationModesGraphModule) {
+                    dto.put(OperationModesGraphModule.name, OperationModesGraphModuleDto.fromOperationModesGraphModule((OperationModesGraphModule) value));
                 } else if (value instanceof IridiumReportingModule) {
                     dto.put(IridiumReportingModule.name, IridiumReportingModuleDto.fromIridiumReportingModule((IridiumReportingModule) value));
                 } else if (value instanceof LoRaReportingModule) {
@@ -146,14 +157,13 @@ public class NodeDeviceDTO {
         }
 
         @Data
+        @EqualsAndHashCode(callSuper = true)
         public static class LocationModuleDto extends ExtModuleDto {
-            private String name;
             private Float latitude;
             private Float longitude;
 
             public static LocationModuleDto fromLocationModule(LocationModule value) {
                 LocationModuleDto dto = new LocationModuleDto();
-                dto.setName(LocationModule.name);
                 dto.setLatitude(value.getLatitude());
                 dto.setLongitude(value.getLongitude());
                 return dto;
@@ -168,14 +178,13 @@ public class NodeDeviceDTO {
         }
 
         @Data
+        @EqualsAndHashCode(callSuper = true)
         public static class StorageModuleDto extends ExtModuleDto {
-            private String name;
             private Integer storageUsedMegabytes;
             private Integer storageTotalMegabytes;
 
             public static StorageModuleDto fromStorageModule(StorageModule value) {
                 StorageModuleDto dto = new StorageModuleDto();
-                dto.setName(StorageModule.name);
                 dto.setStorageUsedMegabytes(value.getStorageUsedMegabytes());
                 dto.setStorageTotalMegabytes(value.getStorageTotalMegabytes());
                 return dto;
@@ -189,15 +198,14 @@ public class NodeDeviceDTO {
             }
         }
 
+        @EqualsAndHashCode(callSuper = true)
         @Data
         public static class BatteryModuleDto extends ExtModuleDto {
-            private String name;
             private Integer batteryPercentage;
             private Integer batteryStatus;
 
             public static BatteryModuleDto fromBatteryModule(BatteryModule value) {
                 BatteryModuleDto dto = new BatteryModuleDto();
-                dto.setName(BatteryModule.name);
                 dto.setBatteryPercentage(value.getBatteryPercentage());
                 dto.setBatteryStatus(value.getBatteryStatus().getValue());
                 return dto;
@@ -211,15 +219,14 @@ public class NodeDeviceDTO {
             }
         }
 
+        @EqualsAndHashCode(callSuper = true)
         @Data
         public static class AmbientModuleDTO extends ExtModuleDto {
-            private String name;
             private Integer temperature;
             private Integer humidity;
 
             public static AmbientModuleDTO fromTemperatureModule(AmbientModule value) {
                 AmbientModuleDTO dto = new AmbientModuleDTO();
-                dto.setName(AmbientModule.name);
                 dto.setTemperature(value.getTemperature());
                 dto.setHumidity(value.getHumidity());
                 return dto;
@@ -233,35 +240,68 @@ public class NodeDeviceDTO {
             }
         }
 
+        @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class ReportingPeriodDto {
-            private OperationMode key;
-            private Short value;
+        public static class OperationModeModuleDto extends ExtModuleDto {
+            private Map<Short, String> operationModes;
+            private Integer activeOperationModeIdx;
 
-            public ReportingPeriodDto(OperationMode key, Short value) {
-                this.key = key;
-                this.value = value;
+            public static OperationModeModuleDto fromOperationModeModule(OperationModesModule module) {
+                OperationModeModuleDto dto = new OperationModeModuleDto();
+                dto.setActiveOperationModeIdx((int) module.getActiveOperationModeIdx());
+                dto.setOperationModes(module.getOperationModes()
+                        .entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(e -> (short) e.getKey().byteValue(), e -> e.getValue().getName())));
+                return dto;
+            }
+
+            public OperationModesModule toOperationModeModule() {
+                Map<Short, OperationMode> modes = operationModes.entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> OperationMode.create(e.getKey(), e.getValue())));
+                return new OperationModesModule(modes, activeOperationModeIdx.shortValue());
             }
         }
 
+
+        @Data
+        public static class ReportingPeriodPerOperationModeDto {
+            private Short operationModeIdx;
+            private Short value;
+
+            public ReportingPeriodPerOperationModeDto(Short operationModeIdx, Short value) {
+                this.operationModeIdx = operationModeIdx;
+                this.value = value;
+            }
+
+            public static OperationModesModule fromDTO(List<ReportingPeriodPerOperationModeDto> reportingPeriods) {
+                Map<Short, OperationMode> modes = new HashMap<>();
+                for (ReportingPeriodPerOperationModeDto period : reportingPeriods) {
+                    modes.put(period.getOperationModeIdx(), OperationMode.create(period.getOperationModeIdx(), "operationMode" + period.getOperationModeIdx()));
+                }
+
+                return new OperationModesModule(modes, (short) 0);
+            }
+        }
+
+        @EqualsAndHashCode(callSuper = true)
         @Data
         public static class IridiumReportingModuleDto extends ExtModuleDto {
-            private String name;
             private Integer technologyId;
-            private List<ReportingPeriodDto> reportingPeriods;
+            private List<ReportingPeriodPerOperationModeDto> reportingPeriods;
             private String imei;
 
             public static IridiumReportingModuleDto fromIridiumReportingModule(IridiumReportingModule value) {
                 IridiumReportingModuleDto dto = new IridiumReportingModuleDto();
-                dto.setName(IridiumReportingModule.name);
                 dto.setTechnologyId((int) value.getTechnologyId());
                 dto.setImei(value.getImei());
 
                 // Convertir el Map a List<ReportingPeriodDto>
-                List<ReportingPeriodDto> reportingPeriodList = value.getReportingPeriodsPerOperationMode()
+                List<ReportingPeriodPerOperationModeDto> reportingPeriodList = value.getReportingPeriodsPerOperationMode()
                         .entrySet()
                         .stream()
-                        .map(entry -> new ReportingPeriodDto(entry.getKey(), entry.getValue()))
+                        .map(entry -> new ReportingPeriodPerOperationModeDto(entry.getKey().getId(), entry.getValue()))
                         .toList();
 
                 dto.setReportingPeriods(reportingPeriodList);
@@ -270,28 +310,27 @@ public class NodeDeviceDTO {
 
             public IridiumReportingModule toIridiumReportingModule() {
                 return new IridiumReportingModule(
-                        OperationModeModule.fromDTO(this.reportingPeriods),
+                        ReportingPeriodPerOperationModeDto.fromDTO(this.reportingPeriods),
                         this.imei
                 );
             }
         }
 
+        @EqualsAndHashCode(callSuper = true)
         @Data
         public static class LoRaReportingModuleDto extends ExtModuleDto {
-            private String name;
             private Integer technologyId;
-            private List<ReportingPeriodDto> reportingPeriods;
+            private List<ReportingPeriodPerOperationModeDto> reportingPeriods;
 
             public static LoRaReportingModuleDto fromLoRaReportingModule(LoRaReportingModule value) {
                 LoRaReportingModuleDto dto = new LoRaReportingModuleDto();
-                dto.setName(LoRaReportingModule.name);
                 dto.setTechnologyId((int) value.getTechnologyId());
 
                 // Convertir el Map a List<ReportingPeriodDto>
-                List<ReportingPeriodDto> reportingPeriodList = value.getReportingPeriodsPerOperationMode()
+                List<ReportingPeriodPerOperationModeDto> reportingPeriodList = value.getReportingPeriodsPerOperationMode()
                         .entrySet()
                         .stream()
-                        .map(entry -> new ReportingPeriodDto(entry.getKey(), entry.getValue()))
+                        .map(entry -> new ReportingPeriodPerOperationModeDto(entry.getKey().getId(), entry.getValue()))
                         .toList();
 
                 dto.setReportingPeriods(reportingPeriodList);
@@ -300,19 +339,63 @@ public class NodeDeviceDTO {
 
             public LoRaReportingModule toLoRaReportingModule() {
                 return new LoRaReportingModule(
-                        OperationModeModule.fromDTO(this.reportingPeriods)
+                        ReportingPeriodPerOperationModeDto.fromDTO(this.reportingPeriods)
                 );
             }
         }
 
+        @EqualsAndHashCode(callSuper = true)
+        @Data
+        public static class OperationModesGraphModuleDto extends ExtModuleDto {
+            private Map<Integer, TransitionDto> graph;
+
+            @Data
+            public static class TransitionDto {
+                private Integer targetMode;
+                private Integer duration;
+
+                public TransitionDto(Integer targetMode, Integer duration) {
+                    this.targetMode = targetMode;
+                    this.duration = duration;
+                }
+            }
+
+            public static OperationModesGraphModuleDto fromOperationModesGraphModule(OperationModesGraphModule module) {
+                OperationModesGraphModuleDto dto = new OperationModesGraphModuleDto();
+                // Convert graph to TransitionDto map
+                Map<Integer, TransitionDto> graphDto = module.getGraph().entrySet().stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> new TransitionDto(entry.getValue().getTargetMode(), entry.getValue().getDuration())
+                        ));
+
+                dto.setGraph(graphDto);
+                return dto;
+            }
+
+            public OperationModesGraphModule toOperationModesGraphModule() {
+                // Convert TransitionDto map back to the original graph structure
+                Map<Integer, OperationModesGraphModule.Transition> graph = this.graph.entrySet().stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> new OperationModesGraphModule.Transition(
+                                        entry.getValue().getTargetMode(),
+                                        entry.getValue().getDuration()
+                                )
+                        ));
+
+                return new OperationModesGraphModule(graph);
+            }
+        }
+
+
+        @EqualsAndHashCode(callSuper = true)
         @Data
         public static class RtcModuleDto extends ExtModuleDto {
-            private String name;
             private String currentTime;
 
             public static RtcModuleDto fromRtcModule(RTCModule value) {
                 RtcModuleDto dto = new RtcModuleDto();
-                dto.setName(RTCModule.name);
                 dto.setCurrentTime(value.getCurrentTime().toString());
                 return dto;
             }
@@ -324,15 +407,14 @@ public class NodeDeviceDTO {
             }
         }
 
+        @EqualsAndHashCode(callSuper = true)
         @Data
         public static class NetworkModuleDto extends ExtModuleDto {
-            private String name;
             private Integer localAddress;
             private RoutingTableDto routingTable;
 
             public static NetworkModuleDto fromNetworkModule(NetworkModule value) {
                 NetworkModuleDto dto = new NetworkModuleDto();
-                dto.setName(NetworkModule.name);
                 dto.setLocalAddress((int) value.getLocalAddress().getValue());
                 dto.setRoutingTable(RoutingTableDto.fromRoutingTable(value.getRoutingTable()));
                 return dto;

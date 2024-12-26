@@ -1,8 +1,7 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes;
 
-import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
+import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import com.acousea.backend.core.shared.domain.UnsignedByte;
 import lombok.Getter;
@@ -15,43 +14,47 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Getter
-public class OperationModeModule extends SerializableModule implements ExtModule {
+public class OperationModesModule extends SerializableModule implements ExtModule {
     public static final String name = "operationMode";
     private static final int MAX_MODES = 256; // Número máximo de modos permitidos
-    private final Map<Integer, OperationMode> operationModes = new TreeMap<>(); // Mapa para almacenar modos
+    private Short activeOperationModeIdx;
+    private final Map<Short, OperationMode> operationModes = new TreeMap<>(); // Mapa para almacenar modos
 
-    public OperationModeModule(Map<Integer, OperationMode> operationModes) {
+    public OperationModesModule(Map<Short, OperationMode> operationModes) {
         super(ModuleCode.OPERATION_MODES, serialize(operationModes));
         this.operationModes.putAll(operationModes);
+        this.activeOperationModeIdx = !operationModes.isEmpty() ? operationModes.keySet().iterator().next() : 0;
     }
 
-    private static byte[] serialize(Map<Integer, OperationMode> operationModes) {
-        ByteBuffer buffer = ByteBuffer.allocate(operationModes.size());
+    public OperationModesModule(Map<Short, OperationMode> operationModes, Short activeOperationModeIdx) {
+        super(ModuleCode.OPERATION_MODES, serialize(operationModes));
+        this.operationModes.putAll(operationModes);
+        this.activeOperationModeIdx = activeOperationModeIdx;
+    }
+
+
+    private static byte[] serialize(Map<Short, OperationMode> operationModes) {
+        ByteBuffer buffer = ByteBuffer.allocate(operationModes.size() + Byte.BYTES);
         for (OperationMode mode : operationModes.values()) {
             buffer.put(UnsignedByte.toByte(mode.getId()));
         }
+        buffer.put(UnsignedByte.toByte((byte) 0)); // Modo activo
         return buffer.array();
     }
 
-    public static OperationModeModule fromDTO(List<NodeDeviceDTO.ExtModuleDto.ReportingPeriodDto> reportingPeriods) {
-        Map<Integer, OperationMode> modes = new TreeMap<>();
-        for (NodeDeviceDTO.ExtModuleDto.ReportingPeriodDto period : reportingPeriods) {
-            modes.put(period.getKey().getId(), OperationMode.create(period.getKey().getId(), period.getKey().getName()));
-        }
-        return new OperationModeModule(modes);
-    }
-
-    public static OperationModeModule fromBytes(ByteBuffer buffer) {
+    public static OperationModesModule fromBytes(ByteBuffer buffer) {
         if (buffer.remaining() < getMinSize()) {
             throw new IllegalArgumentException("Invalid byte array for OperationModeModule");
         }
-        Map<Integer, OperationMode> modes = IntStream.range(0, buffer.remaining())
+        Map<Short, OperationMode> modes = IntStream.range(0, buffer.remaining())
                 .mapToObj(i -> {
-                    int id = UnsignedByte.toUnsignedInt(buffer.get());
-                    return OperationMode.create(id, "operationMode" + id);
+                    short id = buffer.get();
+                    return OperationMode.create(Short.valueOf(id), "operationMode" + id);
                 })
                 .collect(Collectors.toMap(OperationMode::getId, mode -> mode, (a, b) -> b, TreeMap::new));
-        return new OperationModeModule(modes);
+
+        short activeOperationModeIdx = buffer.get();
+        return new OperationModesModule(modes, activeOperationModeIdx);
     }
 
     @Override
@@ -63,16 +66,16 @@ public class OperationModeModule extends SerializableModule implements ExtModule
         return Byte.BYTES; // Tamaño mínimo es 1 byte
     }
 
-    public static OperationModeModule createWithModes(List<OperationMode> names) {
-        Map<Integer, OperationMode> modes = new TreeMap<>();
-        for (OperationMode name : names) {
-            modes.put(name.getId(), name);
+    public static OperationModesModule createWithModes(List<OperationMode> operationModes) {
+        Map<Short, OperationMode> modes = new TreeMap<>();
+        for (OperationMode mode : operationModes) {
+            modes.put(mode.getId(), mode);
         }
-        return new OperationModeModule(modes);
+        return new OperationModesModule(modes);
     }
 
     public void addOperationMode(String name) {
-        int nextId = getNextAvailableId();
+        short nextId = getNextAvailableId();
         if (nextId == -1) {
             throw new IllegalStateException("Maximum number of operation modes reached.");
         }
@@ -97,8 +100,8 @@ public class OperationModeModule extends SerializableModule implements ExtModule
         operationModes.remove(unsignedId);
     }
 
-    public int getNextAvailableId() {
-        for (int i = 0; i < MAX_MODES; i++) {
+    public short getNextAvailableId() {
+        for (short i = 0; i < MAX_MODES; i++) {
             if (!operationModes.containsKey(i)) {
                 return i;
             }

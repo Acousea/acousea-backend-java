@@ -39,14 +39,14 @@ public class CRCUtils {
         }
 
         // Extraer el CRC del paquete (últimos dos bytes)
-        int receivedCRC = buffer.getShort(buffer.capacity() - 2) & 0xFFFF;
+        short receivedCRC = buffer.getShort(buffer.capacity() - 2);
 
         // Calcular el CRC del paquete excluyendo los últimos dos bytes
-        byte[] data = new byte[buffer.capacity()];
-        // Set the last two bytes to 0
+        byte[] data = new byte[buffer.capacity() - 2];
+
         buffer.get(data, 0, buffer.capacity() - 2);
         buffer.rewind();
-        int calculatedCRC = calculateCRC(data);
+        short calculatedCRC = calculate16BitCRC(data);
         return receivedCRC == calculatedCRC;
     }
 

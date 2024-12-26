@@ -12,10 +12,10 @@ import java.util.List;
 
 @Getter
 @Setter
-public class SummaryReportPayload implements Payload {
+public class BasicStatusReportPayload implements Payload {
     private List<SerializableModule> serializableModules;
 
-    public SummaryReportPayload(List<SerializableModule> serializableModules) {
+    public BasicStatusReportPayload(List<SerializableModule> serializableModules) {
         this.serializableModules = serializableModules;
     }
 
@@ -23,7 +23,7 @@ public class SummaryReportPayload implements Payload {
     public short getBytesSize() {
         int size = serializableModules.stream().mapToInt(SerializableModule::getFullLength).sum();
         if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE)  {
-            throw new IllegalArgumentException(SummaryReportPayload.class.getSimpleName() + "Payload size is too big");
+            throw new IllegalArgumentException(BasicStatusReportPayload.class.getSimpleName() + "Payload size is too big");
         }
         return (short) size;
     }
@@ -38,6 +38,6 @@ public class SummaryReportPayload implements Payload {
     public static Payload fromBytes(ByteBuffer buffer) {
         List<SerializableModule> serializableModules = SerializableModuleFactory.createModules(buffer);
         serializableModules.addAll(serializableModules);
-        return new SummaryReportPayload(serializableModules);
+        return new BasicStatusReportPayload(serializableModules);
     }
 }

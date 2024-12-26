@@ -8,7 +8,7 @@ public class MainTests {
     public static void main(String[] args) {
         System.out.println("Hello, World!");
         // 2043000103001a52080000000067530fd6500a010100000200000000005402000035d0
-        byte[] bytes = HexFormat.of().parseHex("2043010003001a52080000000067530fd6500a01010000020000000000540200000000");
+        byte[] bytes = HexFormat.of().parseHex("20730200030018420264004c084080000040800000520800000000386d43bd");
         short crc = CRCUtils.calculate16BitCRC(bytes);
         byte[] crcBytes = new byte[2];
         crcBytes[0] = (byte) ((crc >> 8) & 0xFF);

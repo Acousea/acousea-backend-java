@@ -4,7 +4,7 @@ import com.acousea.backend.core.communicationSystem.domain.communication.seriali
 import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModeModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModesModule;
 import com.acousea.backend.core.shared.domain.UnsignedByte;
 import lombok.Getter;
 
@@ -17,21 +17,21 @@ public abstract class ReportingModule extends SerializableModule implements ExtM
     private final byte technologyId; // ID de la tecnología
     private final Map<OperationMode, Short> reportingPeriodsPerOperationMode = new HashMap<>();
 
-    protected ReportingModule(byte technologyId, OperationModeModule operationModeModule) {
-        super(ModuleCode.REPORTING, serialize(technologyId, operationModeModule));
+    protected ReportingModule(byte technologyId, OperationModesModule operationModesModule) {
+        super(ModuleCode.REPORTING, serialize(technologyId, operationModesModule));
         this.technologyId = technologyId;
-        if (operationModeModule != null) {
-            initializeReportingPeriods(operationModeModule);
+        if (operationModesModule != null) {
+            initializeReportingPeriods(operationModesModule);
         }
     }
 
-    private static byte[] serialize(byte technologyId, OperationModeModule operationModeModule) {
-        int size = Byte.BYTES + (operationModeModule != null ?
-                operationModeModule.getOperationModes().size() * (Byte.BYTES + Short.BYTES) : 0);
+    private static byte[] serialize(byte technologyId, OperationModesModule operationModesModule) {
+        int size = Byte.BYTES + (operationModesModule != null ?
+                operationModesModule.getOperationModes().size() * (Byte.BYTES + Short.BYTES) : 0);
         ByteBuffer buffer = ByteBuffer.allocate(size);
         buffer.put(technologyId);
-        if (operationModeModule != null) {
-            operationModeModule.getOperationModes().forEach((id, mode) -> {
+        if (operationModesModule != null) {
+            operationModesModule.getOperationModes().forEach((id, mode) -> {
                 buffer.put(UnsignedByte.toByte(id));
                 buffer.putShort((short) 0);
             });
@@ -39,8 +39,8 @@ public abstract class ReportingModule extends SerializableModule implements ExtM
         return buffer.array();
     }
 
-    private void initializeReportingPeriods(OperationModeModule operationModeModule) {
-        operationModeModule.getOperationModes().forEach((id, mode) -> {
+    private void initializeReportingPeriods(OperationModesModule operationModesModule) {
+        operationModesModule.getOperationModes().forEach((id, mode) -> {
             reportingPeriodsPerOperationMode.put(mode, (short) 0);
         });
     }

@@ -9,6 +9,7 @@ import com.acousea.backend.core.shared.domain.crc.CRCUtils;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.HexFormat;
 
 /**
@@ -43,7 +44,7 @@ public class CommunicationPacket {
 
         // Calcula el CRC y lo agrega al final del buffer
         byte[] packetBytes = this.toBytes();
-        // Get the last two bytes of the packetBytes as the CRC
+        // Get the last two bytes of the packetBytes as the CRC (CRC gets calculated in the toBytes method)
         this.checksum = ByteBuffer.wrap(packetBytes).getShort(packetBytes.length - 2);
     }
 
@@ -71,9 +72,7 @@ public class CommunicationPacket {
         return buffer.array();
     }
 
-    public static CommunicationPacket fromBytes(byte[] data) throws InvalidPacketException {
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-
+    public static CommunicationPacket fromBytes(ByteBuffer buffer) throws InvalidPacketException {
         short receivedCRC = buffer.getShort(buffer.capacity() - 2);
         if (!CRCUtils.verifyCRC(buffer)) {
             throw new InvalidPacketException(CommunicationPacket.class.getSimpleName() + " -> Invalid CRC");
@@ -89,7 +88,7 @@ public class CommunicationPacket {
         RoutingChunk routingChunk = RoutingChunk.fromBytes(buffer);
 
         int payloadLength = buffer.getShort();
-        if (buffer.remaining() != payloadLength) {
+            if (buffer.remaining() != payloadLength) {
             throw new InvalidPacketException("Invalid payload length");
         }
 

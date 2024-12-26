@@ -5,8 +5,9 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambi
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModeGraph.OperationModesGraphModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModeModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModesModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.ReportingModule;
@@ -39,17 +40,22 @@ public class MockNodeDevices {
         LocationModule locationModule = LocationModule.create();
         AmbientModule ambientModule = AmbientModule.create();
         StorageModule storageModule = StorageModule.create(1000);
-        OperationModeModule operationModeModule = OperationModeModule.createWithModes(
+        OperationModesModule operationModesModule = OperationModesModule.createWithModes(
                 List.of(
-                        OperationMode.create(1, "Launching"),
-                        OperationMode.create(2, "Working"),
-                        OperationMode.create(3, "Recovering")
+                        OperationMode.create((short) 1, "Launching"),
+                        OperationMode.create((short) 2, "Working"),
+                        OperationMode.create((short) 3, "Recovering")
                 )
         );
-        ReportingModule loRaReportingModule = LoRaReportingModule.create(operationModeModule);
 
-        IridiumReportingModule iridiumReportingModuleLocalizer = IridiumReportingModule.create(operationModeModule, environment.getProperty("localizer.imei"));
-        IridiumReportingModule iridiumReportingModuleDrifter = IridiumReportingModule.create(operationModeModule, environment.getProperty("drifter.imei"));
+        ReportingModule loRaReportingModule = LoRaReportingModule.create(operationModesModule);
+        OperationModesGraphModule graph = new OperationModesGraphModule(Map.ofEntries(
+                Map.entry(1, new OperationModesGraphModule.Transition(2, 3)), // Launching -> Working (3 cycles duration)
+                Map.entry(2, new OperationModesGraphModule.Transition(2, 1)) // Working -> Working (1 cycle duration) (loop)
+        ));
+
+        IridiumReportingModule iridiumReportingModuleLocalizer = IridiumReportingModule.create(operationModesModule, environment.getProperty("localizer.imei"));
+        IridiumReportingModule iridiumReportingModuleDrifter = IridiumReportingModule.create(operationModesModule, environment.getProperty("drifter.imei"));
 
         return List.of(new NodeDevice(
                         UUID.fromString("00000000-0000-0000-0000-000000000001"),
@@ -61,7 +67,8 @@ public class MockNodeDevices {
                                 LocationModule.name, locationModule,
                                 AmbientModule.name, ambientModule,
                                 StorageModule.name, storageModule,
-                                OperationModeModule.name, operationModeModule,
+                                OperationModesModule.name, operationModesModule,
+                                OperationModesGraphModule.name, graph,
                                 LoRaReportingModule.name, loRaReportingModule,
                                 IridiumReportingModule.name, iridiumReportingModuleDrifter,
                                 NetworkModule.name, networkModule1
@@ -80,7 +87,8 @@ public class MockNodeDevices {
                                 LocationModule.name, locationModule,
                                 AmbientModule.name, ambientModule,
                                 StorageModule.name, storageModule,
-                                OperationModeModule.name, operationModeModule,
+                                OperationModesModule.name, operationModesModule,
+                                OperationModesGraphModule.name, graph,
                                 LoRaReportingModule.name, loRaReportingModule,
                                 IridiumReportingModule.name, iridiumReportingModuleLocalizer,
                                 NetworkModule.name, networkModule2

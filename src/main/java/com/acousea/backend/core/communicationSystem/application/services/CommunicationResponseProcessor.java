@@ -1,7 +1,7 @@
 package com.acousea.backend.core.communicationSystem.application.services;
 
-import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.NewNodeConfigurationPayload;
-import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.SummaryReportPayload;
+import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.BasicStatusReportPayload;
+import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.CompleteStatusReportPayload;
 import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.exceptions.InvalidPacketException;
@@ -10,7 +10,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambi
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModeModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModesModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.ReportingModule;
@@ -18,11 +18,11 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.storage.StorageModule;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class CommunicationResponseProcessor {
-
 
     // Interfaz funcional para el procesamiento de tags
     @FunctionalInterface
@@ -43,7 +43,7 @@ public class CommunicationResponseProcessor {
             ModuleCode.STORAGE, (nodeDevice, serializableModule) ->
                     nodeDevice.getExtModules().put(StorageModule.name, (StorageModule) serializableModule),
             ModuleCode.OPERATION_MODES, (nodeDevice, serializableModule) ->
-                    nodeDevice.getExtModules().put(OperationModeModule.name, (OperationModeModule) serializableModule),
+                    nodeDevice.getExtModules().put(OperationModesModule.name, (OperationModesModule) serializableModule),
             ModuleCode.RTC, (nodeDevice, serializableModule) ->
                     nodeDevice.getExtModules().put(RTCModule.name, ((RTCModule) serializableModule)),
             ModuleCode.REPORTING, (nodeDevice, tag) -> {
@@ -60,8 +60,10 @@ public class CommunicationResponseProcessor {
     );
 
 
-    public void processNodeDeviceConfigurationResponse(NodeDevice nodeDevice, NewNodeConfigurationPayload payload) {
-        payload.getSerializableModules().forEach(tag -> {
+
+
+    public void processSerializableModulesForNode(NodeDevice nodeDevice, List<SerializableModule> modules) {
+        modules.forEach(tag -> {
             try {
                 ModuleCode moduleCode = ModuleCode.fromValue(tag.getTYPE());
                 TagProcessor processor = tagProcessors.get(moduleCode);
@@ -74,12 +76,6 @@ public class CommunicationResponseProcessor {
             }
 
         });
-
-        System.out.println("Processing SetNodeDeviceConfigurationPayload");
-    }
-
-    public void processSummaryReportResponse(NodeDevice nodeDevice, SummaryReportPayload payload) {
-
     }
 
 
