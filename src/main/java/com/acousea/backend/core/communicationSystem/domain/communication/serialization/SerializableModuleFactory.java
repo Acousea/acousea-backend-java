@@ -8,6 +8,11 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.oper
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.ReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.storage.StorageModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.ICListenHF;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenLoggingConfig;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenRecordingStats;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStatus;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStreamingConfig;
 import lombok.SneakyThrows;
 
 import java.nio.ByteBuffer;
@@ -33,6 +38,12 @@ public class SerializableModuleFactory {
         put(ModuleCode.RTC, RTCModule::fromBytes);
         put(ModuleCode.STORAGE, StorageModule::fromBytes);
         put(ModuleCode.AMBIENT, AmbientModule::fromBytes);
+        put(ModuleCode.ICLISTEN_COMPLETE, ICListenHF::fromBytes);
+        put(ModuleCode.ICLISTEN_STATUS, ICListenStatus::fromBytes);
+        put(ModuleCode.ICLISTEN_LOGGING_CONFIG,  ICListenLoggingConfig::fromBytes);
+        put(ModuleCode.ICLISTEN_STREAMING_CONFIG, ICListenStreamingConfig::fromBytes);
+        put(ModuleCode.ICLISTEN_RECORDING_STATS, ICListenRecordingStats::fromBytes);
+
     }};
 
     @SneakyThrows

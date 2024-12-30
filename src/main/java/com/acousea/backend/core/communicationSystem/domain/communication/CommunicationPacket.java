@@ -5,6 +5,7 @@ import com.acousea.backend.core.communicationSystem.domain.communication.constan
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.Payload;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.PayloadFactory;
 import com.acousea.backend.core.communicationSystem.domain.exceptions.InvalidPacketException;
+import com.acousea.backend.core.shared.domain.UnsignedByte;
 import com.acousea.backend.core.shared.domain.crc.CRCUtils;
 import lombok.Getter;
 
@@ -27,6 +28,7 @@ public class CommunicationPacket {
         public static final int PACKET_SIZE = 260; // Iridium MO: 340 bytes, Iridium MT: 260 bytes
         public static final int MAX_PAYLOAD_SIZE = PACKET_SIZE - 9; // 7 bytes for the auxiliary fields
     }
+
     private static final byte SYNC_BYTE = 0x20; // 1 byte
     private final OperationCode operationCode; // 1 byte
     private final RoutingChunk routingChunk; // 3 bytes (1 bytes sender, 1 byte receiver, 1 byte ttl)
@@ -64,7 +66,7 @@ public class CommunicationPacket {
         buffer.put(SYNC_BYTE);
         buffer.put((byte) operationCode.getValue());
         buffer.put(routingChunk.toBytes());
-        buffer.putShort(payload.getBytesSize());
+        buffer.put((byte) payload.getBytesSize());
         buffer.put(payload.toBytes());
         // Calcula el CRC y lo agrega al final del buffer
         short crc = CRCUtils.calculate16BitCRC(buffer.array());
@@ -79,7 +81,7 @@ public class CommunicationPacket {
         }
 
         // Remove the CRC from the buffer
-        buffer = buffer.slice( 0, buffer.capacity() - 2);
+        buffer = buffer.slice(0, buffer.capacity() - 2);
         byte syncByte = buffer.get();
         if (syncByte != SYNC_BYTE) {
             throw new IllegalArgumentException("Invalid sync byte");
@@ -87,9 +89,9 @@ public class CommunicationPacket {
         OperationCode operationCode = OperationCode.fromValue(buffer.get());
         RoutingChunk routingChunk = RoutingChunk.fromBytes(buffer);
 
-        int payloadLength = buffer.getShort();
-            if (buffer.remaining() != payloadLength) {
-            throw new InvalidPacketException("Invalid payload length");
+        int payloadLength = UnsignedByte.toUnsignedInt(buffer.get());
+        if (buffer.remaining() != payloadLength) {
+            throw new InvalidPacketException("Invalid payload length, Expected: " + payloadLength + " bytes, Received: " + buffer.remaining() + " bytes");
         }
 
         // Get the remainder of the buffer as the payload

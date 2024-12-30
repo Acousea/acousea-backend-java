@@ -1,16 +1,11 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.pamModules;
 
-import lombok.Getter;
-import lombok.Setter;
+public interface PamModule {
+    String getSerialNumber();
 
-@Setter
-@Getter
-public abstract class PamModule {
-    protected String serialNumber;
-    private String name;
+    void setSerialNumber(String serialNumber);
 
-    public PamModule(String serialNumber, String name) {
-        this.serialNumber = serialNumber;
-        this.name = name;
-    }
+    String getName();
+
+    void setName(String name);
 }

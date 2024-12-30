@@ -507,9 +507,9 @@ public class NodeDeviceDTO {
         public static class StatusDto {
             private Integer unitStatus;
             private Integer batteryStatus;
-            private Double batteryPercentage;
-            private Double temperature;
-            private Double humidity;
+            private Float batteryPercentage;
+            private Float temperature;
+            private Float humidity;
             private LocalDateTime timestamp;
 
             public static StatusDto fromStatus(ICListenStatus status) {

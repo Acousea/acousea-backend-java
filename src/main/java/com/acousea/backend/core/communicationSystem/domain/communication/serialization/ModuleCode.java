@@ -22,7 +22,14 @@ public enum ModuleCode {
     REPORTING('P'),
     RTC('R'),
     STORAGE('S'),
-    AMBIENT('T');
+    AMBIENT('T'),
+    PAM_MODULE('M'),
+    ICLISTEN_COMPLETE('i'),
+    ICLISTEN_STATUS('s'),
+    ICLISTEN_LOGGING_CONFIG('l'),
+    ICLISTEN_STREAMING_CONFIG('c'),
+    ICLISTEN_RECORDING_STATS('r'),
+    ;
 
     private final char value;
 
@@ -41,7 +48,7 @@ public enum ModuleCode {
                 return moduleCode;
             }
         }
-        throw new InvalidPacketException("Invalid operation code: " + code);
+        throw new InvalidPacketException("Invalid module code: " + String.format("%02X", code));
     }
 
 

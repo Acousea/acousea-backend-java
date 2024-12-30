@@ -1,7 +1,5 @@
 package com.acousea.backend.core.communicationSystem.application.services;
 
-import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.BasicStatusReportPayload;
-import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.CompleteStatusReportPayload;
 import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.exceptions.InvalidPacketException;
@@ -30,24 +28,46 @@ public class CommunicationResponseProcessor {
         void process(NodeDevice nodeDevice, SerializableModule tag) throws InvalidPacketException;
     }
 
-    // Mapeo de TagType a acciones específicas
-    private final Map<ModuleCode, TagProcessor> tagProcessors = Map.of(
-            ModuleCode.BATTERY, (nodeDevice, serializableModule) ->
-                    nodeDevice.getExtModules().put(BatteryModule.name, (BatteryModule) serializableModule),
-            ModuleCode.LOCATION, (nodeDevice, serializableModule) ->
-                    nodeDevice.getExtModules().put(LocationModule.name, (LocationModule) serializableModule),
-            ModuleCode.AMBIENT, (nodeDevice, serializableModule) ->
-                    nodeDevice.getExtModules().put(AmbientModule.name, (AmbientModule) serializableModule),
-            ModuleCode.NETWORK, (nodeDevice, serializableModule) ->
-                    nodeDevice.getExtModules().put(NetworkModule.name, (NetworkModule) serializableModule),
-            ModuleCode.STORAGE, (nodeDevice, serializableModule) ->
-                    nodeDevice.getExtModules().put(StorageModule.name, (StorageModule) serializableModule),
-            ModuleCode.OPERATION_MODES, (nodeDevice, serializableModule) ->
-                    nodeDevice.getExtModules().put(OperationModesModule.name, (OperationModesModule) serializableModule),
-            ModuleCode.RTC, (nodeDevice, serializableModule) ->
-                    nodeDevice.getExtModules().put(RTCModule.name, ((RTCModule) serializableModule)),
-            ModuleCode.REPORTING, (nodeDevice, tag) -> {
-                ReportingModule reportingModule = ((ReportingModule) tag);
+    private final Map<ModuleCode, TagProcessor> tagProcessors = Map.ofEntries(
+            Map.entry(ModuleCode.BATTERY,
+                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(BatteryModule.name, (BatteryModule) serializableModule)
+            ),
+            Map.entry(ModuleCode.LOCATION,
+                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(LocationModule.name, (LocationModule) serializableModule)
+            ),
+            Map.entry(ModuleCode.AMBIENT,
+                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(AmbientModule.name, (AmbientModule) serializableModule)
+            ),
+            Map.entry(ModuleCode.NETWORK,
+                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(NetworkModule.name, (NetworkModule) serializableModule)
+            ),
+            Map.entry(ModuleCode.STORAGE, (nodeDevice, serializableModule) ->
+                    nodeDevice.getExtModules().put(StorageModule.name, (StorageModule) serializableModule)
+            ),
+            Map.entry(ModuleCode.OPERATION_MODES,
+                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(OperationModesModule.name, (OperationModesModule) serializableModule)
+            ),
+            Map.entry(ModuleCode.RTC,
+                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(RTCModule.name, ((RTCModule) serializableModule))
+            ),
+            Map.entry(ModuleCode.ICLISTEN_COMPLETE,
+                    (nodeDevice, serializableModule) -> {
+                        System.out.println("ICLISTEN_COMPLETE: TODO implement");
+                    }),
+            Map.entry(ModuleCode.ICLISTEN_STATUS, (nodeDevice, serializableModule) -> {
+                System.out.println("ICLISTEN_STATUS: TODO implement");
+            }),
+            Map.entry(ModuleCode.ICLISTEN_LOGGING_CONFIG, (nodeDevice, serializableModule) -> {
+                System.out.println("ICLISTEN_LOGGING_CONFIG: TODO implement");
+            }),
+            Map.entry(ModuleCode.ICLISTEN_STREAMING_CONFIG, (nodeDevice, serializableModule) -> {
+                System.out.println("ICLISTEN_STREAMING_CONFIG: TODO implement");
+            }),
+            Map.entry(ModuleCode.ICLISTEN_RECORDING_STATS, (nodeDevice, serializableModule) -> {
+                System.out.println("ICLISTEN_RECORDING_STATS: TODO implement");
+            }),
+            Map.entry(ModuleCode.REPORTING, (nodeDevice, serializableModule) -> {
+                ReportingModule reportingModule = ((ReportingModule) serializableModule);
                 switch (reportingModule.getTechnologyId()) {
                     case IridiumReportingModule.TECHNOLOGY_ID ->
                             nodeDevice.getExtModules().put(IridiumReportingModule.name, reportingModule);
@@ -56,10 +76,8 @@ public class CommunicationResponseProcessor {
                     default -> throw new IllegalArgumentException(
                             ReportingModule.class.getName() + " -> Unknown technology id: " + reportingModule.getTechnologyId());
                 }
-            }
+            })
     );
-
-
 
 
     public void processSerializableModulesForNode(NodeDevice nodeDevice, List<SerializableModule> modules) {
