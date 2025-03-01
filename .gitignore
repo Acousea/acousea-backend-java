@@ -43,3 +43,5 @@ out/
 
 ### SQLITE databases ###
 *.sqlite
+# Ignore Gradle build output directory
+build
