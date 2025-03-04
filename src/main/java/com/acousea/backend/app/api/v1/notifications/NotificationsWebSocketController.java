@@ -1,12 +1,10 @@
 package com.acousea.backend.app.api.v1.notifications;
 
 
-import com.acousea.backend.core.shared.application.notifications.NotificationService;
+import com.acousea.backend.core.shared.infrastructure.notification.WebSocketNotificationService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
@@ -14,11 +12,11 @@ import java.util.UUID;
 
 @Component
 public class NotificationsWebSocketController extends TextWebSocketHandler {
-    private final NotificationService notificationService;
+    private final WebSocketNotificationService notificationService;
 
     @Autowired
     public NotificationsWebSocketController(
-            NotificationService notificationService
+            WebSocketNotificationService notificationService
     ) {
         this.notificationService = notificationService;
     }

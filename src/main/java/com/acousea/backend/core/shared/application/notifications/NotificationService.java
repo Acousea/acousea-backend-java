@@ -1,13 +1,16 @@
 package com.acousea.backend.core.shared.application.notifications;
 
-import org.springframework.web.socket.WebSocketSession;
+import com.acousea.backend.core.shared.domain.notifications.Notification;
 
 public interface NotificationService {
     void sendSuccessNotification(String message);
+
     void sendErrorNotification(String message);
+
     void sendWarningNotification(String message);
+
     void sendInfoNotification(String message);
-    void addClient(String sessionId, WebSocketSession session);
-    void removeClient(String sessionId);
+
+    void sendNotification(Notification notification);
 }
 

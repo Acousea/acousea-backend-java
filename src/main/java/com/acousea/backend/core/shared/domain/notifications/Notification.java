@@ -1,5 +1,6 @@
 package com.acousea.backend.core.shared.domain.notifications;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import org.springframework.web.socket.WebSocketMessage;
 
@@ -10,6 +11,7 @@ enum NotificationType {
     ERROR("error"),
     WARNING("warning");
 
+    @JsonValue
     private final String value;
 
     NotificationType(String value) {
