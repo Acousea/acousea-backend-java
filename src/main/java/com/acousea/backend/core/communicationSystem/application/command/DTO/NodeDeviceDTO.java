@@ -243,13 +243,13 @@ public class NodeDeviceDTO {
         @EqualsAndHashCode(callSuper = true)
         @Data
         public static class OperationModeModuleDto extends ExtModuleDto {
-            private Map<Short, String> operationModes;
+            private Map<Short, String> modes;
             private Integer activeOperationModeIdx;
 
             public static OperationModeModuleDto fromOperationModeModule(OperationModesModule module) {
                 OperationModeModuleDto dto = new OperationModeModuleDto();
                 dto.setActiveOperationModeIdx((int) module.getActiveOperationModeIdx());
-                dto.setOperationModes(module.getOperationModes()
+                dto.setModes(module.getModes()
                         .entrySet()
                         .stream()
                         .collect(Collectors.toMap(e -> (short) e.getKey().byteValue(), e -> e.getValue().getName())));
@@ -257,7 +257,7 @@ public class NodeDeviceDTO {
             }
 
             public OperationModesModule toOperationModeModule() {
-                Map<Short, OperationMode> modes = operationModes.entrySet()
+                Map<Short, OperationMode> modes = this.modes.entrySet()
                         .stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, e -> OperationMode.create(e.getKey(), e.getValue())));
                 return new OperationModesModule(modes, activeOperationModeIdx.shortValue());

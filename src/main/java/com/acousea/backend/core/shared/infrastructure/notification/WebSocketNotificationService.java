@@ -33,7 +33,6 @@ public class WebSocketNotificationService extends WebSocketMessageService implem
         broadcastMessage("notification", Notification.info(message));
     }
 
-
     @Override
     public void sendNotification(Notification notification) {
         broadcastMessage("notification", notification.dumpJson());

@@ -15,20 +15,20 @@ import java.util.stream.IntStream;
 
 @Getter
 public class OperationModesModule extends SerializableModule implements ExtModule {
-    public static final String name = "operationMode";
+    public static final String name = "operationModes";
     private static final int MAX_MODES = 256; // Número máximo de modos permitidos
-    private Short activeOperationModeIdx;
-    private final Map<Short, OperationMode> operationModes = new TreeMap<>(); // Mapa para almacenar modos
+    private final Short activeOperationModeIdx;
+    private final Map<Short, OperationMode> modes = new TreeMap<>(); // Mapa para almacenar modos
 
-    public OperationModesModule(Map<Short, OperationMode> operationModes) {
-        super(ModuleCode.OPERATION_MODES, serialize(operationModes));
-        this.operationModes.putAll(operationModes);
-        this.activeOperationModeIdx = !operationModes.isEmpty() ? operationModes.keySet().iterator().next() : 0;
+    public OperationModesModule(Map<Short, OperationMode> modes) {
+        super(ModuleCode.OPERATION_MODES, serialize(modes));
+        this.modes.putAll(modes);
+        this.activeOperationModeIdx = !modes.isEmpty() ? modes.keySet().iterator().next() : 0;
     }
 
-    public OperationModesModule(Map<Short, OperationMode> operationModes, Short activeOperationModeIdx) {
-        super(ModuleCode.OPERATION_MODES, serialize(operationModes));
-        this.operationModes.putAll(operationModes);
+    public OperationModesModule(Map<Short, OperationMode> modes, Short activeOperationModeIdx) {
+        super(ModuleCode.OPERATION_MODES, serialize(modes));
+        this.modes.putAll(modes);
         this.activeOperationModeIdx = activeOperationModeIdx;
     }
 
@@ -59,7 +59,7 @@ public class OperationModesModule extends SerializableModule implements ExtModul
 
     @Override
     public int getFullSize() {
-        return operationModes.size();
+        return modes.size();
     }
 
     public static int getMinSize() {
@@ -80,12 +80,12 @@ public class OperationModesModule extends SerializableModule implements ExtModul
             throw new IllegalStateException("Maximum number of operation modes reached.");
         }
         OperationMode mode = OperationMode.create(nextId, name);
-        operationModes.put(nextId, mode);
+        modes.put(nextId, mode);
     }
 
     public OperationMode getOperationMode(byte id) {
         int unsignedId = Byte.toUnsignedInt(id);
-        OperationMode mode = operationModes.get(unsignedId);
+        OperationMode mode = modes.get(unsignedId);
         if (mode == null) {
             throw new IllegalArgumentException("Operation mode ID not found: " + id);
         }
@@ -94,15 +94,15 @@ public class OperationModesModule extends SerializableModule implements ExtModul
 
     public void removeOperationMode(byte id) {
         int unsignedId = Byte.toUnsignedInt(id);
-        if (!operationModes.containsKey(unsignedId)) {
+        if (!modes.containsKey(unsignedId)) {
             throw new IllegalArgumentException("Operation mode ID not found: " + id);
         }
-        operationModes.remove(unsignedId);
+        modes.remove(unsignedId);
     }
 
     public short getNextAvailableId() {
         for (short i = 0; i < MAX_MODES; i++) {
-            if (!operationModes.containsKey(i)) {
+            if (!modes.containsKey(i)) {
                 return i;
             }
         }
@@ -112,7 +112,7 @@ public class OperationModesModule extends SerializableModule implements ExtModul
     @Override
     public String toString() {
         return "OperationModeModule{" +
-                "operationModes=" + operationModes +
+                "operationModes=" + modes +
                 '}';
     }
 }

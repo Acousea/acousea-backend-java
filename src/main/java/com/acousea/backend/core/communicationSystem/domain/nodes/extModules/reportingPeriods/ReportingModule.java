@@ -27,11 +27,11 @@ public abstract class ReportingModule extends SerializableModule implements ExtM
 
     private static byte[] serialize(byte technologyId, OperationModesModule operationModesModule) {
         int size = Byte.BYTES + (operationModesModule != null ?
-                operationModesModule.getOperationModes().size() * (Byte.BYTES + Short.BYTES) : 0);
+                operationModesModule.getModes().size() * (Byte.BYTES + Short.BYTES) : 0);
         ByteBuffer buffer = ByteBuffer.allocate(size);
         buffer.put(technologyId);
         if (operationModesModule != null) {
-            operationModesModule.getOperationModes().forEach((id, mode) -> {
+            operationModesModule.getModes().forEach((id, mode) -> {
                 buffer.put(UnsignedByte.toByte(id));
                 buffer.putShort((short) 0);
             });
@@ -40,7 +40,7 @@ public abstract class ReportingModule extends SerializableModule implements ExtM
     }
 
     private void initializeReportingPeriods(OperationModesModule operationModesModule) {
-        operationModesModule.getOperationModes().forEach((id, mode) -> {
+        operationModesModule.getModes().forEach((id, mode) -> {
             reportingPeriodsPerOperationMode.put(mode, (short) 0);
         });
     }
