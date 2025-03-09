@@ -43,7 +43,7 @@ public class RockBlockController {
     }
 
     @PostMapping("/webhook")
-    public ResponseEntity<ApiResult<String>> receiveRockblockPacket(
+    public ResponseEntity<ApiResult<String>> receiveRockBlockPacket(
             @RequestParam("imei") String imei,
             @RequestParam("serial") String serial,
             @RequestParam("momsn") int momsn,
