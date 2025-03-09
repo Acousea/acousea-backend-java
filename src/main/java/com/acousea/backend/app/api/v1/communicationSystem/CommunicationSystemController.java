@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("${apiPrefix}/communication-system")
@@ -38,11 +39,21 @@ public class CommunicationSystemController {
     }
 
     @GetMapping("/node-device")
-    public ResponseEntity<ApiResult<NodeDevice>> getNodeStatus(@RequestParam String id) {
+    public ResponseEntity<ApiResult<NodeDevice>> getNodeStatus(
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String networkAddress
+    ) {
         GetNodeDeviceCommand query = new GetNodeDeviceCommand(
                 nodeDeviceRepository, storageService
         );
-        return ResponseEntity.ok(query.run(id));
+        return ResponseEntity.ok(
+                query.run(
+                        new GetNodeDeviceCommand.NodeDeviceIdentifier(
+                                Optional.ofNullable(id),
+                                Optional.ofNullable(networkAddress)
+                        )
+                )
+        );
     }
 
     @GetMapping("/node-device/all")

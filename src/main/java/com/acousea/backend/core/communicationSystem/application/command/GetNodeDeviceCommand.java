@@ -2,16 +2,19 @@ package com.acousea.backend.core.communicationSystem.application.command;
 
 
 import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
+import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.shared.application.services.StorageService;
-import com.acousea.backend.core.shared.domain.httpWrappers.Command;
 import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
+import com.acousea.backend.core.shared.domain.httpWrappers.Command;
 
 import java.util.Optional;
 import java.util.UUID;
 
+public class GetNodeDeviceCommand extends Command<GetNodeDeviceCommand.NodeDeviceIdentifier, NodeDevice> {
+    public record NodeDeviceIdentifier(Optional<String> id, Optional<String> networkAddress) {
+    }
 
-public class GetNodeDeviceCommand extends Command<String, NodeDevice> {
     private final NodeDeviceRepository nodeDeviceRepository;
     private final StorageService storageService;
 
@@ -21,8 +24,18 @@ public class GetNodeDeviceCommand extends Command<String, NodeDevice> {
     }
 
     @Override
-    public ApiResult<NodeDevice> execute(String id) {
-        Optional<NodeDevice> nodeDeviceInfo = nodeDeviceRepository.findById(UUID.fromString(id));
+    public ApiResult<NodeDevice> execute(NodeDeviceIdentifier identifier) {
+        Optional<NodeDevice> nodeDeviceInfo;
+        if (identifier.id().isPresent()) {
+            nodeDeviceInfo = nodeDeviceRepository.findById(UUID.fromString(identifier.id().get()));
+        } else if (identifier.networkAddress().isPresent()) {
+            nodeDeviceInfo = nodeDeviceRepository.findByNetworkAddress(
+                    Address.fromValue(Integer.parseInt(identifier.networkAddress().get()))
+            );
+        } else {
+            return ApiResult.fail(400, "You need to specify an id or a network address");
+        }
+
         if (nodeDeviceInfo.isEmpty()) {
             return ApiResult.fail(404, "Node not found");
         }

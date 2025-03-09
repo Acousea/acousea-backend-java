@@ -53,4 +53,12 @@ public class LocationModule extends SerializableModule implements ExtModule {
                 ", longitude=" + longitude +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        LocationModule that = (LocationModule) obj;
+        return Float.compare(that.latitude, latitude) == 0 && Float.compare(that.longitude, longitude) == 0;
+    }
 }

@@ -7,6 +7,7 @@ import com.acousea.backend.core.communicationSystem.domain.communication.constan
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.BasicStatusReportPayload;
 import com.acousea.backend.core.communicationSystem.domain.mother.CommunicationPacketMother;
 import com.acousea.backend.core.communicationSystem.domain.mother.RockBlockMessageMother;
+import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
 import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +24,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -86,10 +88,16 @@ public class EndToEndRockBlockControllerTest {
 
     @Test
     void testWebHookEndpointWithBasicStatusReport() throws Exception {
+
+        LocationModule initialLocationModule = new LocationModule(
+                new Random().nextFloat() * 180 - 90,
+                new Random().nextFloat() * 360 - 180
+        );
+
         // Given: A valid RockBlockMessage
         BasicStatusReportPayload payload = new BasicStatusReportPayload(
                 List.of(
-                        new LocationModule(20.5f, 30.0f)
+                        initialLocationModule
                 )
         );
         CommunicationPacket packet = CommunicationPacketMother.createBasicStatusReport(
@@ -126,9 +134,32 @@ public class EndToEndRockBlockControllerTest {
         // Then: Validate response properties
         assertThat(apiResult.success()).isTrue();
         assertThat(apiResult.value()).isNotEmpty().contains("RockBlockMessage processed successfully");
-
-        // Optional: Check that error field is null
         assertThat(apiResult.error()).isNull();
+
+        // Now we need to get the nodeDevice info and check that the location was updated.
+        EntityExchangeResult<ApiResult<NodeDevice>> nodeDeviceResponse = webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/v1/communication-system/node-device")
+                        .queryParam("id", "1")
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new ParameterizedTypeReference<ApiResult<NodeDevice>>() {
+                }) // Deserialize JSON correctly
+                .returnResult();
+
+        ApiResult<NodeDevice> nodeDeviceApiResult = nodeDeviceResponse.getResponseBody();
+        assert nodeDeviceApiResult != null;
+
+        // Debug: Print API Response
+        System.out.println("API Response: " + objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(nodeDeviceApiResult));
+
+        // Then: Validate response properties
+        assertThat(nodeDeviceApiResult.success()).isTrue();
+        assertThat(nodeDeviceApiResult.value()).isNotNull();
+        LocationModule locationModule = (LocationModule) nodeDeviceApiResult.value().getExtModules().get(LocationModule.name);
+        assertThat(locationModule).isNotNull();
+        assertThat(locationModule).isEqualTo(initialLocationModule);
     }
 }
 
