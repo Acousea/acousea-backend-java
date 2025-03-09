@@ -31,7 +31,7 @@ dependencies {
 
 	// Lombok
 	implementation 'org.projectlombok:lombok:1.18.28'
-implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
 	// AOP
@@ -60,6 +60,10 @@ implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	testImplementation 'org.junit.platform:junit-platform-runner:1.10.2'
 	testImplementation 'org.junit.platform:junit-platform-suite-api:1.10.2'
 	testImplementation 'org.junit.platform:junit-platform-suite-engine:1.10.2'
+
+	// Spring test
+	implementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 def currentProfile;
@@ -75,6 +79,10 @@ if (project.hasProperty('spring.profiles.active') && project.property('spring.pr
 	currentProfile = 'development';
 	println("Current profile is ${currentProfile}")
 //	apply from: rootProject.file('gradle/build_dev.gradle');
+
+} else if (project.hasProperty('spring.profiles.active') && project.property('spring.profiles.active') == 'test') {
+	currentProfile = 'test';
+	println("Current profile is ${currentProfile}")
 } else {
 	currentProfile = 'default';
 	println("Current profile is ${currentProfile}")
