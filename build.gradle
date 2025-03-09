@@ -31,7 +31,8 @@ dependencies {
 
 	// Lombok
 	implementation 'org.projectlombok:lombok:1.18.28'
-	annotationProcessor 'org.projectlombok:lombok:1.18.28'
+implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
 	// AOP
 	implementation 'org.springframework:spring-aop:'
