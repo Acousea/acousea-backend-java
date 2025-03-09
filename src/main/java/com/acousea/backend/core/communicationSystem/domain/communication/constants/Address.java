@@ -25,7 +25,7 @@ public class Address {
 //        if (isReserved(value)) {
 //            throw new IllegalArgumentException("Address value " + value + " is reserved.");
 //        }
-        if (!UnsignedByte.isValidUnsignedByte(value)) {
+        if (UnsignedByte.isNotValidUnsignedByte(value)) {
             throw new IllegalArgumentException("Address value " + value + " is out of the valid range.");
         }
         return new Address(UnsignedByte.toByte(value));

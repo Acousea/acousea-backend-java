@@ -37,7 +37,6 @@ public class BasicStatusReportPayload implements Payload {
 
     public static Payload fromBytes(ByteBuffer buffer) {
         List<SerializableModule> serializableModules = SerializableModuleFactory.createModules(buffer);
-        serializableModules.addAll(serializableModules);
         return new BasicStatusReportPayload(serializableModules);
     }
 }

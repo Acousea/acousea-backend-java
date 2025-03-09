@@ -10,7 +10,6 @@ import com.acousea.backend.core.shared.domain.crc.CRCUtils;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.HexFormat;
 
 /**
@@ -62,14 +61,26 @@ public class CommunicationPacket {
     }
 
     public byte[] toBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate((Byte.BYTES * 7) + payload.getBytesSize() + (Byte.BYTES * 2)); // +2 para el CRC de 16 bits
+        ByteBuffer buffer = ByteBuffer.allocate(
+                Byte.BYTES + // SYNC
+                        OperationCode.getSize() + // OP_CODE
+                        RoutingChunk.getSize() + // ROUTING_CHUNK
+                        Byte.BYTES + // TOTAL_PAYLOAD_LEN
+                        payload.getBytesSize() + // PAYLOAD
+                        Short.BYTES
+        ); // CRC (2 bytes)
         buffer.put(SYNC_BYTE);
         buffer.put((byte) operationCode.getValue());
         buffer.put(routingChunk.toBytes());
         buffer.put((byte) payload.getBytesSize());
         buffer.put(payload.toBytes());
         // Calcula el CRC y lo agrega al final del buffer
-        short crc = CRCUtils.calculate16BitCRC(buffer.array());
+        // Calculate CRC using only the bytes BEFORE the CRC field
+        byte[] bytesForCRC = new byte[buffer.position()];
+        buffer.rewind(); // Reset position to read
+        buffer.get(bytesForCRC); // Read only the relevant part
+
+        short crc = CRCUtils.calculate16BitCRC(bytesForCRC);
         buffer.putShort(crc);
         return buffer.array();
     }

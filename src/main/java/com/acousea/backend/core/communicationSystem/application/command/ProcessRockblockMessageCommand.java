@@ -63,7 +63,8 @@ public class ProcessRockblockMessageCommand extends Command<RockBlockMessage, St
         switch (communicationResponse.getOperationCode()) {
             case SET_NODE_DEVICE_CONFIG, GET_UPDATED_NODE_DEVICE_CONFIG:
                 communicationResponseProcessor.processSerializableModulesForNode(
-                        nodeDevice, ((NewNodeConfigurationPayload) communicationResponse.getPayload()).getSerializableModules()
+                        nodeDevice,
+                        ((NewNodeConfigurationPayload) communicationResponse.getPayload()).getSerializableModules()
                 );
                 eventBus.publish(
                         new UpdatedNodeConfigurationEvent(
@@ -76,7 +77,8 @@ public class ProcessRockblockMessageCommand extends Command<RockBlockMessage, St
 
             case COMPLETE_STATUS_REPORT:
                 communicationResponseProcessor.processSerializableModulesForNode(
-                        nodeDevice, ((CompleteStatusReportPayload) communicationResponse.getPayload()).getSerializableModules()
+                        nodeDevice,
+                        ((CompleteStatusReportPayload) communicationResponse.getPayload()).getSerializableModules()
                 );
                 eventBus.publish(
                         new ReceivedCompleteStatusReportEvent(

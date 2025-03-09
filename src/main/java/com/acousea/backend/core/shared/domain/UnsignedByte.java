@@ -22,13 +22,15 @@ public final class UnsignedByte {
     }
 
     public static byte toByte(int value) {
-        if (value < MIN_VALUE || value > MAX_VALUE) {
-            throw new IllegalArgumentException("Value must be between " + MIN_VALUE + " and " + MAX_VALUE);
+        if (isNotValidUnsignedByte(value)) {
+            throw new IllegalArgumentException("Value " + value + " must be between "
+                    + Byte.MIN_VALUE + " and " + Byte.MAX_VALUE
+                    + "to be converted to an UnsignedByte[" + MIN_VALUE + "-" + MAX_VALUE + "]");
         }
-        return (byte) value;
+        return (byte) Byte.toUnsignedInt((byte) value);
     }
 
-    public static boolean isValidUnsignedByte(int value) {
-        return value >= MIN_VALUE && value <= MAX_VALUE;
+    public static boolean isNotValidUnsignedByte(int value) {
+        return value < Byte.MIN_VALUE || value > Byte.MAX_VALUE;
     }
 }

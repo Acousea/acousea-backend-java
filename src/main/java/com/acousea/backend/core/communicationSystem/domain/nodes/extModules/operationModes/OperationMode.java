@@ -13,7 +13,7 @@ public final class OperationMode {
     private final String name;
 
     private OperationMode(Short id, String name) {
-        if (!UnsignedByte.isValidUnsignedByte(id)) {
+        if (UnsignedByte.isNotValidUnsignedByte(id)) {
             throw new IllegalArgumentException("ID must be between 0 and 255, inclusive.");
         }
         this.id = id;

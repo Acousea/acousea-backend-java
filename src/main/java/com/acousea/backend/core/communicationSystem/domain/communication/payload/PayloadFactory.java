@@ -1,10 +1,7 @@
 package com.acousea.backend.core.communicationSystem.domain.communication.payload;
 
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.OperationCode;
-import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.BasicStatusReportPayload;
-import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.CompleteStatusReportPayload;
-import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.GetUpdatedNodeConfigurationPayload;
-import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.NewNodeConfigurationPayload;
+import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.*;
 import com.acousea.backend.core.communicationSystem.domain.exceptions.InvalidPacketException;
 
 import java.nio.ByteBuffer;
@@ -24,7 +21,7 @@ public class PayloadFactory {
                 put(OperationCode.GET_UPDATED_NODE_DEVICE_CONFIG, GetUpdatedNodeConfigurationPayload::fromBytes);
                 put(OperationCode.BASIC_STATUS_REPORT, BasicStatusReportPayload::fromBytes);
                 put(OperationCode.COMPLETE_STATUS_REPORT, CompleteStatusReportPayload::fromBytes);
-
+                put(OperationCode.DEFAULT_WITH_EMPTY_PAYLOAD, EmptyPayload::fromBytes);
             }};
 
     // Método principal para obtener el payload decodificado desde ByteBuffer

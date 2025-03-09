@@ -73,7 +73,6 @@ public final class RoutingChunk {
         return Objects.hash(sender, receiver, TTL);
     }
 
-
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(getSize());
         buffer.put(sender.getValue());
