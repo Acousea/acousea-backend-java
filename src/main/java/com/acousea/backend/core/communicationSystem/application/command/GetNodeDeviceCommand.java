@@ -1,6 +1,7 @@
 package com.acousea.backend.core.communicationSystem.application.command;
 
 
+import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
 import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
@@ -11,7 +12,7 @@ import com.acousea.backend.core.shared.domain.httpWrappers.Command;
 import java.util.Optional;
 import java.util.UUID;
 
-public class GetNodeDeviceCommand extends Command<GetNodeDeviceCommand.NodeDeviceIdentifier, NodeDevice> {
+public class GetNodeDeviceCommand extends Command<GetNodeDeviceCommand.NodeDeviceIdentifier, NodeDeviceDTO> {
     public record NodeDeviceIdentifier(Optional<String> id, Optional<String> networkAddress) {
     }
 
@@ -24,7 +25,7 @@ public class GetNodeDeviceCommand extends Command<GetNodeDeviceCommand.NodeDevic
     }
 
     @Override
-    public ApiResult<NodeDevice> execute(NodeDeviceIdentifier identifier) {
+    public ApiResult<NodeDeviceDTO> execute(NodeDeviceIdentifier identifier) {
         Optional<NodeDevice> nodeDeviceInfo;
         if (identifier.id().isPresent()) {
             nodeDeviceInfo = nodeDeviceRepository.findById(UUID.fromString(identifier.id().get()));
@@ -46,6 +47,7 @@ public class GetNodeDeviceCommand extends Command<GetNodeDeviceCommand.NodeDevic
             return ApiResult.fail(500, "Error getting icon URL");
         }
 
+
         var node = new NodeDevice(
                 nodeDeviceInfo.get().getId(),
                 nodeDeviceInfo.get().getName(),
@@ -53,6 +55,7 @@ public class GetNodeDeviceCommand extends Command<GetNodeDeviceCommand.NodeDevic
                 nodeDeviceInfo.get().getExtModules(),
                 nodeDeviceInfo.get().getPamModules()
         );
-        return ApiResult.success(node);
+
+        return ApiResult.success(NodeDeviceDTO.fromNodeDevice(node));
     }
 }

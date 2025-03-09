@@ -82,7 +82,7 @@ public class NodeDeviceDTO {
 
     @JsonTypeInfo(
             use = JsonTypeInfo.Id.NAME,
-            include = JsonTypeInfo.As.EXISTING_PROPERTY,
+            include = JsonTypeInfo.As.PROPERTY,
             property = "name",
             visible = true
     )

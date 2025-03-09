@@ -1,5 +1,6 @@
 package com.acousea.backend.api.v1.communicationSystem;
 
+import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
 import com.acousea.backend.core.communicationSystem.domain.RockBlockMessage;
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationPacket;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
@@ -7,7 +8,6 @@ import com.acousea.backend.core.communicationSystem.domain.communication.constan
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.BasicStatusReportPayload;
 import com.acousea.backend.core.communicationSystem.domain.mother.CommunicationPacketMother;
 import com.acousea.backend.core.communicationSystem.domain.mother.RockBlockMessageMother;
-import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
 import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -137,18 +137,18 @@ public class EndToEndRockBlockControllerTest {
         assertThat(apiResult.error()).isNull();
 
         // Now we need to get the nodeDevice info and check that the location was updated.
-        EntityExchangeResult<ApiResult<NodeDevice>> nodeDeviceResponse = webTestClient.get()
+        EntityExchangeResult<ApiResult<NodeDeviceDTO>> nodeDeviceResponse = webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/api/v1/communication-system/node-device")
-                        .queryParam("id", "1")
+                        .queryParam("networkAddress", "1")
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<ApiResult<NodeDevice>>() {
+                .expectBody(new ParameterizedTypeReference<ApiResult<NodeDeviceDTO>>() {
                 }) // Deserialize JSON correctly
                 .returnResult();
 
-        ApiResult<NodeDevice> nodeDeviceApiResult = nodeDeviceResponse.getResponseBody();
+        ApiResult<NodeDeviceDTO> nodeDeviceApiResult = nodeDeviceResponse.getResponseBody();
         assert nodeDeviceApiResult != null;
 
         // Debug: Print API Response
@@ -157,9 +157,10 @@ public class EndToEndRockBlockControllerTest {
         // Then: Validate response properties
         assertThat(nodeDeviceApiResult.success()).isTrue();
         assertThat(nodeDeviceApiResult.value()).isNotNull();
-        LocationModule locationModule = (LocationModule) nodeDeviceApiResult.value().getExtModules().get(LocationModule.name);
+        NodeDeviceDTO.ExtModuleDto.LocationModuleDto locationModule = (NodeDeviceDTO.ExtModuleDto.LocationModuleDto) nodeDeviceApiResult.value().getExtModules().get(LocationModule.name);
         assertThat(locationModule).isNotNull();
-        assertThat(locationModule).isEqualTo(initialLocationModule);
+        assertThat(locationModule.getLongitude()).isEqualTo(initialLocationModule.getLongitude());
+        assertThat(locationModule.getLatitude()).isEqualTo(initialLocationModule.getLatitude());
     }
 }
 

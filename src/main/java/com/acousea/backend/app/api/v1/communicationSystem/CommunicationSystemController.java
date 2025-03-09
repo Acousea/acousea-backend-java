@@ -39,7 +39,7 @@ public class CommunicationSystemController {
     }
 
     @GetMapping("/node-device")
-    public ResponseEntity<ApiResult<NodeDevice>> getNodeStatus(
+    public ResponseEntity<ApiResult<NodeDeviceDTO>> getNodeStatus(
             @RequestParam(required = false) String id,
             @RequestParam(required = false) String networkAddress
     ) {
