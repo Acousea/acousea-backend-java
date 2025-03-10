@@ -1,7 +1,7 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location;
 
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import lombok.Getter;
 import lombok.Setter;

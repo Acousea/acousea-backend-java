@@ -1,7 +1,7 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.pamModules;
 
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenLoggingConfig;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenRecordingStats;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStatus;

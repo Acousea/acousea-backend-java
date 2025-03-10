@@ -1,8 +1,8 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModeGraph;
 
 
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import com.acousea.backend.core.shared.domain.UnsignedByte;
 import lombok.Getter;

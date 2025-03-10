@@ -1,6 +1,6 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules;
 
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModesModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;

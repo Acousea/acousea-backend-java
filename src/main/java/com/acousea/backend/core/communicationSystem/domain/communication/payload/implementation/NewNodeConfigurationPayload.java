@@ -2,8 +2,8 @@ package com.acousea.backend.core.communicationSystem.domain.communication.payloa
 
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationPacket;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.Payload;
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModuleFactory;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModuleFactory;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import lombok.Getter;
 import lombok.Setter;

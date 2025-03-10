@@ -1,4 +1,4 @@
-package com.acousea.backend.core.communicationSystem.domain.communication.serialization;
+package com.acousea.backend.core.communicationSystem.domain.nodes.serialization;
 
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient.AmbientModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;

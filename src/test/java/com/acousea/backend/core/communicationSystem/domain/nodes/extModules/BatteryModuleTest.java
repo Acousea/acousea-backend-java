@@ -1,7 +1,7 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules;
 
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.BatteryStatus;
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

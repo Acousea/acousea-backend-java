@@ -1,8 +1,8 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery;
 
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.BatteryStatus;
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import lombok.Getter;
 import lombok.Setter;

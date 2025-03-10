@@ -4,11 +4,17 @@ import com.acousea.backend.core.communicationSystem.application.command.DTO.Node
 import com.acousea.backend.core.communicationSystem.domain.RockBlockMessage;
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationPacket;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
+import com.acousea.backend.core.communicationSystem.domain.communication.constants.BatteryStatus;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.RoutingChunk;
 import com.acousea.backend.core.communicationSystem.domain.communication.payload.implementation.BasicStatusReportPayload;
 import com.acousea.backend.core.communicationSystem.domain.mother.CommunicationPacketMother;
 import com.acousea.backend.core.communicationSystem.domain.mother.RockBlockMessageMother;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient.AmbientModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.storage.StorageModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.shared.domain.httpWrappers.ApiResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +29,8 @@ import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Random;
 
@@ -86,20 +94,11 @@ public class EndToEndRockBlockControllerTest {
         assertThat(apiResult.error()).isNull();
     }
 
-    @Test
-    void testWebHookEndpointWithBasicStatusReport() throws Exception {
-
-        LocationModule initialLocationModule = new LocationModule(
-                new Random().nextFloat() * 180 - 90,
-                new Random().nextFloat() * 360 - 180
-        );
-
+    private NodeDeviceDTO testWebHookEndpointWithModule(
+            List<SerializableModule> modules
+    ) throws Exception {
         // Given: A valid RockBlockMessage
-        BasicStatusReportPayload payload = new BasicStatusReportPayload(
-                List.of(
-                        initialLocationModule
-                )
-        );
+        BasicStatusReportPayload payload = new BasicStatusReportPayload(modules);
         CommunicationPacket packet = CommunicationPacketMother.createBasicStatusReport(
                 new RoutingChunk(Address.fromValue(1), Address.getBroadcastAddress()),
                 payload
@@ -136,7 +135,7 @@ public class EndToEndRockBlockControllerTest {
         assertThat(apiResult.value()).isNotEmpty().contains("RockBlockMessage processed successfully");
         assertThat(apiResult.error()).isNull();
 
-        // Now we need to get the nodeDevice info and check that the location was updated.
+        // Now we need to get the nodeDevice info and check that the module data was updated.
         EntityExchangeResult<ApiResult<NodeDeviceDTO>> nodeDeviceResponse = webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/api/v1/communication-system/node-device")
@@ -157,11 +156,100 @@ public class EndToEndRockBlockControllerTest {
         // Then: Validate response properties
         assertThat(nodeDeviceApiResult.success()).isTrue();
         assertThat(nodeDeviceApiResult.value()).isNotNull();
-        NodeDeviceDTO.ExtModuleDto.LocationModuleDto locationModule = (NodeDeviceDTO.ExtModuleDto.LocationModuleDto) nodeDeviceApiResult.value().getExtModules().get(LocationModule.name);
+
+        // Extract and validate the module
+        return nodeDeviceApiResult.value();
+    }
+
+
+    @Test
+    void testWebHookEndpointWithAmbientModule() throws Exception {
+        AmbientModule initialAmbientModule = new AmbientModule(
+                new Random().nextInt(101) - 50,
+                new Random().nextInt(100)
+        );
+
+        NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialAmbientModule));
+        NodeDeviceDTO.ExtModuleDto.AmbientModuleDTO ambientModule = (NodeDeviceDTO.ExtModuleDto.AmbientModuleDTO) nodeDeviceDTO.getExtModules().get(AmbientModule.name);
+        assertThat(ambientModule).isNotNull();
+        assertThat(ambientModule.getTemperature()).isEqualTo(initialAmbientModule.getTemperature());
+        assertThat(ambientModule.getHumidity()).isEqualTo(initialAmbientModule.getHumidity());
+
+    }
+
+    @Test
+    void testWebHookEndpointWithBatteryModule() throws Exception {
+        BatteryStatus initialBatteryStatus = BatteryStatus.values()[new Random().nextInt(BatteryStatus.values().length)];
+        BatteryModule initialBatteryModule = new BatteryModule(new Random().nextInt(100), initialBatteryStatus);
+
+
+        NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialBatteryModule));
+        NodeDeviceDTO.ExtModuleDto.BatteryModuleDto batteryModule = (NodeDeviceDTO.ExtModuleDto.BatteryModuleDto) nodeDeviceDTO.getExtModules().get(BatteryModule.name);
+        assertThat(batteryModule).isNotNull();
+        assertThat(batteryModule.getBatteryStatus()).isEqualTo(initialBatteryModule.getBatteryStatus().getValue());
+        assertThat(batteryModule.getBatteryPercentage()).isEqualTo(initialBatteryModule.getBatteryPercentage());
+    }
+
+    @Test
+    void testWebHookEndpointWithLocationModule() throws Exception {
+        LocationModule initialLocationModule = new LocationModule(
+                new Random().nextFloat() * 180 - 90,
+                new Random().nextFloat() * 360 - 180
+        );
+
+        NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(
+                List.of(initialLocationModule)
+        );
+        NodeDeviceDTO.ExtModuleDto.LocationModuleDto locationModule = (NodeDeviceDTO.ExtModuleDto.LocationModuleDto) nodeDeviceDTO.getExtModules().get(LocationModule.name);
         assertThat(locationModule).isNotNull();
         assertThat(locationModule.getLongitude()).isEqualTo(initialLocationModule.getLongitude());
         assertThat(locationModule.getLatitude()).isEqualTo(initialLocationModule.getLatitude());
     }
+
+    @Test
+    void testWebHookEndpointWithNetworkModule() throws Exception {
+
+    }
+
+    @Test
+    void testWebHookEndpointWithOperationModeGraph() throws Exception {
+
+    }
+
+    @Test
+    void testWebHookEndpointWithReportingPeriods() throws Exception {
+
+    }
+
+    @Test
+    void testWebHookEndpointWithRTCModule() throws Exception {
+        RTCModule initialRTCModule = new RTCModule(LocalDateTime.ofEpochSecond(new Random().nextInt((int) LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)), 0, ZoneOffset.UTC));
+
+        NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(
+                List.of(initialRTCModule)
+        );
+
+        NodeDeviceDTO.ExtModuleDto.RtcModuleDto rtcModule = (NodeDeviceDTO.ExtModuleDto.RtcModuleDto) nodeDeviceDTO.getExtModules().get(RTCModule.name);
+        assertThat(rtcModule).isNotNull();
+        assertThat(LocalDateTime.parse(rtcModule.getCurrentTime())).isEqualTo(initialRTCModule.getCurrentTime());
+
+    }
+
+    @Test
+    void testWebHookEndpointWithStorageModule() throws Exception {
+        StorageModule initialStorageModule = new StorageModule(new Random().nextInt(100), new Random().nextInt(100));
+
+        NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(
+                List.of(initialStorageModule)
+        );
+
+        NodeDeviceDTO.ExtModuleDto.StorageModuleDto storageModule = (NodeDeviceDTO.ExtModuleDto.StorageModuleDto) nodeDeviceDTO.getExtModules().get(StorageModule.name);
+        assertThat(storageModule).isNotNull();
+        assertThat(storageModule.getStorageUsedMegabytes()).isEqualTo(initialStorageModule.getStorageUsedMegabytes());
+        assertThat(storageModule.getStorageTotalMegabytes()).isEqualTo(initialStorageModule.getStorageTotalMegabytes());
+    }
+
+
 }
 
 

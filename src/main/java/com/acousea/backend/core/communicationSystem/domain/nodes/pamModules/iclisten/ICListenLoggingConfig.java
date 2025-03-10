@@ -2,8 +2,8 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten;
 
 
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.ModuleCode;
-import com.acousea.backend.core.communicationSystem.domain.communication.serialization.SerializableModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import lombok.Getter;
 import lombok.Setter;
 
