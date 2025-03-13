@@ -92,7 +92,8 @@ public class ProcessRockblockMessageCommand extends Command<RockBlockMessage, St
             case BASIC_STATUS_REPORT:
                 System.out.println(ProcessRockblockMessageCommand.class.getSimpleName() + "-> BASIC_STATUS_REPORT not implemented yet");
                 communicationResponseProcessor.processSerializableModulesForNode(
-                        nodeDevice, ((BasicStatusReportPayload) communicationResponse.getPayload()).getSerializableModules()
+                        nodeDevice,
+                        ((BasicStatusReportPayload) communicationResponse.getPayload()).getSerializableModules()
                 );
                 eventBus.publish(
                         new ReceivedCompleteStatusReportEvent(

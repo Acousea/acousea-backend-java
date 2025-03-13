@@ -4,6 +4,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambi
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModeGraph.OperationModesGraphModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModesModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.ReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
@@ -34,6 +35,7 @@ public class SerializableModuleFactory {
         put(ModuleCode.LOCATION, LocationModule::fromBytes);
         put(ModuleCode.NETWORK, NetworkModule::fromBytes);
         put(ModuleCode.OPERATION_MODES, OperationModesModule::fromBytes);
+        put(ModuleCode.OPERATION_MODES_GRAPH, OperationModesGraphModule::fromBytes);
         put(ModuleCode.REPORTING, ReportingModule::fromBytes);
         put(ModuleCode.RTC, RTCModule::fromBytes);
         put(ModuleCode.STORAGE, StorageModule::fromBytes);

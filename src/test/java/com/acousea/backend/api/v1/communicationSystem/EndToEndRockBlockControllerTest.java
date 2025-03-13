@@ -12,6 +12,12 @@ import com.acousea.backend.core.communicationSystem.domain.mother.RockBlockMessa
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient.AmbientModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.network.NetworkModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModeGraph.OperationModesGraphModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModesModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.storage.StorageModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
@@ -31,8 +37,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -208,18 +213,176 @@ public class EndToEndRockBlockControllerTest {
 
     @Test
     void testWebHookEndpointWithNetworkModule() throws Exception {
+        // Create a routing table with random routes
+        NetworkModule.RoutingTable routingTable = new NetworkModule.RoutingTable();
+        routingTable.addRoute(Address.fromValue(2), Address.fromValue(3));
+        routingTable.addRoute(Address.fromValue(4), Address.fromValue(5));
+        routingTable.setDefaultGateway(Address.fromValue(1));
 
+        // Create a NetworkModule with a random local address and the routing table
+        NetworkModule initialNetworkModule = new NetworkModule(Address.fromValue(1), routingTable);
+
+        NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialNetworkModule));
+
+        // Retrieve and validate the NetworkModule DTO from the API response
+        NodeDeviceDTO.ExtModuleDto.NetworkModuleDto networkModuleDto =
+                (NodeDeviceDTO.ExtModuleDto.NetworkModuleDto) nodeDeviceDTO.getExtModules().get(NetworkModule.name);
+
+        assertThat(networkModuleDto).isNotNull();
+        assertThat(networkModuleDto.getLocalAddress()).isEqualTo(initialNetworkModule.getLocalAddress().getValue());
+
+        // Validate routing table data
+        assertThat(networkModuleDto.getRoutingTable()).isNotNull();
+        assertThat(networkModuleDto.getRoutingTable().getDefaultGateway()).isEqualTo(routingTable.getDefaultGateway().getValue());
+
+        // Ensure all routes are correctly mapped
+        routingTable.getPeerRoutes().forEach((destination, nextHop) -> {
+            assertThat(networkModuleDto.getRoutingTable().getPeerRoutes())
+                    .containsEntry((int) destination.getValue(), (int) nextHop.getValue());
+        });
     }
 
     @Test
-    void testWebHookEndpointWithOperationModeGraph() throws Exception {
+    void testWebHookEndpointWithOperationModesModule() throws Exception {
+        // Create a set of operation modes
+        OperationMode mode1 = OperationMode.create((short) 1, "Normal Mode");
+        OperationMode mode2 = OperationMode.create((short) 2, "Power Saving Mode");
+        OperationMode mode3 = OperationMode.create((short) 3, "Emergency Mode");
 
+        // Create a map for the operation modes
+        Map<Short, OperationMode> operationModesMap = new TreeMap<>();
+        operationModesMap.put(mode1.getId(), mode1);
+        operationModesMap.put(mode2.getId(), mode2);
+        operationModesMap.put(mode3.getId(), mode3);
+
+        // Select an active operation mode
+        Short activeModeId = mode2.getId();
+
+        // Create the OperationModesModule
+        OperationModesModule initialOperationModesModule = new OperationModesModule(operationModesMap, activeModeId);
+
+        NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialOperationModesModule));
+
+        // Retrieve and validate the OperationModesModule DTO from the API response
+        NodeDeviceDTO.ExtModuleDto.OperationModeModuleDto operationModesModuleDto =
+                (NodeDeviceDTO.ExtModuleDto.OperationModeModuleDto) nodeDeviceDTO.getExtModules().get(OperationModesModule.name);
+
+        assertThat(operationModesModuleDto).isNotNull();
+        assertThat(operationModesModuleDto.getActiveOperationModeIdx()).isEqualTo(activeModeId);
+
+        // Ensure all operation modes are correctly mapped
+        // FIXME: Cannot compare the operation Mode names, since they're not serialized and are lost in the process.
+        operationModesMap.forEach((id, mode) -> {
+            assertThat(operationModesModuleDto.getModes())
+                    .containsKey(id);
+        });
+    }
+
+
+    @Test
+    void testWebHookEndpointWithOperationModesGraphModule() throws Exception {
+        // Create a transition graph with various operation mode transitions
+        Map<Integer, OperationModesGraphModule.Transition> transitionGraph = new HashMap<>();
+        transitionGraph.put(1, new OperationModesGraphModule.Transition(2, 5000)); // Mode 1 -> Mode 2 (5 sec)
+        transitionGraph.put(2, new OperationModesGraphModule.Transition(3, 8000)); // Mode 2 -> Mode 3 (8 sec)
+        transitionGraph.put(3, new OperationModesGraphModule.Transition(1, 3000)); // Mode 3 -> Mode 1 (3 sec)
+
+        // Create the OperationModesGraphModule instance
+        OperationModesGraphModule initialOperationModesGraphModule = new OperationModesGraphModule(transitionGraph);
+
+        NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialOperationModesGraphModule));
+
+        // Retrieve and validate the OperationModesGraphModule DTO from the API response
+        NodeDeviceDTO.ExtModuleDto.OperationModesGraphModuleDto operationModesGraphModuleDto =
+                (NodeDeviceDTO.ExtModuleDto.OperationModesGraphModuleDto) nodeDeviceDTO.getExtModules().get(OperationModesGraphModule.name);
+
+        assertThat(operationModesGraphModuleDto).isNotNull();
+        assertThat(operationModesGraphModuleDto.getGraph()).isNotNull();
+
+        // Ensure all transitions are correctly mapped
+        transitionGraph.forEach((currentMode, transition) -> {
+            assertThat(operationModesGraphModuleDto.getGraph())
+                    .containsKey(currentMode);
+
+            NodeDeviceDTO.ExtModuleDto.OperationModesGraphModuleDto.TransitionDto transitionDto =
+                    operationModesGraphModuleDto.getGraph().get(currentMode);
+
+            assertThat(transitionDto.getTargetMode()).isEqualTo(transition.getTargetMode());
+            assertThat(transitionDto.getDuration()).isEqualTo(transition.getDuration());
+        });
+    }
+
+
+    @Test
+    void testWebHookEndpointWithLoRaReportingModule() throws Exception {
+        // Create a set of operation modes
+        OperationMode mode1 = OperationMode.create((short) 1, "Mode A");
+        OperationMode mode2 = OperationMode.create((short) 2, "Mode B");
+
+        // Create an OperationModesModule
+        Map<OperationMode, Short> reportingPeriods = new HashMap<>(
+                Map.of(mode1, (short) 1000, mode2, (short) 5000)
+        );
+
+        // Create a LoRaReportingModule with default reporting periods
+        LoRaReportingModule initialLoRaReportingModule = new LoRaReportingModule(reportingPeriods);
+
+        // Set reporting periods for specific operation modes
+        initialLoRaReportingModule.setReportingPeriod(mode1, 1000);
+        initialLoRaReportingModule.setReportingPeriod(mode2, 5000);
+
+        NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialLoRaReportingModule));
+
+        // Retrieve and validate the LoRaReportingModule DTO from the API response
+        NodeDeviceDTO.ExtModuleDto.LoRaReportingModuleDto loRaReportingModuleDto =
+                (NodeDeviceDTO.ExtModuleDto.LoRaReportingModuleDto) nodeDeviceDTO.getExtModules().get(LoRaReportingModule.name);
+
+        assertThat(loRaReportingModuleDto).isNotNull();
+        assertThat(loRaReportingModuleDto.getTechnologyId()).isEqualTo(LoRaReportingModule.TECHNOLOGY_ID);
+
+        // Ensure reporting periods are correctly mapped
+        assertThat(loRaReportingModuleDto.getReportingPeriodsPerOperationModeIdx()).containsEntry(mode1.getId(), (short) 1000);
+        assertThat(loRaReportingModuleDto.getReportingPeriodsPerOperationModeIdx()).containsEntry(mode2.getId(), (short) 5000);
     }
 
     @Test
-    void testWebHookEndpointWithReportingPeriods() throws Exception {
+    void testWebHookEndpointWithIridiumReportingModule() throws Exception {
+        // Create a set of operation modes
+        OperationMode mode1 = OperationMode.create((short) 1, "Mode A");
+        OperationMode mode2 = OperationMode.create((short) 2, "Mode B");
 
+        // Create an OperationModesModule
+        Map<OperationMode, Short> reportingPeriods = new HashMap<>(
+                Map.of(mode1, (short) 2000, mode2, (short) 7000)
+        );
+
+        // Define an IMEI number
+        String imei = "300234063897210";
+
+        // Create an IridiumReportingModule with default reporting periods
+        IridiumReportingModule initialIridiumReportingModule = new IridiumReportingModule(reportingPeriods, imei);
+
+        // Set reporting periods for specific operation modes
+        initialIridiumReportingModule.setReportingPeriod(mode1, 2000);
+        initialIridiumReportingModule.setReportingPeriod(mode2, 7000);
+
+        NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialIridiumReportingModule));
+
+        // Retrieve and validate the IridiumReportingModule DTO from the API response
+        NodeDeviceDTO.ExtModuleDto.IridiumReportingModuleDto iridiumReportingModuleDto =
+                (NodeDeviceDTO.ExtModuleDto.IridiumReportingModuleDto) nodeDeviceDTO.getExtModules().get(IridiumReportingModule.name);
+
+        assertThat(iridiumReportingModuleDto).isNotNull();
+        assertThat(iridiumReportingModuleDto.getTechnologyId()).isEqualTo(IridiumReportingModule.TECHNOLOGY_ID);
+        // FIXME: Cannot compare the IMEI, since it's not serialized and is lost in the process.
+//        assertThat(iridiumReportingModuleDto.getImei()).isEqualTo(imei);
+
+        // Ensure reporting periods are correctly mapped
+        assertThat(iridiumReportingModuleDto.getReportingPeriodsPerOperationModeIdx()).containsEntry(mode1.getId(), (short) 2000);
+        assertThat(iridiumReportingModuleDto.getReportingPeriodsPerOperationModeIdx()).containsEntry(mode2.getId(), (short) 7000);
     }
+
+
 
     @Test
     void testWebHookEndpointWithRTCModule() throws Exception {

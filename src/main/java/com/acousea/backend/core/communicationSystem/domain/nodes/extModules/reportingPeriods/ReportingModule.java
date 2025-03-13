@@ -17,36 +17,30 @@ public abstract class ReportingModule extends SerializableModule implements ExtM
     private final byte technologyId; // ID de la tecnología
     private final Map<OperationMode, Short> reportingPeriodsPerOperationMode = new HashMap<>();
 
-    protected ReportingModule(byte technologyId, OperationModesModule operationModesModule) {
-        super(ModuleCode.REPORTING, serialize(technologyId, operationModesModule));
+    protected ReportingModule(byte technologyId, Map<OperationMode, Short> reportingPeriods) {
+        super(ModuleCode.REPORTING, serialize(technologyId, reportingPeriods));
         this.technologyId = technologyId;
-        if (operationModesModule != null) {
-            initializeReportingPeriods(operationModesModule);
-        }
     }
 
-    private static byte[] serialize(byte technologyId, OperationModesModule operationModesModule) {
-        int size = Byte.BYTES + (operationModesModule != null ?
-                operationModesModule.getModes().size() * (Byte.BYTES + Short.BYTES) : 0);
+    private static byte[] serialize(
+            byte technologyId,
+            Map<OperationMode, Short> reportingPeriods
+    ) {
+        int size = Byte.BYTES + reportingPeriods.size() * (Byte.BYTES + Short.BYTES);
         ByteBuffer buffer = ByteBuffer.allocate(size);
         buffer.put(technologyId);
-        if (operationModesModule != null) {
-            operationModesModule.getModes().forEach((id, mode) -> {
-                buffer.put(UnsignedByte.toByte(id));
-                buffer.putShort((short) 0);
-            });
-        }
-        return buffer.array();
-    }
 
-    private void initializeReportingPeriods(OperationModesModule operationModesModule) {
-        operationModesModule.getModes().forEach((id, mode) -> {
-            reportingPeriodsPerOperationMode.put(mode, (short) 0);
+        reportingPeriods.forEach((mode, period) -> {
+            buffer.put(UnsignedByte.toByte(mode.getId()));
+            buffer.putShort(period);
         });
+
+        return buffer.array();
     }
 
     public void setReportingPeriod(OperationMode mode, int period) {
         reportingPeriodsPerOperationMode.put(mode, (short) period);
+
     }
 
     public int getReportingPeriod(byte modeId) {

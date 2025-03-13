@@ -21,24 +21,24 @@ public class OperationModesModule extends SerializableModule implements ExtModul
     private final Map<Short, OperationMode> modes = new TreeMap<>(); // Mapa para almacenar modos
 
     public OperationModesModule(Map<Short, OperationMode> modes) {
-        super(ModuleCode.OPERATION_MODES, serialize(modes));
+        super(ModuleCode.OPERATION_MODES, serialize(modes, !modes.isEmpty() ? modes.keySet().iterator().next() : 0));
         this.modes.putAll(modes);
         this.activeOperationModeIdx = !modes.isEmpty() ? modes.keySet().iterator().next() : 0;
     }
 
     public OperationModesModule(Map<Short, OperationMode> modes, Short activeOperationModeIdx) {
-        super(ModuleCode.OPERATION_MODES, serialize(modes));
+        super(ModuleCode.OPERATION_MODES, serialize(modes, activeOperationModeIdx));
         this.modes.putAll(modes);
         this.activeOperationModeIdx = activeOperationModeIdx;
     }
 
 
-    private static byte[] serialize(Map<Short, OperationMode> operationModes) {
+    private static byte[] serialize(Map<Short, OperationMode> operationModes, Short activeIdx) {
         ByteBuffer buffer = ByteBuffer.allocate(operationModes.size() + Byte.BYTES);
         for (OperationMode mode : operationModes.values()) {
             buffer.put(UnsignedByte.toByte(mode.getId()));
         }
-        buffer.put(UnsignedByte.toByte((byte) 0)); // Modo activo
+        buffer.put(UnsignedByte.toByte(activeIdx));
         return buffer.array();
     }
 
@@ -46,7 +46,7 @@ public class OperationModesModule extends SerializableModule implements ExtModul
         if (buffer.remaining() < getMinSize()) {
             throw new IllegalArgumentException("Invalid byte array for OperationModeModule");
         }
-        Map<Short, OperationMode> modes = IntStream.range(0, buffer.remaining())
+        Map<Short, OperationMode> modes = IntStream.range(0, buffer.remaining() - Byte.BYTES)
                 .mapToObj(i -> {
                     short id = buffer.get();
                     return OperationMode.create(Short.valueOf(id), "operationMode" + id);

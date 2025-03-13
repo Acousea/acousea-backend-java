@@ -48,14 +48,30 @@ public class MockNodeDevices {
                 )
         );
 
-        ReportingModule loRaReportingModule = LoRaReportingModule.create(operationModesModule);
+        ReportingModule loRaReportingModule = LoRaReportingModule.create(Map.ofEntries(
+                Map.entry(OperationMode.create((short) 1, "Launching"), (short) 1),
+                Map.entry(OperationMode.create((short) 2, "Working"), (short) 2),
+                Map.entry(OperationMode.create((short) 3, "Recovering"), (short) 1)
+        ));
         OperationModesGraphModule graph = new OperationModesGraphModule(Map.ofEntries(
                 Map.entry(1, new OperationModesGraphModule.Transition(2, 3)), // Launching -> Working (3 cycles duration)
                 Map.entry(2, new OperationModesGraphModule.Transition(2, 1)) // Working -> Working (1 cycle duration) (loop)
         ));
 
-        IridiumReportingModule iridiumReportingModuleLocalizer = IridiumReportingModule.create(operationModesModule, environment.getProperty("localizer.imei"));
-        IridiumReportingModule iridiumReportingModuleDrifter = IridiumReportingModule.create(operationModesModule, environment.getProperty("drifter.imei"));
+        IridiumReportingModule iridiumReportingModuleLocalizer = IridiumReportingModule.create(
+                Map.ofEntries(
+                        Map.entry(OperationMode.create((short) 1, "Launching"), (short) 1),
+                        Map.entry(OperationMode.create((short) 2, "Working"), (short) 2),
+                        Map.entry(OperationMode.create((short) 3, "Recovering"), (short) 1)
+                )
+                , environment.getProperty("localizer.imei"));
+        IridiumReportingModule iridiumReportingModuleDrifter = IridiumReportingModule.create(
+                Map.ofEntries(
+                        Map.entry(OperationMode.create((short) 1, "Launching"), (short) 1),
+                        Map.entry(OperationMode.create((short) 2, "Working"), (short) 2),
+                        Map.entry(OperationMode.create((short) 3, "Recovering"), (short) 1)
+                )
+                , environment.getProperty("drifter.imei"));
 
         return List.of(new NodeDevice(
                         UUID.fromString("00000000-0000-0000-0000-000000000001"),

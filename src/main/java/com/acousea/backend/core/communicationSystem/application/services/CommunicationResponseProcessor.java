@@ -1,5 +1,6 @@
 package com.acousea.backend.core.communicationSystem.application.services;
 
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModeGraph.OperationModesGraphModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.exceptions.InvalidPacketException;
@@ -46,6 +47,9 @@ public class CommunicationResponseProcessor {
             ),
             Map.entry(ModuleCode.OPERATION_MODES,
                     (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(OperationModesModule.name, (OperationModesModule) serializableModule)
+            ),
+            Map.entry(ModuleCode.OPERATION_MODES_GRAPH,
+                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(OperationModesGraphModule.name, (OperationModesGraphModule) serializableModule)
             ),
             Map.entry(ModuleCode.RTC,
                     (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(RTCModule.name, ((RTCModule) serializableModule))

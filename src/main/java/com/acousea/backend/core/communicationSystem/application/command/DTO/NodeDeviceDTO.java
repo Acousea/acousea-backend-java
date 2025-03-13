@@ -244,11 +244,11 @@ public class NodeDeviceDTO {
         @Data
         public static class OperationModeModuleDto extends ExtModuleDto {
             private Map<Short, String> modes;
-            private Integer activeOperationModeIdx;
+            private Short activeOperationModeIdx;
 
             public static OperationModeModuleDto fromOperationModeModule(OperationModesModule module) {
                 OperationModeModuleDto dto = new OperationModeModuleDto();
-                dto.setActiveOperationModeIdx((int) module.getActiveOperationModeIdx());
+                dto.setActiveOperationModeIdx(module.getActiveOperationModeIdx());
                 dto.setModes(module.getModes()
                         .entrySet()
                         .stream()
@@ -260,28 +260,7 @@ public class NodeDeviceDTO {
                 Map<Short, OperationMode> modes = this.modes.entrySet()
                         .stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, e -> OperationMode.create(e.getKey(), e.getValue())));
-                return new OperationModesModule(modes, activeOperationModeIdx.shortValue());
-            }
-        }
-
-
-        @Data
-        public static class ReportingPeriodPerOperationModeDto {
-            private Short operationModeIdx;
-            private Short value;
-
-            public ReportingPeriodPerOperationModeDto(Short operationModeIdx, Short value) {
-                this.operationModeIdx = operationModeIdx;
-                this.value = value;
-            }
-
-            public static OperationModesModule fromDTO(List<ReportingPeriodPerOperationModeDto> reportingPeriods) {
-                Map<Short, OperationMode> modes = new HashMap<>();
-                for (ReportingPeriodPerOperationModeDto period : reportingPeriods) {
-                    modes.put(period.getOperationModeIdx(), OperationMode.create(period.getOperationModeIdx(), "operationMode" + period.getOperationModeIdx()));
-                }
-
-                return new OperationModesModule(modes, (short) 0);
+                return new OperationModesModule(modes, activeOperationModeIdx);
             }
         }
 
@@ -289,7 +268,7 @@ public class NodeDeviceDTO {
         @Data
         public static class IridiumReportingModuleDto extends ExtModuleDto {
             private Integer technologyId;
-            private List<ReportingPeriodPerOperationModeDto> reportingPeriods;
+            private Map<Short, Short> reportingPeriodsPerOperationModeIdx; // Changed List to Map
             private String imei;
 
             public static IridiumReportingModuleDto fromIridiumReportingModule(IridiumReportingModule value) {
@@ -297,22 +276,25 @@ public class NodeDeviceDTO {
                 dto.setTechnologyId((int) value.getTechnologyId());
                 dto.setImei(value.getImei());
 
-                // Convertir el Map a List<ReportingPeriodDto>
-                List<ReportingPeriodPerOperationModeDto> reportingPeriodList = value.getReportingPeriodsPerOperationMode()
+                // Convert ReportingModule Map to DTO Map
+                dto.setReportingPeriodsPerOperationModeIdx(value.getReportingPeriodsPerOperationMode()
                         .entrySet()
                         .stream()
-                        .map(entry -> new ReportingPeriodPerOperationModeDto(entry.getKey().getId(), entry.getValue()))
-                        .toList();
+                        .collect(Collectors.toMap(entry -> entry.getKey().getId(), Map.Entry::getValue))
+                );
 
-                dto.setReportingPeriods(reportingPeriodList);
                 return dto;
             }
 
             public IridiumReportingModule toIridiumReportingModule() {
-                return new IridiumReportingModule(
-                        ReportingPeriodPerOperationModeDto.fromDTO(this.reportingPeriods),
-                        this.imei
-                );
+                Map<OperationMode, Short> reportingPeriods = reportingPeriodsPerOperationModeIdx.entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                                entry -> OperationMode.create(entry.getKey(), "operationMode" + entry.getKey()),
+                                Map.Entry::getValue
+                        ));
+                IridiumReportingModule module = new IridiumReportingModule(reportingPeriods, this.imei);
+                return module;
             }
         }
 
@@ -320,29 +302,34 @@ public class NodeDeviceDTO {
         @Data
         public static class LoRaReportingModuleDto extends ExtModuleDto {
             private Integer technologyId;
-            private List<ReportingPeriodPerOperationModeDto> reportingPeriods;
+            private Map<Short, Short> reportingPeriodsPerOperationModeIdx; // Changed List to Map
 
             public static LoRaReportingModuleDto fromLoRaReportingModule(LoRaReportingModule value) {
                 LoRaReportingModuleDto dto = new LoRaReportingModuleDto();
                 dto.setTechnologyId((int) value.getTechnologyId());
 
-                // Convertir el Map a List<ReportingPeriodDto>
-                List<ReportingPeriodPerOperationModeDto> reportingPeriodList = value.getReportingPeriodsPerOperationMode()
+                // Convert ReportingModule Map to DTO Map
+                dto.setReportingPeriodsPerOperationModeIdx(value.getReportingPeriodsPerOperationMode()
                         .entrySet()
                         .stream()
-                        .map(entry -> new ReportingPeriodPerOperationModeDto(entry.getKey().getId(), entry.getValue()))
-                        .toList();
+                        .collect(Collectors.toMap(entry -> entry.getKey().getId(), Map.Entry::getValue))
+                );
 
-                dto.setReportingPeriods(reportingPeriodList);
                 return dto;
             }
 
             public LoRaReportingModule toLoRaReportingModule() {
-                return new LoRaReportingModule(
-                        ReportingPeriodPerOperationModeDto.fromDTO(this.reportingPeriods)
-                );
+                Map<OperationMode, Short> reportingPeriods = reportingPeriodsPerOperationModeIdx.entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                                entry -> OperationMode.create(entry.getKey(), "operationMode" + entry.getKey()),
+                                Map.Entry::getValue
+                        ));
+                LoRaReportingModule module = new LoRaReportingModule(reportingPeriods);
+                return module;
             }
         }
+
 
         @EqualsAndHashCode(callSuper = true)
         @Data

@@ -1,11 +1,11 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules;
 
-import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModesModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.IridiumReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.ReportingModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +23,11 @@ public class ReportingModuleTest {
         modes.put((short) 1, OperationMode.create((short) 1, "Mode1"));
         modes.put((short) 2, OperationMode.create((short) 2, "Mode2"));
 
-        OperationModesModule operationModesModule = new OperationModesModule(modes);
-        LoRaReportingModule reportingModule = new LoRaReportingModule(operationModesModule);
+        Map<OperationMode, Short> reportingPeriods = new HashMap<>(
+                Map.of(OperationMode.create((short) 1, "Mode1"), (short) 120,
+                        OperationMode.create((short) 2, "Mode2"), (short) 300)
+        );
+        LoRaReportingModule reportingModule = new LoRaReportingModule(reportingPeriods);
         reportingModule.setReportingPeriod(OperationMode.create((short) 1, "Mode1"), 120);
         reportingModule.setReportingPeriod(OperationMode.create((short) 2, "Mode2"), 300);
 
@@ -58,8 +61,11 @@ public class ReportingModuleTest {
         // Given: An Iridium reporting module with predefined operation modes
         Map<Short, OperationMode> modes = new HashMap<>();
         modes.put((short) 3, OperationMode.create((short) 3, "Mode3"));
-        OperationModesModule operationModesModule = new OperationModesModule(modes);
-        IridiumReportingModule reportingModule = new IridiumReportingModule(operationModesModule, "123456789012345");
+
+        Map<OperationMode, Short> reportingPeriods = new HashMap<>(
+                Map.of(OperationMode.create((short) 3, "Mode3"), (short) 600)
+        );
+        IridiumReportingModule reportingModule = new IridiumReportingModule(reportingPeriods, "123456789012345");
         reportingModule.setReportingPeriod(OperationMode.create((short) 3, "Mode3"), 600);
 
         // When: We serialize the IridiumReportingModule
