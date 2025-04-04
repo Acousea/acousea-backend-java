@@ -59,7 +59,7 @@ public class SQLNodeDeviceInfo {
                 "name",
                 "",
                 Map.of(),
-                List.of()
+                Map.of()
         );
     }
 

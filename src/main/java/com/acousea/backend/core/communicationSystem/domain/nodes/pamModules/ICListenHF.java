@@ -15,16 +15,21 @@ import java.nio.ByteBuffer;
 @Getter
 @Setter
 public class ICListenHF extends SerializableModule implements PamModule {
-    String serialNumber, name;
+    String serialNumber;
+    public static final String name = "ICListenHF";
     private ICListenStatus status;
     private ICListenLoggingConfig loggingConfig;
     private ICListenStreamingConfig streamingConfig;
     private ICListenRecordingStats recordingStats;
 
+    @Override
+    public String getName() {
+        return name;
+    }
+
     public ICListenHF(String serialNumber) {
         super(ModuleCode.ICLISTEN_COMPLETE, serializeValues(serialNumber, ICListenStatus.createDefault(), ICListenLoggingConfig.createDefault(), ICListenStreamingConfig.createDefault(), ICListenRecordingStats.createDefault()));
         this.serialNumber = serialNumber;
-        this.name = "ICListenHF";
         this.status = ICListenStatus.createDefault();
         this.loggingConfig = ICListenLoggingConfig.createDefault();
         this.streamingConfig = ICListenStreamingConfig.createDefault();

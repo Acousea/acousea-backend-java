@@ -8,6 +8,7 @@ import com.acousea.backend.core.communicationSystem.infrastructure.mocks.MockNod
 import com.acousea.backend.core.shared.infrastructure.ports.InMemoryIRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,7 +29,8 @@ public class InMemoryNodeDeviceRepository extends InMemoryIRepository<NodeDevice
 
     public InMemoryNodeDeviceRepository(MockNodeDevices mockNodeDevices) {
         super(NodeDevice::getId);
-        mockNodeDevices.generate().forEach(this::save);
+        List<NodeDevice> mockNodes = mockNodeDevices.generate();
+        mockNodes.forEach(this::save);
         System.out.println("InMemoryNodeDeviceRepository created with nodes: " + this.findAll().toString());
     }
 

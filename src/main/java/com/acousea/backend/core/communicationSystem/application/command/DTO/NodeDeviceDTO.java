@@ -40,7 +40,7 @@ public class NodeDeviceDTO {
     private String name;
     private String icon;
     private Map<String, ExtModuleDto> extModules;
-    private List<PamModuleDto> pamModules;
+    private Map<String, PamModuleDto> pamModules;
 
     public NodeDevice toNodeDevice() {
         return new NodeDevice(
@@ -48,7 +48,7 @@ public class NodeDeviceDTO {
                 this.name,
                 this.icon,
                 (this.extModules != null) ? ExtModuleDto.toExtModules(this.extModules) : new HashMap<>(),
-                (this.pamModules != null) ? this.pamModules.stream().map(PamModuleDto::toPamModule).toList() : List.of()
+                (this.pamModules != null) ? PamModuleDto.toPamModules(this.pamModules) : new HashMap<>()
         );
     }
 
@@ -123,6 +123,8 @@ public class NodeDeviceDTO {
                     extModuleMap.put(key, ((StorageModuleDto) value).toStorageModule());
                 } else if (value instanceof LocationModuleDto) {
                     extModuleMap.put(key, ((LocationModuleDto) value).toLocationModule());
+                } else {
+                    throw new IllegalArgumentException("Unknown ExtModule type: " + value.getClass().getName());
                 }
             });
             return extModuleMap;
@@ -151,6 +153,8 @@ public class NodeDeviceDTO {
                     dto.put(StorageModule.name, StorageModuleDto.fromStorageModule((StorageModule) value));
                 } else if (value instanceof LocationModule) {
                     dto.put(LocationModule.name, LocationModuleDto.fromLocationModule((LocationModule) value));
+                } else {
+                    throw new IllegalArgumentException("Unknown ExtModule type: " + value.getClass().getName());
                 }
             });
             return dto;
@@ -453,233 +457,272 @@ public class NodeDeviceDTO {
 
     }
 
+
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.PROPERTY,
+            property = "name",
+            visible = true
+    )
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = PamModuleDto.ICListenHFDto.class, name = ICListenHF.name),
+    })
     @Data
     public static class PamModuleDto {
-        private String serialNumber;
-        private String name;
-        private StatusDto status;
-        private LoggingConfigDto loggingConfig;
-        private StreamingConfigDto streamingConfig;
-        private RecordingStatsDto recordingStats;
 
-        public static List<PamModuleDto> fromPamModules(List<PamModule> pamModules) {
-            return pamModules.stream()
-                    .map(PamModuleDto::fromPamModule)
-                    .toList();
+        public static Map<String, PamModule> toPamModules(Map<String, PamModuleDto> pamModules) {
+            Map<String, PamModule> pamModuleMap = new HashMap<>();
+            pamModules.forEach((key, value) -> {
+                if (value instanceof ICListenHFDto) {
+                    pamModuleMap.put(key, ((ICListenHFDto) value).toPamModule());
+                } else {
+                    throw new IllegalArgumentException("Unknown PamModule type: " + value.getClass().getName());
+                }
+            });
+            return pamModuleMap;
         }
 
-        private static PamModuleDto fromPamModule(PamModule pamModule) {
-            PamModuleDto dto = new PamModuleDto();
-            dto.setSerialNumber(pamModule.getSerialNumber());
-            dto.setName(pamModule.getName());
-            if (pamModule instanceof ICListenHF icListenHF) {
-                dto.setStatus(StatusDto.fromStatus(icListenHF.getStatus()));
-                dto.setLoggingConfig(LoggingConfigDto.fromLoggingConfig(icListenHF.getLoggingConfig()));
-                dto.setStreamingConfig(StreamingConfigDto.fromStreamingConfig(icListenHF.getStreamingConfig()));
-                dto.setRecordingStats(RecordingStatsDto.fromRecordingStats(icListenHF.getRecordingStats()));
-            }
+        public static Map<String, PamModuleDto> fromPamModules(Map<String, PamModule> pamModules) {
+            Map<String, PamModuleDto> dto = new HashMap<>();
+            pamModules.forEach((key, value) -> {
+                if (value instanceof ICListenHF) {
+                    dto.put(ICListenHF.name, ICListenHFDto.fromPamModule((ICListenHF) value));
+                } else {
+                    throw new IllegalArgumentException("Unknown PamModule type: " + value.getClass().getName());
+                }
+            });
             return dto;
         }
 
-        public PamModule toPamModule() {
-            ICListenHF module = new ICListenHF(this.serialNumber);
-            module.setStatus(this.status.toStatus());
-            module.setLoggingConfig(this.loggingConfig.toLoggingConfig());
-            module.setStreamingConfig(this.streamingConfig.toStreamingConfig());
-            module.setRecordingStats(this.recordingStats.toRecordingStats());
-            return module;
-        }
-
+        @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class StatusDto {
-            private Integer unitStatus;
-            private Integer batteryStatus;
-            private Float batteryPercentage;
-            private Float temperature;
-            private Float humidity;
-            private LocalDateTime timestamp;
+        public static class ICListenHFDto extends PamModuleDto {
+            private String serialNumber;
+            private String name;
+            private StatusDto status;
+            private LoggingConfigDto loggingConfig;
+            private StreamingConfigDto streamingConfig;
+            private RecordingStatsDto recordingStats;
 
-            public static StatusDto fromStatus(ICListenStatus status) {
-                StatusDto dto = new StatusDto();
-                dto.setUnitStatus(status.getUnitStatus());
-                dto.setBatteryStatus(status.getBatteryStatus());
-                dto.setBatteryPercentage(status.getBatteryPercentage());
-                dto.setTemperature(status.getTemperature());
-                dto.setHumidity(status.getHumidity());
-                dto.setTimestamp(status.getTimestamp());
+            public static List<ICListenHFDto> fromPamModules(List<PamModule> pamModules) {
+                return pamModules.stream()
+                        .map(ICListenHFDto::fromPamModule)
+                        .toList();
+            }
+
+            private static ICListenHFDto fromPamModule(PamModule pamModule) {
+                ICListenHFDto dto = new ICListenHFDto();
+                dto.setSerialNumber(pamModule.getSerialNumber());
+                dto.setName(pamModule.getName());
+                if (pamModule instanceof ICListenHF icListenHF) {
+                    dto.setStatus(StatusDto.fromStatus(icListenHF.getStatus()));
+                    dto.setLoggingConfig(LoggingConfigDto.fromLoggingConfig(icListenHF.getLoggingConfig()));
+                    dto.setStreamingConfig(StreamingConfigDto.fromStreamingConfig(icListenHF.getStreamingConfig()));
+                    dto.setRecordingStats(RecordingStatsDto.fromRecordingStats(icListenHF.getRecordingStats()));
+                }
                 return dto;
             }
 
-            public ICListenStatus toStatus() {
-                return new ICListenStatus(
-                        UUID.randomUUID(),
-                        this.unitStatus,
-                        this.batteryStatus,
-                        this.batteryPercentage,
-                        this.temperature,
-                        this.humidity,
-                        this.timestamp
-                );
-            }
-        }
-
-        @Data
-        public static class LoggingConfigDto {
-            private WaveformConfigDTO wav;
-            private FFTConfigDTO fft;
-            private LocalDateTime timestamp;
-
-            public ICListenLoggingConfig toLoggingConfig() {
-                return new ICListenLoggingConfig(
-                        UUID.randomUUID(),
-                        this.wav.getGain(),
-                        this.wav.getSampleRate(),
-                        this.wav.getLoggingMode(),
-                        this.wav.getLogLength(),
-                        this.wav.getBitDepth(),
-                        this.fft.getSampleRate(),
-                        this.fft.getProcessingType(),
-                        this.fft.getFftsAccumulated(),
-                        this.fft.getLoggingMode(),
-                        this.fft.getLogLength(),
-                        this.timestamp
-                );
+            public PamModule toPamModule() {
+                ICListenHF module = new ICListenHF(this.serialNumber);
+                module.setStatus(this.status.toStatus());
+                module.setLoggingConfig(this.loggingConfig.toLoggingConfig());
+                module.setStreamingConfig(this.streamingConfig.toStreamingConfig());
+                module.setRecordingStats(this.recordingStats.toRecordingStats());
+                return module;
             }
 
             @Data
-            public static class WaveformConfigDTO {
-                private Integer gain;
-                private Integer sampleRate;
-                private Integer bitDepth;
-                private Integer loggingMode;
-                private Integer logLength;
+            public static class StatusDto {
+                private Integer unitStatus;
+                private Integer batteryStatus;
+                private Float batteryPercentage;
+                private Float temperature;
+                private Float humidity;
+                private LocalDateTime timestamp;
+
+                public static StatusDto fromStatus(ICListenStatus status) {
+                    StatusDto dto = new StatusDto();
+                    dto.setUnitStatus(status.getUnitStatus());
+                    dto.setBatteryStatus(status.getBatteryStatus());
+                    dto.setBatteryPercentage(status.getBatteryPercentage());
+                    dto.setTemperature(status.getTemperature());
+                    dto.setHumidity(status.getHumidity());
+                    dto.setTimestamp(status.getTimestamp());
+                    return dto;
+                }
+
+                public ICListenStatus toStatus() {
+                    return new ICListenStatus(
+                            UUID.randomUUID(),
+                            this.unitStatus,
+                            this.batteryStatus,
+                            this.batteryPercentage,
+                            this.temperature,
+                            this.humidity,
+                            this.timestamp
+                    );
+                }
             }
 
             @Data
-            public static class FFTConfigDTO {
-                private Integer processingType;
-                private Integer sampleRate;
-                private Integer fftsAccumulated;
-                private Integer loggingMode;
-                private Integer logLength;
-            }
+            public static class LoggingConfigDto {
+                private WaveformConfigDTO wav;
+                private FFTConfigDTO fft;
+                private LocalDateTime timestamp;
 
-            public static LoggingConfigDto fromLoggingConfig(ICListenLoggingConfig loggingConfig) {
-                LoggingConfigDto dto = new LoggingConfigDto();
-                dto.setWav(
-                        new WaveformConfigDTO() {{
-                            setGain(loggingConfig.getGain());
-                            setSampleRate(loggingConfig.getWaveformSampleRate());
-                            setLoggingMode(loggingConfig.getWaveformLoggingMode());
-                            setLogLength(loggingConfig.getWaveformLogLength());
-                            setBitDepth(loggingConfig.getBitDepth());
-                        }}
-                );
-                dto.setFft(
-                        new FFTConfigDTO() {{
-                            setSampleRate(loggingConfig.getFftSampleRate());
-                            setProcessingType(loggingConfig.getFftProcessingType());
-                            setFftsAccumulated(loggingConfig.getFftsAccumulated());
-                            setLoggingMode(loggingConfig.getFftLoggingMode());
-                            setLogLength(loggingConfig.getFftLogLength());
-                        }}
-                );
-                dto.setTimestamp(loggingConfig.getTimestamp());
-                return dto;
-            }
-        }
+                public ICListenLoggingConfig toLoggingConfig() {
+                    return new ICListenLoggingConfig(
+                            UUID.randomUUID(),
+                            this.wav.getGain(),
+                            this.wav.getSampleRate(),
+                            this.wav.getLoggingMode(),
+                            this.wav.getLogLength(),
+                            this.wav.getBitDepth(),
+                            this.fft.getSampleRate(),
+                            this.fft.getProcessingType(),
+                            this.fft.getFftsAccumulated(),
+                            this.fft.getLoggingMode(),
+                            this.fft.getLogLength(),
+                            this.timestamp
+                    );
+                }
 
-        @Data
-        public static class StreamingConfigDto {
-            private WaveformConfigDTO wav;
-            private FFTConfigDTO fft;
-            private String timestamp;
+                @Data
+                public static class WaveformConfigDTO {
+                    private Integer gain;
+                    private Integer sampleRate;
+                    private Integer bitDepth;
+                    private Integer loggingMode;
+                    private Integer logLength;
+                }
 
-            public ICListenStreamingConfig toStreamingConfig() {
-                return new ICListenStreamingConfig(
-                        UUID.randomUUID(),
-                        this.wav.getRecordWaveform(),
-                        this.wav.getProcessWaveform(),
-                        this.wav.getWaveformProcessingType(),
-                        this.wav.getWaveformInterval(),
-                        this.wav.getWaveformDuration(),
-                        this.fft.getRecordFFT(),
-                        this.fft.getProcessFFT(),
-                        this.fft.getFftProcessingType(),
-                        this.fft.getFftInterval(),
-                        this.fft.getFftDuration(),
-                        LocalDateTime.parse(this.timestamp)
-                );
+                @Data
+                public static class FFTConfigDTO {
+                    private Integer processingType;
+                    private Integer sampleRate;
+                    private Integer fftsAccumulated;
+                    private Integer loggingMode;
+                    private Integer logLength;
+                }
+
+                public static LoggingConfigDto fromLoggingConfig(ICListenLoggingConfig loggingConfig) {
+                    LoggingConfigDto dto = new LoggingConfigDto();
+                    dto.setWav(
+                            new WaveformConfigDTO() {{
+                                setGain(loggingConfig.getGain());
+                                setSampleRate(loggingConfig.getWaveformSampleRate());
+                                setLoggingMode(loggingConfig.getWaveformLoggingMode());
+                                setLogLength(loggingConfig.getWaveformLogLength());
+                                setBitDepth(loggingConfig.getBitDepth());
+                            }}
+                    );
+                    dto.setFft(
+                            new FFTConfigDTO() {{
+                                setSampleRate(loggingConfig.getFftSampleRate());
+                                setProcessingType(loggingConfig.getFftProcessingType());
+                                setFftsAccumulated(loggingConfig.getFftsAccumulated());
+                                setLoggingMode(loggingConfig.getFftLoggingMode());
+                                setLogLength(loggingConfig.getFftLogLength());
+                            }}
+                    );
+                    dto.setTimestamp(loggingConfig.getTimestamp());
+                    return dto;
+                }
             }
 
             @Data
-            public static class WaveformConfigDTO {
-                private Boolean recordWaveform;
-                private Boolean processWaveform;
-                private Integer waveformProcessingType;
-                private Integer waveformInterval;
-                private Integer waveformDuration;
+            public static class StreamingConfigDto {
+                private WaveformConfigDTO wav;
+                private FFTConfigDTO fft;
+                private String timestamp;
+
+                public ICListenStreamingConfig toStreamingConfig() {
+                    return new ICListenStreamingConfig(
+                            UUID.randomUUID(),
+                            this.wav.getRecordWaveform(),
+                            this.wav.getProcessWaveform(),
+                            this.wav.getWaveformProcessingType(),
+                            this.wav.getWaveformInterval(),
+                            this.wav.getWaveformDuration(),
+                            this.fft.getRecordFFT(),
+                            this.fft.getProcessFFT(),
+                            this.fft.getFftProcessingType(),
+                            this.fft.getFftInterval(),
+                            this.fft.getFftDuration(),
+                            LocalDateTime.parse(this.timestamp)
+                    );
+                }
+
+                @Data
+                public static class WaveformConfigDTO {
+                    private Boolean recordWaveform;
+                    private Boolean processWaveform;
+                    private Integer waveformProcessingType;
+                    private Integer waveformInterval;
+                    private Integer waveformDuration;
+                }
+
+                @Data
+                public static class FFTConfigDTO {
+                    private Boolean recordFFT;
+                    private Boolean processFFT;
+                    private Integer fftProcessingType;
+                    private Integer fftInterval;
+                    private Integer fftDuration;
+                }
+
+                public static StreamingConfigDto fromStreamingConfig(ICListenStreamingConfig streamingConfig) {
+                    StreamingConfigDto dto = new StreamingConfigDto();
+                    dto.setWav(
+                            new WaveformConfigDTO() {{
+                                setRecordWaveform(streamingConfig.isRecordWaveform());
+                                setProcessWaveform(streamingConfig.isProcessWaveform());
+                                setWaveformProcessingType(streamingConfig.getWaveformProcessingType());
+                                setWaveformInterval(streamingConfig.getWaveformInterval());
+                                setWaveformDuration(streamingConfig.getWaveformDuration());
+                            }}
+                    );
+                    dto.setFft(
+                            new FFTConfigDTO() {{
+                                setRecordFFT(streamingConfig.isRecordFFT());
+                                setProcessFFT(streamingConfig.isProcessFFT());
+                                setFftProcessingType(streamingConfig.getFftProcessingType());
+                                setFftInterval(streamingConfig.getFftInterval());
+                                setFftDuration(streamingConfig.getFftDuration());
+                            }}
+                    );
+                    dto.setTimestamp(streamingConfig.getTimestamp().toString());
+                    return dto;
+                }
             }
+
 
             @Data
-            public static class FFTConfigDTO {
-                private Boolean recordFFT;
-                private Boolean processFFT;
-                private Integer fftProcessingType;
-                private Integer fftInterval;
-                private Integer fftDuration;
-            }
+            public static class RecordingStatsDto {
+                private String epochTime;
+                private Integer numberOfClicks;
+                private Integer recordedMinutes;
+                private Integer numberOfFiles;
 
-            public static StreamingConfigDto fromStreamingConfig(ICListenStreamingConfig streamingConfig) {
-                StreamingConfigDto dto = new StreamingConfigDto();
-                dto.setWav(
-                        new WaveformConfigDTO() {{
-                            setRecordWaveform(streamingConfig.isRecordWaveform());
-                            setProcessWaveform(streamingConfig.isProcessWaveform());
-                            setWaveformProcessingType(streamingConfig.getWaveformProcessingType());
-                            setWaveformInterval(streamingConfig.getWaveformInterval());
-                            setWaveformDuration(streamingConfig.getWaveformDuration());
-                        }}
-                );
-                dto.setFft(
-                        new FFTConfigDTO() {{
-                            setRecordFFT(streamingConfig.isRecordFFT());
-                            setProcessFFT(streamingConfig.isProcessFFT());
-                            setFftProcessingType(streamingConfig.getFftProcessingType());
-                            setFftInterval(streamingConfig.getFftInterval());
-                            setFftDuration(streamingConfig.getFftDuration());
-                        }}
-                );
-                dto.setTimestamp(streamingConfig.getTimestamp().toString());
-                return dto;
-            }
-        }
+                public static RecordingStatsDto fromRecordingStats(ICListenRecordingStats recordingStats) {
+                    RecordingStatsDto dto = new RecordingStatsDto();
+                    dto.setEpochTime(recordingStats.getEpochTime().toString());
+                    dto.setNumberOfClicks(recordingStats.getNumberOfClicks());
+                    dto.setRecordedMinutes(recordingStats.getRecordedMinutes());
+                    dto.setNumberOfFiles(recordingStats.getNumberOfFiles());
+                    return dto;
+                }
 
-
-        @Data
-        public static class RecordingStatsDto {
-            private String epochTime;
-            private Integer numberOfClicks;
-            private Integer recordedMinutes;
-            private Integer numberOfFiles;
-
-            public static RecordingStatsDto fromRecordingStats(ICListenRecordingStats recordingStats) {
-                RecordingStatsDto dto = new RecordingStatsDto();
-                dto.setEpochTime(recordingStats.getEpochTime().toString());
-                dto.setNumberOfClicks(recordingStats.getNumberOfClicks());
-                dto.setRecordedMinutes(recordingStats.getRecordedMinutes());
-                dto.setNumberOfFiles(recordingStats.getNumberOfFiles());
-                return dto;
-            }
-
-            public ICListenRecordingStats toRecordingStats() {
-                return new ICListenRecordingStats(
-                        UUID.randomUUID(),
-                        LocalDateTime.parse(this.epochTime),
-                        this.numberOfClicks,
-                        this.recordedMinutes,
-                        this.numberOfFiles
-                );
+                public ICListenRecordingStats toRecordingStats() {
+                    return new ICListenRecordingStats(
+                            UUID.randomUUID(),
+                            LocalDateTime.parse(this.epochTime),
+                            this.numberOfClicks,
+                            this.recordedMinutes,
+                            this.numberOfFiles
+                    );
+                }
             }
         }
     }

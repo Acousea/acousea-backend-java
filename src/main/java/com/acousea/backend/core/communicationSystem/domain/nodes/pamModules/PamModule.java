@@ -7,5 +7,4 @@ public interface PamModule {
 
     String getName();
 
-    void setName(String name);
 }

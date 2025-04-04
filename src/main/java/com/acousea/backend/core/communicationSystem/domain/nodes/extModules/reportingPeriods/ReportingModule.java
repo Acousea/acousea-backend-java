@@ -20,6 +20,7 @@ public abstract class ReportingModule extends SerializableModule implements ExtM
     protected ReportingModule(byte technologyId, Map<OperationMode, Short> reportingPeriods) {
         super(ModuleCode.REPORTING, serialize(technologyId, reportingPeriods));
         this.technologyId = technologyId;
+        this.reportingPeriodsPerOperationMode.putAll(reportingPeriods);
     }
 
     private static byte[] serialize(
@@ -79,5 +80,13 @@ public abstract class ReportingModule extends SerializableModule implements ExtM
 
     public static int getMinSize() {
         return Byte.BYTES + (Byte.BYTES + Short.BYTES);
+    }
+
+    @Override
+    public String toString() {
+        return "ReportingModule{" +
+                "technologyId=" + technologyId +
+                ", reportingPeriodsPerOperationMode=" + reportingPeriodsPerOperationMode +
+                '}';
     }
 }

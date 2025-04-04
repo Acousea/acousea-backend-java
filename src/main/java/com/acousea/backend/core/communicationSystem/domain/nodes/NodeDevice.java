@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,9 +24,14 @@ public class NodeDevice {
     @NotNull
     private final Map<String, ExtModule> extModules;
     @NotNull
-    private final List<PamModule> pamModules;
+    private final Map<String, PamModule> pamModules;
 
-    public NodeDevice(@NotNull UUID id, @NotNull String name, @NotNull String icon, @NotNull Map<String, ExtModule> extModules, @NotNull List<PamModule> pamModules) {
+    public NodeDevice(
+            @NotNull UUID id,
+            @NotNull String name,
+            @NotNull String icon,
+            @NotNull Map<String, ExtModule> extModules,
+            @NotNull Map<String, PamModule> pamModules) {
         this.id = id;
         this.name = name;
         this.icon = icon;

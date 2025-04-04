@@ -18,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 
 @Component
@@ -89,8 +92,8 @@ public class MockNodeDevices {
                                 IridiumReportingModule.name, iridiumReportingModuleDrifter,
                                 NetworkModule.name, networkModule1
                         )),
-                        new ArrayList<>(List.of(
-                                new ICListenHF("RB9-ETH")
+                        new HashMap<>(Map.of(
+                                ICListenHF.name, new ICListenHF("RB9-ETH")
                         ))
                 ),
                 new NodeDevice(
@@ -109,7 +112,7 @@ public class MockNodeDevices {
                                 IridiumReportingModule.name, iridiumReportingModuleLocalizer,
                                 NetworkModule.name, networkModule2
                         )),
-                        List.of()
+                        Map.of()
                 )
 
         );

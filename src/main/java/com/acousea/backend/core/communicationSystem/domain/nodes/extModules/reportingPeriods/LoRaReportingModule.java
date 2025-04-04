@@ -20,4 +20,6 @@ public class LoRaReportingModule extends ReportingModule {
     public static LoRaReportingModule createEmpty() {
         return new LoRaReportingModule(new HashMap<>());
     }
+
+
 }
