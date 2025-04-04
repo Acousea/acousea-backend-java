@@ -38,7 +38,7 @@ public class GetUpdatedNodeConfigurationPayload implements Payload {
         int size = moduleCodes.size() * ModuleCode.getAmountOfBytes();
         // Check if size fits in short
         if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE) {
-            throw new IllegalArgumentException(GetUpdatedNodeConfigurationPayload.class.getSimpleName() + "Payload size is too big");
+            throw new IllegalArgumentException(GetUpdatedNodeConfigurationPayload.class.getSimpleName() + "Payload size is too big: " + size + " bytes");
         }
         return (short) size;
     }

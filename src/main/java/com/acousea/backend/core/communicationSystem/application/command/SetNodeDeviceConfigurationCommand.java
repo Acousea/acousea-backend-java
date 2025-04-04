@@ -61,6 +61,7 @@ public class SetNodeDeviceConfigurationCommand extends Command<NodeDeviceDTO, Co
                 nodeChanges
         );
 
+
         return ApiResult.success(communicationService.send(request));
     }
 }

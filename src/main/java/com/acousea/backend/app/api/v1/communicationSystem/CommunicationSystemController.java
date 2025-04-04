@@ -3,10 +3,7 @@ package com.acousea.backend.app.api.v1.communicationSystem;
 
 import com.acousea.backend.core.communicationSystem.application.command.DTO.GetUpdatedNodeDeviceConfigurationDTO;
 import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
-import com.acousea.backend.core.communicationSystem.application.command.GetAllNodeDevicesCommand;
-import com.acousea.backend.core.communicationSystem.application.command.GetNodeDeviceCommand;
-import com.acousea.backend.core.communicationSystem.application.command.GetUpdatedNodeDeviceConfigurationCommand;
-import com.acousea.backend.core.communicationSystem.application.command.SetNodeDeviceConfigurationCommand;
+import com.acousea.backend.core.communicationSystem.application.command.*;
 import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
 import com.acousea.backend.core.communicationSystem.application.services.CommunicationService;
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationResult;
@@ -92,5 +89,15 @@ public class CommunicationSystemController {
                 nodeDeviceRepository, communicationService
         );
         return ResponseEntity.ok(query.run(dto));
+    }
+
+    @PostMapping("/estimate-packet-cost")
+    public ResponseEntity<ApiResult<EstimateConfigurationPacketCostCommand.NodeCostEstimationPayload>> estimatePacketCost(
+            @RequestBody NodeDeviceDTO dto
+    ) {
+        EstimateConfigurationPacketCostCommand query = new EstimateConfigurationPacketCostCommand();
+        return ResponseEntity.ok(query.run(
+                dto
+        ));
     }
 }

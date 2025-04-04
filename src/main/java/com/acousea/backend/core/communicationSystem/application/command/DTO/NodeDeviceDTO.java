@@ -498,7 +498,6 @@ public class NodeDeviceDTO {
         @Data
         public static class ICListenHFDto extends PamModuleDto {
             private String serialNumber;
-            private String name;
             private StatusDto status;
             private LoggingConfigDto loggingConfig;
             private StreamingConfigDto streamingConfig;
@@ -513,7 +512,6 @@ public class NodeDeviceDTO {
             private static ICListenHFDto fromPamModule(PamModule pamModule) {
                 ICListenHFDto dto = new ICListenHFDto();
                 dto.setSerialNumber(pamModule.getSerialNumber());
-                dto.setName(pamModule.getName());
                 if (pamModule instanceof ICListenHF icListenHF) {
                     dto.setStatus(StatusDto.fromStatus(icListenHF.getStatus()));
                     dto.setLoggingConfig(LoggingConfigDto.fromLoggingConfig(icListenHF.getLoggingConfig()));

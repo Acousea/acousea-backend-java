@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -23,18 +24,22 @@ public class NewNodeConfigurationPayload implements Payload {
     }
 
     public static NewNodeConfigurationPayload fromNodeDevice(@NotNull NodeDevice nodeDevice) {
-        List<SerializableModule> serializableModules = nodeDevice.getExtModules().values().stream()
+        List<SerializableModule> serializableModules = Stream.concat(
+                        nodeDevice.getExtModules().values().stream(),
+                        nodeDevice.getPamModules().values().stream()
+                )
                 .filter(SerializableModule.class::isInstance)
                 .map(SerializableModule.class::cast)
                 .collect(Collectors.toList());
         return new NewNodeConfigurationPayload(serializableModules);
     }
 
+
     @Override
     public short getBytesSize() {
         int size = serializableModules.stream().mapToInt(SerializableModule::getFullLength).sum();
         if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE) {
-            throw new IllegalArgumentException(NewNodeConfigurationPayload.class.getSimpleName() + "Payload size is too big");
+            throw new IllegalArgumentException(NewNodeConfigurationPayload.class.getSimpleName() + "Payload size is too big: " + size + " bytes");
         }
         return (short) size;
     }
