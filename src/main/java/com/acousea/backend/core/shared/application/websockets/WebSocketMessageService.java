@@ -22,6 +22,19 @@ public abstract class WebSocketMessageService {
         clients.remove(sessionId);
     }
 
+    public void sendMessageTo(String sessionId, String type, Object payload) {
+        WebSocketSession session = clients.get(sessionId);
+        if (session != null && session.isOpen()) {
+            WebSocketMessage message = new WebSocketMessage(type, payload);
+            String jsonMessage = message.toJson();
+            try {
+                session.sendMessage(new TextMessage(jsonMessage));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void broadcastMessage(String type, Object payload) {
         WebSocketMessage message = new WebSocketMessage(type, payload);
         String jsonMessage = message.toJson();

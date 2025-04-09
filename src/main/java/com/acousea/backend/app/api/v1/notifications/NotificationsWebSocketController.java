@@ -5,10 +5,9 @@ import com.acousea.backend.core.shared.infrastructure.notification.WebSocketNoti
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
-import java.util.UUID;
 
 @Component
 public class NotificationsWebSocketController extends TextWebSocketHandler {
@@ -23,7 +22,7 @@ public class NotificationsWebSocketController extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(@NotNull WebSocketSession session) throws Exception {
-        String sessionId = UUID.randomUUID().toString();
+        String sessionId = session.getId();
         notificationService.addClient(sessionId, session);
         System.out.println("Client connected: " + sessionId);
     }
@@ -33,4 +32,16 @@ public class NotificationsWebSocketController extends TextWebSocketHandler {
         notificationService.removeClient(session.getId());
         System.out.println("Client disconnected: " + session.getId());
     }
+
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        String payload = message.getPayload();
+        if ("{\"type\":\"ping\",\"payload\":{}}".equals(payload)) {
+            System.out.println("Received ping message from client: " + session.getId());
+            notificationService.sendPongMessage(session);
+        } else {
+            System.out.println("Received message: " + payload);
+        }
+    }
+
 }

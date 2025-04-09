@@ -37,4 +37,8 @@ public class WebSocketNotificationService extends WebSocketMessageService implem
     public void sendNotification(Notification notification) {
         broadcastMessage("notification", notification.dumpJson());
     }
+
+    public void sendPongMessage(WebSocketSession session) {
+        sendMessageTo(session.getId(), "ping", "pong");
+    }
 }

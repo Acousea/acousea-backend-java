@@ -2,6 +2,7 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten;
 
 
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.PamModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ICListenLoggingConfig extends SerializableModule {
+    public static final String name = "ICListenLoggingConfig";
     private UUID id;
     private int gain;
     private int waveformSampleRate;

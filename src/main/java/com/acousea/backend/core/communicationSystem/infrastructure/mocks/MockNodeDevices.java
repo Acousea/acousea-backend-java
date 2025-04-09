@@ -93,7 +93,7 @@ public class MockNodeDevices {
                                 NetworkModule.name, networkModule1
                         )),
                         new HashMap<>(Map.of(
-                                ICListenHF.name, new ICListenHF("RB9-ETH")
+                                ICListenHF.name, new ICListenHF()
                         ))
                 ),
                 new NodeDevice(

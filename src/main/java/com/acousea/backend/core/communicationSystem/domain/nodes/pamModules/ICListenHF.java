@@ -15,7 +15,7 @@ import java.nio.ByteBuffer;
 @Getter
 @Setter
 public class ICListenHF extends SerializableModule implements PamModule {
-    String serialNumber;
+    public static final String serialNumber = "RB9-ETH";
     public static final String name = "ICListenHF";
     private ICListenStatus status;
     private ICListenLoggingConfig loggingConfig;
@@ -27,9 +27,8 @@ public class ICListenHF extends SerializableModule implements PamModule {
         return name;
     }
 
-    public ICListenHF(String serialNumber) {
+    public ICListenHF() {
         super(ModuleCode.ICLISTEN_COMPLETE, serializeValues(serialNumber, ICListenStatus.createDefault(), ICListenLoggingConfig.createDefault(), ICListenStreamingConfig.createDefault(), ICListenRecordingStats.createDefault()));
-        this.serialNumber = serialNumber;
         this.status = ICListenStatus.createDefault();
         this.loggingConfig = ICListenLoggingConfig.createDefault();
         this.streamingConfig = ICListenStreamingConfig.createDefault();
@@ -37,7 +36,7 @@ public class ICListenHF extends SerializableModule implements PamModule {
     }
 
     public ICListenHF(ICListenStatus status, ICListenLoggingConfig loggingConfig, ICListenStreamingConfig streamingConfig, ICListenRecordingStats recordingStats) {
-        super(ModuleCode.ICLISTEN_COMPLETE, serializeValues("RB9-ETH", ICListenStatus.createDefault(), ICListenLoggingConfig.createDefault(), ICListenStreamingConfig.createDefault(), ICListenRecordingStats.createDefault()));
+        super(ModuleCode.ICLISTEN_COMPLETE, serializeValues(serialNumber, ICListenStatus.createDefault(), ICListenLoggingConfig.createDefault(), ICListenStreamingConfig.createDefault(), ICListenRecordingStats.createDefault()));
         this.status = status;
         this.loggingConfig = loggingConfig;
         this.streamingConfig = streamingConfig;
