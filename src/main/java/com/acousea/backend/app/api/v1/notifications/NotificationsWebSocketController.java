@@ -43,5 +43,4 @@ public class NotificationsWebSocketController extends TextWebSocketHandler {
             System.out.println("Received message: " + payload);
         }
     }
-
 }
