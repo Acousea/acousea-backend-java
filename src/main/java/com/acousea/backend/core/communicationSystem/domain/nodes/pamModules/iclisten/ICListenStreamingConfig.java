@@ -27,7 +27,7 @@ public class ICListenStreamingConfig extends SerializableModule {
 
     public ICListenStreamingConfig(UUID id, boolean recordWaveform, boolean processWaveform, int waveformProcessingType, int waveformInterval, int waveformDuration,
                                    boolean recordFFT, boolean processFFT, int fftProcessingType, int fftInterval, int fftDuration, LocalDateTime timestamp) {
-        super(ModuleCode.ICLISTEN_STREAMING_CONFIG, serializeValues(id, recordWaveform, processWaveform, waveformProcessingType, waveformInterval, waveformDuration, recordFFT, processFFT, fftProcessingType, fftInterval, fftDuration, timestamp));
+        super(ModuleCode.ICLISTEN_STREAMING_CONFIG);
         this.id = id;
         this.recordWaveform = recordWaveform;
         this.processWaveform = processWaveform;
@@ -42,8 +42,8 @@ public class ICListenStreamingConfig extends SerializableModule {
         this.timestamp = timestamp;
     }
 
-    public static byte[] serializeValues(UUID id, boolean recordWaveform, boolean processWaveform, int waveformProcessingType, int waveformInterval, int waveformDuration,
-                                         boolean recordFFT, boolean processFFT, int fftProcessingType, int fftInterval, int fftDuration, LocalDateTime timestamp) {
+    @Override
+    public byte[] getVALUE() {
         ByteBuffer buffer = ByteBuffer.allocate(16 + 1 + 1 + 4 * 7 + 8);
         buffer.put((byte) (recordWaveform ? 1 : 0));
         buffer.put((byte) (processWaveform ? 1 : 0));

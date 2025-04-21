@@ -20,7 +20,7 @@ public class ICListenRecordingStats extends SerializableModule {
     private int numberOfFiles;
 
     public ICListenRecordingStats(UUID id, LocalDateTime epochTime, int numberOfClicks, int recordedMinutes, int numberOfFiles) {
-        super(ModuleCode.ICLISTEN_RECORDING_STATS, serializeValues(id, epochTime, numberOfClicks, recordedMinutes, numberOfFiles));
+        super(ModuleCode.ICLISTEN_RECORDING_STATS);
         this.id = id;
         this.epochTime = epochTime;
         this.numberOfClicks = numberOfClicks;
@@ -28,7 +28,8 @@ public class ICListenRecordingStats extends SerializableModule {
         this.numberOfFiles = numberOfFiles;
     }
 
-    public static byte[] serializeValues(UUID id, LocalDateTime epochTime, int numberOfClicks, int recordedMinutes, int numberOfFiles) {
+    @Override
+    public byte[] getVALUE() {
         ByteBuffer buffer = ByteBuffer.allocate(8 + 3);
         buffer.putLong(epochTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli());
         buffer.put((byte) numberOfClicks);
@@ -37,6 +38,7 @@ public class ICListenRecordingStats extends SerializableModule {
         buffer.flip();
         return buffer.array();
     }
+
 
     public static ICListenRecordingStats fromBytes(ByteBuffer buffer) {
         if (buffer.remaining() < 8 + 3) {

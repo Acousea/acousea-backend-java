@@ -17,7 +17,7 @@ public class RTCModule extends SerializableModule implements ExtModule {
     private LocalDateTime currentTime;
 
     public RTCModule(LocalDateTime currentTime) {
-        super(ModuleCode.RTC, serialize(currentTime));
+        super(ModuleCode.RTC);
         this.currentTime = currentTime;
     }
 
@@ -25,12 +25,14 @@ public class RTCModule extends SerializableModule implements ExtModule {
         return new RTCModule(LocalDateTime.now());
     }
 
-    private static byte[] serialize(LocalDateTime currentTime) {
+    @Override
+    public byte[] getVALUE() {
         long epochSecond = currentTime.toEpochSecond(ZoneOffset.UTC);
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
         buffer.putLong(epochSecond);
         return buffer.array();
     }
+
 
     public static RTCModule fromBytes(ByteBuffer buffer) {
         if (buffer.remaining() < getMinSize()) {

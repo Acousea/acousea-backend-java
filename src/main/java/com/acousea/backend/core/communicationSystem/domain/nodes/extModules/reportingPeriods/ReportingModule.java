@@ -18,26 +18,25 @@ public abstract class ReportingModule extends SerializableModule implements ExtM
     private final Map<OperationMode, Short> reportingPeriodsPerOperationMode = new HashMap<>();
 
     protected ReportingModule(byte technologyId, Map<OperationMode, Short> reportingPeriods) {
-        super(ModuleCode.REPORTING, serialize(technologyId, reportingPeriods));
+        super(ModuleCode.REPORTING);
         this.technologyId = technologyId;
         this.reportingPeriodsPerOperationMode.putAll(reportingPeriods);
     }
 
-    private static byte[] serialize(
-            byte technologyId,
-            Map<OperationMode, Short> reportingPeriods
-    ) {
-        int size = Byte.BYTES + reportingPeriods.size() * (Byte.BYTES + Short.BYTES);
+    @Override
+    public byte[] getVALUE() {
+        int size = Byte.BYTES + reportingPeriodsPerOperationMode.size() * (Byte.BYTES + Short.BYTES);
         ByteBuffer buffer = ByteBuffer.allocate(size);
         buffer.put(technologyId);
 
-        reportingPeriods.forEach((mode, period) -> {
+        reportingPeriodsPerOperationMode.forEach((mode, period) -> {
             buffer.put(UnsignedByte.toByte(mode.getId()));
             buffer.putShort(period);
         });
 
         return buffer.array();
     }
+
 
     public void setReportingPeriod(OperationMode mode, int period) {
         reportingPeriodsPerOperationMode.put(mode, (short) period);

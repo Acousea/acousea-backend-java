@@ -17,12 +17,17 @@ public class BatteryModule extends SerializableModule implements ExtModule {
     private BatteryStatus batteryStatus;
 
     public BatteryModule(int batteryPercentage, BatteryStatus batteryStatus) {
-        super(ModuleCode.BATTERY, ByteBuffer.allocate(2)
-                .put((byte) batteryPercentage)
-                .put((byte) batteryStatus.getValue())
-                .array());
+        super(ModuleCode.BATTERY);
         this.batteryPercentage = batteryPercentage;
         this.batteryStatus = batteryStatus;
+    }
+
+    @Override
+    public byte[] getVALUE() {
+        return ByteBuffer.allocate(2)
+                .put((byte) batteryPercentage)
+                .put((byte) batteryStatus.getValue())
+                .array();
     }
 
     @Override

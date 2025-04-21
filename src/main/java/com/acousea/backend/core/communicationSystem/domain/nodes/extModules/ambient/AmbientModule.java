@@ -17,12 +17,17 @@ public class AmbientModule extends SerializableModule implements ExtModule {
     private int humidity;
 
     public AmbientModule(int temperature, int humidity) {
-        super(ModuleCode.AMBIENT, ByteBuffer.allocate(Byte.BYTES * 2)
-                .put((byte) temperature)
-                .put((byte) humidity)
-                .array());
+        super(ModuleCode.AMBIENT);
         this.temperature = temperature;
         this.humidity = humidity;
+    }
+
+    @Override
+    public byte[] getVALUE() {
+        return ByteBuffer.allocate(Byte.BYTES * 2)
+                .put((byte) temperature)
+                .put((byte) humidity)
+                .array();
     }
 
     @Override

@@ -16,12 +16,17 @@ public class LocationModule extends SerializableModule implements ExtModule {
     private float longitude;
 
     public LocationModule(float latitude, float longitude) {
-        super(ModuleCode.LOCATION, ByteBuffer.allocate(getMinSize())
-                .putFloat(latitude)
-                .putFloat(longitude)
-                .array());
+        super(ModuleCode.LOCATION);
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    @Override
+    public byte[] getVALUE() {
+        return  ByteBuffer.allocate(getMinSize())
+                .putFloat(latitude)
+                .putFloat(longitude)
+                .array();
     }
 
     @Override

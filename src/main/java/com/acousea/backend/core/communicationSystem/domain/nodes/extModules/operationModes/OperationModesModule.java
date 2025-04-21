@@ -21,24 +21,25 @@ public class OperationModesModule extends SerializableModule implements ExtModul
     private final Map<Short, OperationMode> modes = new TreeMap<>(); // Mapa para almacenar modos
 
     public OperationModesModule(Map<Short, OperationMode> modes) {
-        super(ModuleCode.OPERATION_MODES, serialize(modes, !modes.isEmpty() ? modes.keySet().iterator().next() : 0));
+        super(ModuleCode.OPERATION_MODES);
         this.modes.putAll(modes);
         this.activeOperationModeIdx = !modes.isEmpty() ? modes.keySet().iterator().next() : 0;
     }
 
     public OperationModesModule(Map<Short, OperationMode> modes, Short activeOperationModeIdx) {
-        super(ModuleCode.OPERATION_MODES, serialize(modes, activeOperationModeIdx));
+        super(ModuleCode.OPERATION_MODES);
         this.modes.putAll(modes);
         this.activeOperationModeIdx = activeOperationModeIdx;
     }
 
 
-    private static byte[] serialize(Map<Short, OperationMode> operationModes, Short activeIdx) {
-        ByteBuffer buffer = ByteBuffer.allocate(operationModes.size() + Byte.BYTES);
-        for (OperationMode mode : operationModes.values()) {
+    @Override
+    public byte[] getVALUE() {
+        ByteBuffer buffer = ByteBuffer.allocate(modes.size() + Byte.BYTES);
+        for (OperationMode mode : modes.values()) {
             buffer.put(UnsignedByte.toByte(mode.getId()));
         }
-        buffer.put(UnsignedByte.toByte(activeIdx));
+        buffer.put(UnsignedByte.toByte(activeOperationModeIdx));
         return buffer.array();
     }
 

@@ -37,7 +37,7 @@ public class OperationModesGraphModule extends SerializableModule implements Ext
     private final Map<Integer, Transition> graph; // Nodo actual -> (Nodo siguiente, Duración)
 
     public OperationModesGraphModule(Map<Integer, Transition> graph) {
-        super(ModuleCode.OPERATION_MODES_GRAPH, serialize(graph));
+        super(ModuleCode.OPERATION_MODES_GRAPH);
         this.graph = graph;
     }
 
@@ -57,7 +57,8 @@ public class OperationModesGraphModule extends SerializableModule implements Ext
         return new OperationModesGraphModule(graph);
     }
 
-    private static byte[] serialize(Map<Integer, Transition> graph) {
+    @Override
+    public byte[] getVALUE() {
         List<Byte> bytes = new ArrayList<>();
 
         for (Map.Entry<Integer, Transition> entry : graph.entrySet()) {
@@ -77,11 +78,11 @@ public class OperationModesGraphModule extends SerializableModule implements Ext
         return result;
     }
 
+
     @Override
     public int getFullSize() {
-        return serialize(graph).length;
+        return getVALUE().length;
     }
-
 
     @Override
     public String toString() {

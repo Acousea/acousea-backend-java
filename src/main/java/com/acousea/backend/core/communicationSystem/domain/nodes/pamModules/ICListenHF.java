@@ -25,22 +25,24 @@ public class ICListenHF extends SerializableModule implements PamModule {
 
     @Override
     public String getName() {
+
         return name;
     }
 
     public ICListenHF() {
-        super(ModuleCode.ICLISTEN_COMPLETE, serializeValues( null, null, null, null));
+        super(ModuleCode.ICLISTEN_COMPLETE);
     }
 
     public ICListenHF(ICListenStatus status, ICListenLoggingConfig loggingConfig, ICListenStreamingConfig streamingConfig, ICListenRecordingStats recordingStats) {
-        super(ModuleCode.ICLISTEN_COMPLETE, serializeValues(status, loggingConfig, streamingConfig, recordingStats));
+        super(ModuleCode.ICLISTEN_COMPLETE);
         this.status = status;
         this.loggingConfig = loggingConfig;
         this.streamingConfig = streamingConfig;
         this.recordingStats = recordingStats;
     }
 
-    public static byte[] serializeValues(ICListenStatus status, ICListenLoggingConfig loggingConfig, ICListenStreamingConfig streamingConfig, ICListenRecordingStats recordingStats) {
+    @Override
+    public byte[] getVALUE() {
         ByteBuffer buffer = ByteBuffer.allocate(1024); // Puedes ajustar este tamaño según tus necesidades
 
         if (status != null) {
@@ -68,6 +70,7 @@ public class ICListenHF extends SerializableModule implements PamModule {
         buffer.get(serializedData);
         return serializedData;
     }
+
 
     @SneakyThrows
     public static ICListenHF fromBytes(ByteBuffer buffer) {

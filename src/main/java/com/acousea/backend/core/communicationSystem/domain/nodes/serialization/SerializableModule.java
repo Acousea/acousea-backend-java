@@ -8,35 +8,37 @@ import java.nio.ByteBuffer;
 @Getter
 @Setter
 public abstract class SerializableModule {
-    protected final byte TYPE; // Campo común para el tipo de parámetro
-    protected final byte[] VALUE; // Campo común para el valor del parámetro
+    protected final byte TYPE;
 
-    public SerializableModule(ModuleCode type, byte[] value) {
+    public SerializableModule(ModuleCode type) {
         this.TYPE = (byte) type.getValue();
-        this.VALUE = value;
     }
 
+    public abstract byte[] getVALUE();
+
     public byte[] toBytes() {
+        byte[] value = getVALUE();
         return ByteBuffer
-                .allocate(VALUE.length + 2)
+                .allocate(value.length + 2)
                 .put(TYPE)
-                .put((byte) VALUE.length)
-                .put(VALUE)
+                .put((byte) value.length)
+                .put(value)
                 .array();
     }
 
     public int getFullLength() {
-        return VALUE.length + 2;
+        return getVALUE().length + 2;
     }
 
     public String encode() {
+        byte[] value = getVALUE();
         StringBuilder sb = new StringBuilder();
-        sb.append(Integer.toHexString(VALUE.length + 1));
+        sb.append(Integer.toHexString(value.length + 1));
         sb.append(Integer.toHexString(TYPE));
-        for (byte b : VALUE) {
+        for (byte b : value) {
             sb.append(Integer.toHexString(b));
         }
         return sb.toString();
-
     }
 }
+

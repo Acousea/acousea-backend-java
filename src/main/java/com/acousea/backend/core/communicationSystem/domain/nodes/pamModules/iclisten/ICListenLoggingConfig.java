@@ -29,7 +29,7 @@ public class ICListenLoggingConfig extends SerializableModule {
     private LocalDateTime timestamp;
 
     public ICListenLoggingConfig(UUID id, int gain, int waveformSampleRate, int waveformLoggingMode, int waveformLogLength, int bitDepth, int fftSampleRate, int fftProcessingType, int fftsAccumulated, int fftLoggingMode, int fftLogLength, LocalDateTime timestamp) {
-        super(ModuleCode.ICLISTEN_LOGGING_CONFIG, serializeValues(gain, waveformSampleRate, waveformLoggingMode, waveformLogLength, bitDepth, fftSampleRate, fftProcessingType, fftsAccumulated, fftLoggingMode, fftLogLength, timestamp));
+        super(ModuleCode.ICLISTEN_LOGGING_CONFIG);
         this.id = id;
         this.gain = gain;
         this.waveformSampleRate = waveformSampleRate;
@@ -44,7 +44,8 @@ public class ICListenLoggingConfig extends SerializableModule {
         this.timestamp = timestamp;
     }
 
-    public static byte[] serializeValues(int gain, int waveformSampleRate, int waveformLoggingMode, int waveformLogLength, int bitDepth, int fftSampleRate, int fftProcessingType, int fftsAccumulated, int fftLoggingMode, int fftLogLength, LocalDateTime timestamp) {
+    @Override
+    public byte[] getVALUE() {
         ByteBuffer buffer = ByteBuffer.allocate(16 + 4 * 10 + 8);
         buffer.putShort((short) gain);
         buffer.putInt(waveformSampleRate);

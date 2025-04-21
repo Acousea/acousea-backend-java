@@ -20,7 +20,7 @@ public class NetworkModule extends SerializableModule implements ExtModule {
     private RoutingTable routingTable;
 
     public NetworkModule(Address localAddress, RoutingTable routingTable) {
-        super(ModuleCode.NETWORK, serialize(localAddress, routingTable));
+        super(ModuleCode.NETWORK);
         this.localAddress = localAddress;
         this.routingTable = routingTable;
     }
@@ -42,7 +42,9 @@ public class NetworkModule extends SerializableModule implements ExtModule {
         return new NetworkModule(address);
     }
 
-    private static byte[] serialize(Address localAddress, RoutingTable routingTable) {
+
+    @Override
+    public byte[] getVALUE() {
         int size = Address.getSize() + routingTable.getPeerRoutes().size() * 2 * Byte.BYTES + Byte.BYTES;
         ByteBuffer buffer = ByteBuffer.allocate(size);
         buffer.put(localAddress.getValue());
@@ -53,6 +55,7 @@ public class NetworkModule extends SerializableModule implements ExtModule {
         buffer.put(routingTable.getDefaultGateway().getValue());
         return buffer.array();
     }
+
 
     public static NetworkModule fromBytes(ByteBuffer buffer) {
         if (buffer.remaining() < getMinSize()) {

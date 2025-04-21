@@ -16,7 +16,7 @@ public class StorageModule extends SerializableModule implements ExtModule {
     private int storageTotalMegabytes;
 
     public StorageModule(int storageUsedMegabytes, int storageTotalMegabytes) {
-        super(ModuleCode.STORAGE, serialize(storageUsedMegabytes, storageTotalMegabytes));
+        super(ModuleCode.STORAGE);
         this.storageUsedMegabytes = storageUsedMegabytes;
         this.storageTotalMegabytes = storageTotalMegabytes;
     }
@@ -25,12 +25,15 @@ public class StorageModule extends SerializableModule implements ExtModule {
         return new StorageModule(0, capacity);
     }
 
-    private static byte[] serialize(int storageUsed, int storageTotal) {
+
+    @Override
+    public byte[] getVALUE() {
         ByteBuffer buffer = ByteBuffer.allocate(getMinSize());
-        buffer.putInt(storageUsed);
-        buffer.putInt(storageTotal);
+        buffer.putInt(storageUsedMegabytes);
+        buffer.putInt(storageTotalMegabytes);
         return buffer.array();
     }
+
 
     public static StorageModule fromBytes(ByteBuffer buffer) {
         if (buffer.remaining() < getMinSize()) {
