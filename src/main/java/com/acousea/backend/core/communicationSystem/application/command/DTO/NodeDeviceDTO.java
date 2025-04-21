@@ -23,6 +23,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.icli
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStreamingConfig;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.annotation.Nullable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -498,9 +499,13 @@ public class NodeDeviceDTO {
         @Data
         public static class ICListenHFDto extends PamModuleDto {
             private String serialNumber;
+            @Nullable
             private StatusDto status;
+            @Nullable
             private LoggingConfigDto loggingConfig;
+            @Nullable
             private StreamingConfigDto streamingConfig;
+            @Nullable
             private RecordingStatsDto recordingStats;
 
             public static List<ICListenHFDto> fromPamModules(List<PamModule> pamModules) {
@@ -523,10 +528,18 @@ public class NodeDeviceDTO {
 
             public PamModule toPamModule() {
                 ICListenHF module = new ICListenHF();
-                module.setStatus(this.status.toStatus());
-                module.setLoggingConfig(this.loggingConfig.toLoggingConfig());
-                module.setStreamingConfig(this.streamingConfig.toStreamingConfig());
-                module.setRecordingStats(this.recordingStats.toRecordingStats());
+                if (this.status != null) {
+                    module.setStatus(this.status.toStatus());
+                }
+                if (this.loggingConfig != null) {
+                    module.setLoggingConfig(this.loggingConfig.toLoggingConfig());
+                }
+                if (this.streamingConfig != null) {
+                    module.setStreamingConfig(this.streamingConfig.toStreamingConfig());
+                }
+                if (this.recordingStats != null) {
+                    module.setRecordingStats(this.recordingStats.toRecordingStats());
+                }
                 return module;
             }
 

@@ -21,7 +21,7 @@ public class ICListenStatus extends SerializableModule {
     private LocalDateTime timestamp;
 
     public ICListenStatus(UUID id, int unitStatus, int batteryStatus, float batteryPercentage, float temperature, float humidity, LocalDateTime timestamp) {
-        super(ModuleCode.ICLISTEN_STATUS, serializeValues(id, unitStatus, batteryStatus, batteryPercentage, temperature, humidity, timestamp));
+        super(ModuleCode.ICLISTEN_STATUS, serializeValues(unitStatus, batteryStatus, batteryPercentage, temperature, humidity, timestamp));
         this.id = id;
         this.unitStatus = unitStatus;
         this.batteryStatus = batteryStatus;
@@ -31,7 +31,7 @@ public class ICListenStatus extends SerializableModule {
         this.timestamp = timestamp;
     }
 
-    public static byte[] serializeValues(UUID id, int unitStatus, int batteryStatus, float batteryPercentage, float temperature, float humidity, LocalDateTime timestamp) {
+    public static byte[] serializeValues(int unitStatus, int batteryStatus, float batteryPercentage, float temperature, float humidity, LocalDateTime timestamp) {
         ByteBuffer buffer = ByteBuffer.allocate(16 + 1 + 1 + 1 + 1 + 1 + 8);
         buffer.put((byte) unitStatus);
         buffer.put((byte) batteryStatus);

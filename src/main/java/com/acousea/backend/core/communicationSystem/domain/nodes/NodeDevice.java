@@ -50,7 +50,7 @@ public class NodeDevice {
 
     @Override
     public String toString() {
-        return "NodeDevice{" +
+        return "NodeDevice {" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", icon='" + icon + '\'' +

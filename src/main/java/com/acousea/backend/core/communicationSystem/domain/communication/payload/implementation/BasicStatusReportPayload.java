@@ -23,7 +23,7 @@ public class BasicStatusReportPayload implements Payload {
     public short getBytesSize() {
         int size = serializableModules.stream().mapToInt(SerializableModule::getFullLength).sum();
         if (size > CommunicationPacket.MaxSizes.MAX_PAYLOAD_SIZE)  {
-            throw new IllegalArgumentException(BasicStatusReportPayload.class.getSimpleName() + "Payload size is too big: " + size + " bytes");
+            throw new IllegalArgumentException(BasicStatusReportPayload.class.getSimpleName() + ": " + "Payload size is too big: " + size + " bytes");
         }
         return (short) size;
     }
