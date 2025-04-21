@@ -28,7 +28,18 @@ public class ICListenLoggingConfig extends SerializableModule {
     private int fftLogLength;
     private LocalDateTime timestamp;
 
-    public ICListenLoggingConfig(UUID id, int gain, int waveformSampleRate, int waveformLoggingMode, int waveformLogLength, int bitDepth, int fftSampleRate, int fftProcessingType, int fftsAccumulated, int fftLoggingMode, int fftLogLength, LocalDateTime timestamp) {
+    public ICListenLoggingConfig(UUID id,
+                                 int gain,
+                                 int waveformSampleRate,
+                                 int waveformLoggingMode,
+                                 int waveformLogLength,
+                                 int bitDepth,
+                                 int fftSampleRate,
+                                 int fftProcessingType,
+                                 int fftsAccumulated,
+                                 int fftLoggingMode,
+                                 int fftLogLength,
+                                 LocalDateTime timestamp) {
         super(ModuleCode.ICLISTEN_LOGGING_CONFIG);
         this.id = id;
         this.gain = gain;

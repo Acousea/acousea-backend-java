@@ -14,6 +14,10 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.repo
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.storage.StorageModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.ICListenHF;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenLoggingConfig;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenRecordingStats;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStatus;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStreamingConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -93,7 +97,12 @@ public class MockNodeDevices {
                                 NetworkModule.name, networkModule1
                         )),
                         new HashMap<>(Map.of(
-                                ICListenHF.name, new ICListenHF()
+                                ICListenHF.name, new ICListenHF(
+                                        ICListenStatus.createDefault(),
+                                        ICListenLoggingConfig.createDefault(),
+                                        ICListenStreamingConfig.createDefault(),
+                                        ICListenRecordingStats.createDefault()
+                                )
                         ))
                 ),
                 new NodeDevice(

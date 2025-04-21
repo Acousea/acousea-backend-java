@@ -518,10 +518,18 @@ public class NodeDeviceDTO {
                 ICListenHFDto dto = new ICListenHFDto();
                 dto.setSerialNumber(ICListenHF.serialNumber);
                 if (pamModule instanceof ICListenHF icListenHF) {
-                    dto.setStatus(StatusDto.fromStatus(icListenHF.getStatus()));
-                    dto.setLoggingConfig(LoggingConfigDto.fromLoggingConfig(icListenHF.getLoggingConfig()));
-                    dto.setStreamingConfig(StreamingConfigDto.fromStreamingConfig(icListenHF.getStreamingConfig()));
-                    dto.setRecordingStats(RecordingStatsDto.fromRecordingStats(icListenHF.getRecordingStats()));
+                    if (icListenHF.getStatus() != null) {
+                        dto.setStatus(StatusDto.fromStatus(icListenHF.getStatus()));
+                    }
+                    if (icListenHF.getLoggingConfig() != null) {
+                        dto.setLoggingConfig(LoggingConfigDto.fromLoggingConfig(icListenHF.getLoggingConfig()));
+                    }
+                    if (icListenHF.getStreamingConfig() != null) {
+                        dto.setStreamingConfig(StreamingConfigDto.fromStreamingConfig(icListenHF.getStreamingConfig()));
+                    }
+                    if (icListenHF.getRecordingStats() != null) {
+                        dto.setRecordingStats(RecordingStatsDto.fromRecordingStats(icListenHF.getRecordingStats()));
+                    }
                 }
                 return dto;
             }

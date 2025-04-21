@@ -6,6 +6,7 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.icli
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenRecordingStats;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStatus;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStreamingConfig;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -18,14 +19,17 @@ public class ICListenHF extends SerializableModule implements PamModule {
     public static final String serialNumber = "RB9-ETH";
     public static final String name = "ICListenHF";
 
+    @Nullable
     private ICListenStatus status;
+    @Nullable
     private ICListenLoggingConfig loggingConfig;
+    @Nullable
     private ICListenStreamingConfig streamingConfig;
+    @Nullable
     private ICListenRecordingStats recordingStats;
 
     @Override
     public String getName() {
-
         return name;
     }
 
