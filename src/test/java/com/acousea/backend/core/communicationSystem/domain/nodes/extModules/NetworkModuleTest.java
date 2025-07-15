@@ -28,14 +28,14 @@ public class NetworkModuleTest {
         byte[] serializedBytes = networkModule.toBytes();
 
         // Then: The length should match expectations (1 byte for TYPE, 1 byte for length, address + routes + default gateway)
-        Assertions.assertEquals(serializedBytes.length, 9);
+        Assertions.assertEquals(serializedBytes.length, 8);
 
         // Checking TYPE and length byte
         Assertions.assertEquals(serializedBytes[0], (byte) ModuleCode.NETWORK.getValue());
-        Assertions.assertEquals(serializedBytes[1], (byte) 7); // 1 byte local, 4 bytes routes, 1 byte default gateway
+        Assertions.assertEquals(serializedBytes[1], (byte) 6); // 1 byte local, 4 bytes routes, 1 byte default gateway
 
         // Checking serialized values
-        ByteBuffer buffer = ByteBuffer.wrap(serializedBytes, 2, 7);
+        ByteBuffer buffer = ByteBuffer.wrap(serializedBytes, 2, 6);
         Address deserializedLocal = Address.fromValue(buffer.get());
         Address dest1 = Address.fromValue(buffer.get());
         Address nextHop1 = Address.fromValue(buffer.get());

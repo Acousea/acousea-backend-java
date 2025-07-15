@@ -94,7 +94,7 @@ public class OperationModesModule extends SerializableModule implements ExtModul
     }
 
     public void removeOperationMode(byte id) {
-        int unsignedId = Byte.toUnsignedInt(id);
+        short unsignedId = (short) Byte.toUnsignedInt(id);
         if (!modes.containsKey(unsignedId)) {
             throw new IllegalArgumentException("Operation mode ID not found: " + id);
         }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -23,7 +24,7 @@ public class ReportingModuleTest {
         modes.put((short) 1, OperationMode.create((short) 1, "Mode1"));
         modes.put((short) 2, OperationMode.create((short) 2, "Mode2"));
 
-        Map<OperationMode, Short> reportingPeriods = new HashMap<>(
+        Map<OperationMode, Short> reportingPeriods = new LinkedHashMap<>(
                 Map.of(OperationMode.create((short) 1, "Mode1"), (short) 120,
                         OperationMode.create((short) 2, "Mode2"), (short) 300)
         );
@@ -34,15 +35,15 @@ public class ReportingModuleTest {
         // When: We serialize the LoRaReportingModule
         byte[] serializedBytes = reportingModule.toBytes();
 
-        // Then: The length should match expectations (1 byte for TYPE, 1 byte for length, 1 byte tech ID, 2 bytes per mode)
-        Assertions.assertEquals(serializedBytes.length, 8);
+        // Then: The length should match expectations (1 byte for TYPE, 1 byte for length, 1 byte tech ID, 3 bytes per mode)
+        Assertions.assertEquals(9, serializedBytes.length);
 
         // Checking TYPE and length byte
         Assertions.assertEquals(serializedBytes[0], (byte) ModuleCode.REPORTING.getValue());
-        Assertions.assertEquals(serializedBytes[1], (byte) 5); // 1 byte tech ID + 2x (1 byte mode ID + 2 bytes period)
+        Assertions.assertEquals((byte) 7, serializedBytes[1]);
 
         // Checking serialized values
-        ByteBuffer buffer = ByteBuffer.wrap(serializedBytes, 2, 6);
+        ByteBuffer buffer = ByteBuffer.wrap(serializedBytes, 2, 7);
         byte techId = buffer.get();
         byte mode1 = buffer.get();
         short period1 = buffer.getShort();
@@ -92,7 +93,7 @@ public class ReportingModuleTest {
     @Test
     void testDeserialization_LoRaReportingModule() {
         // Given: Serialized LoRa reporting module data
-        ByteBuffer buffer = ByteBuffer.allocate(6)
+        ByteBuffer buffer = ByteBuffer.allocate(7)
                 .put(LoRaReportingModule.TECHNOLOGY_ID) // Tech ID
                 .put((byte) 1).putShort((short) 120) // Mode 1 -> 120s
                 .put((byte) 2).putShort((short) 300); // Mode 2 -> 300s

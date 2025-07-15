@@ -26,7 +26,7 @@ public class OperationModesGraphModuleTest {
         byte[] serializedBytes = operationModesGraphModule.toBytes();
 
         // Then: The length should match expectations (1 byte TYPE, 1 byte length, 4 bytes per transition)
-        Assertions.assertEquals(serializedBytes.length, 11);
+        Assertions.assertEquals(serializedBytes.length, 10); // 2 bytes for TYPE and length, 8 bytes for 2 transitions (4 bytes each)
 
         // Checking TYPE and length byte
         Assertions.assertEquals(serializedBytes[0], (byte) ModuleCode.OPERATION_MODES_GRAPH.getValue());

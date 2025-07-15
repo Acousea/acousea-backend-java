@@ -31,6 +31,6 @@ public final class UnsignedByte {
     }
 
     public static boolean isNotValidUnsignedByte(int value) {
-        return value < Byte.MIN_VALUE || value > Byte.MAX_VALUE;
+        return value < UnsignedByte.MIN_VALUE || value > UnsignedByte.MAX_VALUE;
     }
 }

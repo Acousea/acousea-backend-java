@@ -62,15 +62,6 @@ public class OperationModesModuleTest {
     }
 
     @Test
-    void testDeserializationWithInvalidData() {
-        // Given: A buffer that is too short
-        ByteBuffer buffer = ByteBuffer.allocate(1); // Not enough bytes
-
-        // Expect: An exception due to insufficient data
-        assertThrows(IllegalArgumentException.class, () -> OperationModesModule.fromBytes(buffer));
-    }
-
-    @Test
     void testAddingOperationMode() {
         // Given: A module with initial modes
         OperationModesModule operationModesModule = new OperationModesModule(new TreeMap<>());

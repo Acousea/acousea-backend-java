@@ -1,21 +1,22 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods;
 
-import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationModesModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.shared.domain.UnsignedByte;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Getter
 public abstract class ReportingModule extends SerializableModule implements ExtModule {
     private final byte technologyId; // ID de la tecnología
-    private final Map<OperationMode, Short> reportingPeriodsPerOperationMode = new HashMap<>();
+    private final Map<OperationMode, Short> reportingPeriodsPerOperationMode = new TreeMap<>(Comparator.comparingInt(OperationMode::getId));
 
     protected ReportingModule(byte technologyId, Map<OperationMode, Short> reportingPeriods) {
         super(ModuleCode.REPORTING);
@@ -25,6 +26,7 @@ public abstract class ReportingModule extends SerializableModule implements ExtM
 
     @Override
     public byte[] getVALUE() {
+        // Size: 1 byte for tech Id + number of operationModes * (1 byte for mode ID + 2 bytes for reporting period) (3 bytes per mode)
         int size = Byte.BYTES + reportingPeriodsPerOperationMode.size() * (Byte.BYTES + Short.BYTES);
         ByteBuffer buffer = ByteBuffer.allocate(size);
         buffer.put(technologyId);
