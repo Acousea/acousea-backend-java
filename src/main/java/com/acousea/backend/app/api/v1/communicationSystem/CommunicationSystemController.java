@@ -67,24 +67,26 @@ public class CommunicationSystemController {
         return ResponseEntity.ok(ApiResult.success(nodeDevice));
     }
 
-    @PutMapping("/node-device/set/{id}")
+    @PutMapping("/node-device/set")
     public ResponseEntity<ApiResult<CommunicationResult>> setNodeDeviceConfiguration(
-            @PathVariable String id,
             @RequestBody NodeDeviceDTO dto
     ) {
-        dto.setId(id);
+        if (dto.getId() == null || dto.getId().isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResult.fail("Node ID is required"));
+        }
         SetNodeDeviceConfigurationCommand query = new SetNodeDeviceConfigurationCommand(
                 nodeDeviceRepository, storageService, communicationService
         );
         return ResponseEntity.ok(query.run(dto));
     }
 
-    @PutMapping("/node-device/update/{id}")
+    @PutMapping("/node-device/update")
     public ResponseEntity<ApiResult<CommunicationResult>> getUpdatedNodeDeviceConfiguration(
-            @PathVariable String id,
             @RequestBody GetUpdatedNodeDeviceConfigurationDTO dto
     ) {
-        dto.setNodeId(id);
+        if (dto.getNodeId() == null || dto.getNodeId().isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResult.fail("Node ID is required"));
+        }
         GetUpdatedNodeDeviceConfigurationCommand query = new GetUpdatedNodeDeviceConfigurationCommand(
                 nodeDeviceRepository, communicationService
         );

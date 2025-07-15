@@ -12,6 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ICListenStreamingConfig extends SerializableModule {
+    public static final String name = "ICListenStreamingConfig";
     private UUID id;
     private boolean recordWaveform;
     private boolean processWaveform;

@@ -10,6 +10,10 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.repo
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods.LoRaReportingModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.storage.StorageModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenLoggingConfig;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStatus;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStreamingConfig;
+import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenRecordingStats;
 import lombok.Getter;
 
 @Getter
@@ -62,6 +66,11 @@ public enum ModuleCode {
             case RTCModule.name -> RTC;
             case StorageModule.name -> STORAGE;
             case AmbientModule.name -> AMBIENT;
+            case ICListenRecordingStats.name -> ICLISTEN_RECORDING_STATS;
+            case ICListenStatus.name -> ICLISTEN_STATUS;
+            case ICListenLoggingConfig.name -> ICLISTEN_LOGGING_CONFIG;
+            case ICListenStreamingConfig.name -> ICLISTEN_STREAMING_CONFIG;
+
             default -> throw new IllegalArgumentException("Invalid module name: " + moduleName);
         };
     }

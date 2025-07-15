@@ -13,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ICListenRecordingStats extends SerializableModule {
+    public static final String name = "ICListenRecordingStats";
     private UUID id;
     private LocalDateTime epochTime;
     private int numberOfClicks;

@@ -12,6 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ICListenStatus extends SerializableModule {
+    public static final String name = "ICListenStatus";
     private UUID id;
     private int unitStatus;
     private int batteryStatus;
