@@ -70,10 +70,10 @@ public class OperationModesGraphModuleTest {
         OperationModesGraphModule.Transition transition1 = operationModesGraphModule.getGraph().get(1);
         OperationModesGraphModule.Transition transition2 = operationModesGraphModule.getGraph().get(2);
 
-        assertEquals(transition1.getTargetMode(), 2);
-        assertEquals(transition1.getDuration(), 300);
-        assertEquals(transition2.getTargetMode(), 3);
-        assertEquals(transition2.getDuration(), 600);
+        assertEquals(transition1.targetMode(), 2);
+        assertEquals(transition1.duration(), 300);
+        assertEquals(transition2.targetMode(), 3);
+        assertEquals(transition2.duration(), 600);
     }
 
     @Test

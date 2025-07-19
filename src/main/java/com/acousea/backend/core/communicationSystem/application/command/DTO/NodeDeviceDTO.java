@@ -358,7 +358,7 @@ public class NodeDeviceDTO {
                 Map<Integer, TransitionDto> graphDto = module.getGraph().entrySet().stream()
                         .collect(Collectors.toMap(
                                 Map.Entry::getKey,
-                                entry -> new TransitionDto(entry.getValue().getTargetMode(), entry.getValue().getDuration())
+                                entry -> new TransitionDto(entry.getValue().targetMode(), entry.getValue().duration())
                         ));
 
                 dto.setGraph(graphDto);

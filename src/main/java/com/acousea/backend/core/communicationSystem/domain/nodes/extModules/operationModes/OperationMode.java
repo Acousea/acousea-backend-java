@@ -7,7 +7,6 @@ import lombok.Setter;
 import java.util.Objects;
 
 @Getter
-@Setter
 public final class OperationMode {
     private final Short id; // Usamos byte directamente
     private final String name;
@@ -33,7 +32,7 @@ public final class OperationMode {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         OperationMode that = (OperationMode) obj;
-        return this.id == that.id &&
+        return Objects.equals(this.id, that.id) &&
                 Objects.equals(this.name, that.name);
     }
 

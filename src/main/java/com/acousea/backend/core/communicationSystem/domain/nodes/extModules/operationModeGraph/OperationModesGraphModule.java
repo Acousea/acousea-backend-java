@@ -1,11 +1,12 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModeGraph;
 
 
+import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import com.acousea.backend.core.shared.domain.UnsignedByte;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -14,24 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-public class OperationModesGraphModule extends SerializableModule implements ExtModule {    @Getter
-    public static class Transition {
-        private final int targetMode;
-        private final int duration;
+public class OperationModesGraphModule extends SerializableModule implements ExtModule {
 
-        public Transition(int targetMode, int duration) {
-            this.targetMode = targetMode;
-            this.duration = duration;
-        }
-
-        @Override
-        public String toString() {
-            return "Transition{" +
-                    "targetMode=" + targetMode +
-                    ", duration=" + duration +
-                    '}';
-        }
-    }
+    public record Transition(int targetMode, int duration) { }
 
     public static final String name = "operationModesGraph";
     private final Map<Integer, Transition> graph; // Nodo actual -> (Nodo siguiente, Duración)
@@ -66,9 +52,9 @@ public class OperationModesGraphModule extends SerializableModule implements Ext
             Transition transition = entry.getValue();
 
             bytes.add((byte) currentMode);
-            bytes.add((byte) transition.getTargetMode());
-            bytes.add((byte) (transition.getDuration() >> 8)); // High byte of duration
-            bytes.add((byte) (transition.getDuration() & 0xFF)); // Low byte of duration
+            bytes.add((byte) transition.targetMode());
+            bytes.add((byte) (transition.duration() >> 8)); // High byte of duration
+            bytes.add((byte) (transition.duration() & 0xFF)); // Low byte of duration
         }
 
         byte[] result = new byte[bytes.size()];
@@ -96,3 +82,18 @@ public class OperationModesGraphModule extends SerializableModule implements Ext
         return builder.toString();
     }
 }
+
+
+class Main {
+    public static void main(String[] args) {
+        // Example usage
+        Map<Integer, OperationModesGraphModule.Transition> graph = new HashMap<>();
+        graph.put(0, new OperationModesGraphModule.Transition(1, 1000));
+        graph.put(1, new OperationModesGraphModule.Transition(2, 2000));
+        graph.put(2, new OperationModesGraphModule.Transition(0, 1500));
+
+        OperationModesGraphModule module = new OperationModesGraphModule(graph);
+        System.out.println(module);
+    }
+}
+

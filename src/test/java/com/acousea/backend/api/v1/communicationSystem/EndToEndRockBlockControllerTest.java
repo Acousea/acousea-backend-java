@@ -307,8 +307,8 @@ public class EndToEndRockBlockControllerTest {
             NodeDeviceDTO.ExtModuleDto.OperationModesGraphModuleDto.TransitionDto transitionDto =
                     operationModesGraphModuleDto.getGraph().get(currentMode);
 
-            assertThat(transitionDto.getTargetMode()).isEqualTo(transition.getTargetMode());
-            assertThat(transitionDto.getDuration()).isEqualTo(transition.getDuration());
+            assertThat(transitionDto.getTargetMode()).isEqualTo(transition.targetMode());
+            assertThat(transitionDto.getDuration()).isEqualTo(transition.duration());
         });
     }
 
