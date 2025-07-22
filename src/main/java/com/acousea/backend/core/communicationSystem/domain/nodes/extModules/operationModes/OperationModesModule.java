@@ -2,7 +2,7 @@ package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ope
 
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
+
 import com.acousea.backend.core.shared.domain.UnsignedByte;
 import lombok.Getter;
 
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Getter
-public class OperationModesModule extends SerializableModule implements ExtModule {
+public class OperationModesModule extends SerializableModule{
     public static final String name = "operationModes";
     private static final int MAX_MODES = 256; // Número máximo de modos permitidos
     private final Short activeOperationModeIdx;
@@ -56,11 +56,6 @@ public class OperationModesModule extends SerializableModule implements ExtModul
 
         short activeOperationModeIdx = buffer.get();
         return new OperationModesModule(modes, activeOperationModeIdx);
-    }
-
-    @Override
-    public int getFullSize() {
-        return modes.size();
     }
 
     public static int getMinSize() {

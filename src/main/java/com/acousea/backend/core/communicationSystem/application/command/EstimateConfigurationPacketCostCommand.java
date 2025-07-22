@@ -2,8 +2,6 @@ package com.acousea.backend.core.communicationSystem.application.command;
 
 
 import com.acousea.backend.core.communicationSystem.application.command.DTO.NodeDeviceDTO;
-import com.acousea.backend.core.communicationSystem.application.ports.NodeDeviceRepository;
-import com.acousea.backend.core.communicationSystem.application.services.CommunicationService;
 import com.acousea.backend.core.communicationSystem.domain.communication.CommunicationRequest;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
@@ -30,8 +28,8 @@ public class EstimateConfigurationPacketCostCommand extends Command<NodeDeviceDT
         dto.setId(UUID.randomUUID().toString());
         NodeDevice nodeChanges = dto.toNodeDevice();
 
-        // Check if the node device has extModules or pamModules
-        if (nodeChanges.getExtModules().isEmpty() && nodeChanges.getPamModules().isEmpty()) {
+        // Check if the node device has any serializable modules
+        if (nodeChanges.getSerializableModulesMap().isEmpty()) {
             return ApiResult.success(
                     new NodeCostEstimationPayload(
                             0,

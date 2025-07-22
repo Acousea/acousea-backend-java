@@ -15,7 +15,7 @@ import java.nio.ByteBuffer;
 
 @Getter
 @Setter
-public class ICListenHF extends SerializableModule implements PamModule {
+public class ICListenHF extends SerializableModule {
     public static final String serialNumber = "RB9-ETH";
     public static final String name = "ICListenHF";
 
@@ -27,11 +27,6 @@ public class ICListenHF extends SerializableModule implements PamModule {
     private ICListenStreamingConfig streamingConfig;
     @Nullable
     private ICListenRecordingStats recordingStats;
-
-    @Override
-    public String getName() {
-        return name;
-    }
 
     public ICListenHF() {
         super(ModuleCode.ICLISTEN_COMPLETE);

@@ -3,6 +3,7 @@ package com.acousea.backend.core.communicationSystem.infrastructure;
 
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 
+@Getter
 @Entity
 @Table(name = "node_device_info")
 public class SQLNodeDeviceInfo {
@@ -58,43 +60,8 @@ public class SQLNodeDeviceInfo {
                 id,
                 "name",
                 "",
-                Map.of(),
                 Map.of()
         );
     }
 
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-
-    public int getOperationMode() {
-        return operationMode;
-    }
-
-    public void setOperationMode(int operationMode) {
-        this.operationMode = operationMode;
-    }
-
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }

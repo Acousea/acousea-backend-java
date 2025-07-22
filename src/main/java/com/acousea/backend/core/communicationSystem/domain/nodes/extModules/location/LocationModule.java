@@ -2,7 +2,6 @@ package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.loc
 
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +9,7 @@ import java.nio.ByteBuffer;
 
 @Getter
 @Setter
-public class LocationModule extends SerializableModule implements ExtModule {
+public class LocationModule extends SerializableModule  {
     public static final String name = "location";
     private float latitude;
     private float longitude;
@@ -27,11 +26,6 @@ public class LocationModule extends SerializableModule implements ExtModule {
                 .putFloat(latitude)
                 .putFloat(longitude)
                 .array();
-    }
-
-    @Override
-    public int getFullSize() {
-        return getMinSize();
     }
 
     public static int getMinSize() {

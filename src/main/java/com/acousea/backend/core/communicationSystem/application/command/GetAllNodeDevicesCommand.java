@@ -30,8 +30,7 @@ public class GetAllNodeDevicesCommand extends Command<Void, List<NodeDeviceDTO>>
                     node.getId(),
                     node.getName(),
                     storageService.getFileUrl(node.getIcon()),
-                    node.getExtModules(),
-                    node.getPamModules()
+                    node.getSerializableModulesMap()
             ));
         });
 

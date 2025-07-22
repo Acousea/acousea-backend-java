@@ -1,7 +1,7 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModeGraph;
 
 
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
+
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.shared.domain.UnsignedByte;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-public class OperationModesGraphModule extends SerializableModule implements ExtModule {
+public class OperationModesGraphModule extends SerializableModule  {
 
     public record Transition(int targetMode, int duration) { }
 
@@ -64,11 +64,6 @@ public class OperationModesGraphModule extends SerializableModule implements Ext
         return result;
     }
 
-
-    @Override
-    public int getFullSize() {
-        return getVALUE().length;
-    }
 
     @Override
     public String toString() {

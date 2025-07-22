@@ -1,7 +1,6 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes;
 
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
-import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.PamModule;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -22,27 +21,24 @@ public class NodeDevice {
     @NotNull
     private String icon; // Campo nuevo para almacenar la URL completa del icono
     @NotNull
-    private final Map<String, ExtModule> extModules;
-    @NotNull
-    private final Map<String, PamModule> pamModules;
+    private final Map<String, SerializableModule> serializableModulesMap;
 
     public NodeDevice(
             @NotNull UUID id,
             @NotNull String name,
             @NotNull String icon,
-            @NotNull Map<String, ExtModule> extModules,
-            @NotNull Map<String, PamModule> pamModules) {
+            @NotNull Map<String, SerializableModule> serializableModules) {
         this.id = id;
         this.name = name;
         this.icon = icon;
-        this.extModules = extModules;
-        this.pamModules = pamModules;
+        this.serializableModulesMap = serializableModules;
+
     }
 
 
     // Método para obtener un módulo específico
-    public <T extends ExtModule> Optional<T> getModule(Class<T> moduleType) {
-        return extModules.values().stream()
+    public <T extends SerializableModule> Optional<T> getModule(Class<T> moduleType) {
+        return serializableModulesMap.values().stream()
                 .filter(moduleType::isInstance)
                 .map(moduleType::cast)
                 .findFirst();
@@ -54,8 +50,7 @@ public class NodeDevice {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", icon='" + icon + '\'' +
-                ", extModules=" + extModules +
-                ", pamModules=" + pamModules +
+                ", extModules=" + serializableModulesMap +
                 '}';
     }
 }

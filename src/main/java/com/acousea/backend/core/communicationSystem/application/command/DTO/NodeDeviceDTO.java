@@ -3,7 +3,6 @@ package com.acousea.backend.core.communicationSystem.application.command.DTO;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.BatteryStatus;
 import com.acousea.backend.core.communicationSystem.domain.nodes.NodeDevice;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ambient.AmbientModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.battery.BatteryModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.location.LocationModule;
@@ -16,11 +15,11 @@ import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.repo
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc.RTCModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.storage.StorageModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.ICListenHF;
-import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.PamModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenLoggingConfig;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenRecordingStats;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStatus;
 import com.acousea.backend.core.communicationSystem.domain.nodes.pamModules.iclisten.ICListenStreamingConfig;
+import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.annotation.Nullable;
@@ -40,16 +39,14 @@ public class NodeDeviceDTO {
     private String id;
     private String name;
     private String icon;
-    private Map<String, ExtModuleDto> extModules;
-    private Map<String, PamModuleDto> pamModules;
+    private Map<String, SerializableModuleDto> modules;
 
     public NodeDevice toNodeDevice() {
         return new NodeDevice(
                 UUID.fromString(this.id),
                 this.name,
                 this.icon,
-                (this.extModules != null) ? ExtModuleDto.toExtModules(this.extModules) : new HashMap<>(),
-                (this.pamModules != null) ? PamModuleDto.toPamModules(this.pamModules) : new HashMap<>()
+                (this.modules != null) ? SerializableModuleDto.toSerializableModules(this.modules) : new HashMap<>()
         );
     }
 
@@ -64,14 +61,13 @@ public class NodeDeviceDTO {
         dto.setId(nodeDevice.getId().toString());
         dto.setName(nodeDevice.getName());
         dto.setIcon(nodeDevice.getIcon());
-        dto.setExtModules(ExtModuleDto.fromExtModules(nodeDevice.getExtModules()));
-        dto.setPamModules(PamModuleDto.fromPamModules(nodeDevice.getPamModules()));
+        dto.setModules(SerializableModuleDto.fromSerializableModules(nodeDevice.getSerializableModulesMap()));
         return dto;
     }
 
     @SuppressWarnings("unchecked")
     public <T> T getExtModule(String moduleName, Class<T> type) {
-        Object module = extModules.get(moduleName);
+        Object module = modules.get(moduleName);
         if (module == null) {
             throw new IllegalArgumentException("Module not found: " + moduleName);
         }
@@ -88,51 +84,54 @@ public class NodeDeviceDTO {
             visible = true
     )
     @JsonSubTypes({
-            @JsonSubTypes.Type(value = ExtModuleDto.BatteryModuleDto.class, name = BatteryModule.name),
-            @JsonSubTypes.Type(value = ExtModuleDto.AmbientModuleDTO.class, name = AmbientModule.name),
-            @JsonSubTypes.Type(value = ExtModuleDto.LocationModuleDto.class, name = LocationModule.name),
-            @JsonSubTypes.Type(value = ExtModuleDto.NetworkModuleDto.class, name = NetworkModule.name),
-            @JsonSubTypes.Type(value = ExtModuleDto.RtcModuleDto.class, name = RTCModule.name),
-            @JsonSubTypes.Type(value = ExtModuleDto.StorageModuleDto.class, name = StorageModule.name),
-            @JsonSubTypes.Type(value = ExtModuleDto.OperationModeModuleDto.class, name = OperationModesModule.name),
-            @JsonSubTypes.Type(value = ExtModuleDto.OperationModesGraphModuleDto.class, name = OperationModesGraphModule.name),
-            @JsonSubTypes.Type(value = ExtModuleDto.IridiumReportingModuleDto.class, name = IridiumReportingModule.name),
-            @JsonSubTypes.Type(value = ExtModuleDto.LoRaReportingModuleDto.class, name = LoRaReportingModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.BatteryModuleDto.class, name = BatteryModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.AmbientModuleDTO.class, name = AmbientModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.LocationModuleDto.class, name = LocationModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.NetworkModuleDto.class, name = NetworkModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.RtcModuleDto.class, name = RTCModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.StorageModuleDto.class, name = StorageModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.OperationModeModuleDto.class, name = OperationModesModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.OperationModesGraphModuleDto.class, name = OperationModesGraphModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.IridiumReportingModuleDto.class, name = IridiumReportingModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.LoRaReportingModuleDto.class, name = LoRaReportingModule.name),
+            @JsonSubTypes.Type(value = SerializableModuleDto.ICListenHFDto.class, name = ICListenHF.name)
     })
     @Data
-    public static class ExtModuleDto {
-        public static Map<String, ExtModule> toExtModules(Map<String, ExtModuleDto> extModules) {
-            Map<String, ExtModule> extModuleMap = new HashMap<>();
+    public static class SerializableModuleDto {
+        public static Map<String, SerializableModule> toSerializableModules(Map<String, SerializableModuleDto> extModules) {
+            Map<String, SerializableModule> serializableModulesMap = new HashMap<>();
             extModules.forEach((key, value) -> {
                 if (value instanceof BatteryModuleDto) {
-                    extModuleMap.put(key, ((BatteryModuleDto) value).toBatteryModule());
+                    serializableModulesMap.put(key, ((BatteryModuleDto) value).toBatteryModule());
                 } else if (value instanceof AmbientModuleDTO) {
-                    extModuleMap.put(key, ((AmbientModuleDTO) value).toAmbientModule());
+                    serializableModulesMap.put(key, ((AmbientModuleDTO) value).toAmbientModule());
                 } else if (value instanceof OperationModeModuleDto) {
-                    extModuleMap.put(key, ((OperationModeModuleDto) value).toOperationModeModule());
+                    serializableModulesMap.put(key, ((OperationModeModuleDto) value).toOperationModeModule());
                 } else if (value instanceof OperationModesGraphModuleDto) {
-                    extModuleMap.put(key, ((OperationModesGraphModuleDto) value).toOperationModesGraphModule());
+                    serializableModulesMap.put(key, ((OperationModesGraphModuleDto) value).toOperationModesGraphModule());
                 } else if (value instanceof IridiumReportingModuleDto) {
-                    extModuleMap.put(key, ((IridiumReportingModuleDto) value).toIridiumReportingModule());
+                    serializableModulesMap.put(key, ((IridiumReportingModuleDto) value).toIridiumReportingModule());
                 } else if (value instanceof LoRaReportingModuleDto) {
-                    extModuleMap.put(key, ((LoRaReportingModuleDto) value).toLoRaReportingModule());
+                    serializableModulesMap.put(key, ((LoRaReportingModuleDto) value).toLoRaReportingModule());
                 } else if (value instanceof RtcModuleDto) {
-                    extModuleMap.put(key, ((RtcModuleDto) value).toRtcModule());
+                    serializableModulesMap.put(key, ((RtcModuleDto) value).toRtcModule());
                 } else if (value instanceof NetworkModuleDto) {
-                    extModuleMap.put(key, ((NetworkModuleDto) value).toNetworkModule());
+                    serializableModulesMap.put(key, ((NetworkModuleDto) value).toNetworkModule());
                 } else if (value instanceof StorageModuleDto) {
-                    extModuleMap.put(key, ((StorageModuleDto) value).toStorageModule());
+                    serializableModulesMap.put(key, ((StorageModuleDto) value).toStorageModule());
                 } else if (value instanceof LocationModuleDto) {
-                    extModuleMap.put(key, ((LocationModuleDto) value).toLocationModule());
+                    serializableModulesMap.put(key, ((LocationModuleDto) value).toLocationModule());
+                } else if (value instanceof ICListenHFDto) {
+                    serializableModulesMap.put(key, ((ICListenHFDto) value).toSerializableModule());
                 } else {
                     throw new IllegalArgumentException("Unknown ExtModule type: " + value.getClass().getName());
                 }
             });
-            return extModuleMap;
+            return serializableModulesMap;
         }
 
-        public static Map<String, ExtModuleDto> fromExtModules(Map<String, ExtModule> extModules) {
-            Map<String, ExtModuleDto> dto = new HashMap<>();
+        public static Map<String, SerializableModuleDto> fromSerializableModules(Map<String, SerializableModule> extModules) {
+            Map<String, SerializableModuleDto> dto = new HashMap<>();
             extModules.forEach((key, value) -> {
                 if (value instanceof BatteryModule) {
                     dto.put(BatteryModule.name, BatteryModuleDto.fromBatteryModule((BatteryModule) value));
@@ -154,6 +153,8 @@ public class NodeDeviceDTO {
                     dto.put(StorageModule.name, StorageModuleDto.fromStorageModule((StorageModule) value));
                 } else if (value instanceof LocationModule) {
                     dto.put(LocationModule.name, LocationModuleDto.fromLocationModule((LocationModule) value));
+                } else if (value instanceof ICListenHF) {
+                    dto.put(ICListenHF.name, ICListenHFDto.fromSerializable((ICListenHF) value));
                 } else {
                     throw new IllegalArgumentException("Unknown ExtModule type: " + value.getClass().getName());
                 }
@@ -163,7 +164,7 @@ public class NodeDeviceDTO {
 
         @Data
         @EqualsAndHashCode(callSuper = true)
-        public static class LocationModuleDto extends ExtModuleDto {
+        public static class LocationModuleDto extends SerializableModuleDto {
             private Float latitude;
             private Float longitude;
 
@@ -184,7 +185,7 @@ public class NodeDeviceDTO {
 
         @Data
         @EqualsAndHashCode(callSuper = true)
-        public static class StorageModuleDto extends ExtModuleDto {
+        public static class StorageModuleDto extends SerializableModuleDto {
             private Integer storageUsedMegabytes;
             private Integer storageTotalMegabytes;
 
@@ -205,7 +206,7 @@ public class NodeDeviceDTO {
 
         @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class BatteryModuleDto extends ExtModuleDto {
+        public static class BatteryModuleDto extends SerializableModuleDto {
             private Integer batteryPercentage;
             private Integer batteryStatus;
 
@@ -226,7 +227,7 @@ public class NodeDeviceDTO {
 
         @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class AmbientModuleDTO extends ExtModuleDto {
+        public static class AmbientModuleDTO extends SerializableModuleDto {
             private Integer temperature;
             private Integer humidity;
 
@@ -247,7 +248,7 @@ public class NodeDeviceDTO {
 
         @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class OperationModeModuleDto extends ExtModuleDto {
+        public static class OperationModeModuleDto extends SerializableModuleDto {
             private Map<Short, String> modes;
             private Short activeOperationModeIdx;
 
@@ -271,7 +272,7 @@ public class NodeDeviceDTO {
 
         @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class IridiumReportingModuleDto extends ExtModuleDto {
+        public static class IridiumReportingModuleDto extends SerializableModuleDto {
             private Integer technologyId;
             private Map<Short, Short> reportingPeriodsPerOperationModeIdx; // Changed List to Map
             private String imei;
@@ -305,7 +306,7 @@ public class NodeDeviceDTO {
 
         @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class LoRaReportingModuleDto extends ExtModuleDto {
+        public static class LoRaReportingModuleDto extends SerializableModuleDto {
             private Integer technologyId;
             private Map<Short, Short> reportingPeriodsPerOperationModeIdx; // Changed List to Map
 
@@ -338,7 +339,7 @@ public class NodeDeviceDTO {
 
         @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class OperationModesGraphModuleDto extends ExtModuleDto {
+        public static class OperationModesGraphModuleDto extends SerializableModuleDto {
             private Map<Integer, TransitionDto> graph;
 
             @Data
@@ -383,7 +384,7 @@ public class NodeDeviceDTO {
 
         @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class RtcModuleDto extends ExtModuleDto {
+        public static class RtcModuleDto extends SerializableModuleDto {
             private String currentTime;
 
             public static RtcModuleDto fromRtcModule(RTCModule value) {
@@ -401,7 +402,7 @@ public class NodeDeviceDTO {
 
         @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class NetworkModuleDto extends ExtModuleDto {
+        public static class NetworkModuleDto extends SerializableModuleDto {
             private Integer localAddress;
             private RoutingTableDto routingTable;
 
@@ -456,48 +457,9 @@ public class NodeDeviceDTO {
             }
         }
 
-    }
-
-
-    @JsonTypeInfo(
-            use = JsonTypeInfo.Id.NAME,
-            include = JsonTypeInfo.As.PROPERTY,
-            property = "name",
-            visible = true
-    )
-    @JsonSubTypes({
-            @JsonSubTypes.Type(value = PamModuleDto.ICListenHFDto.class, name = ICListenHF.name),
-    })
-    @Data
-    public static class PamModuleDto {
-
-        public static Map<String, PamModule> toPamModules(Map<String, PamModuleDto> pamModules) {
-            Map<String, PamModule> pamModuleMap = new HashMap<>();
-            pamModules.forEach((key, value) -> {
-                if (value instanceof ICListenHFDto) {
-                    pamModuleMap.put(key, ((ICListenHFDto) value).toPamModule());
-                } else {
-                    throw new IllegalArgumentException("Unknown PamModule type: " + value.getClass().getName());
-                }
-            });
-            return pamModuleMap;
-        }
-
-        public static Map<String, PamModuleDto> fromPamModules(Map<String, PamModule> pamModules) {
-            Map<String, PamModuleDto> dto = new HashMap<>();
-            pamModules.forEach((key, value) -> {
-                if (value instanceof ICListenHF) {
-                    dto.put(ICListenHF.name, ICListenHFDto.fromPamModule((ICListenHF) value));
-                } else {
-                    throw new IllegalArgumentException("Unknown PamModule type: " + value.getClass().getName());
-                }
-            });
-            return dto;
-        }
-
         @EqualsAndHashCode(callSuper = true)
         @Data
-        public static class ICListenHFDto extends PamModuleDto {
+        public static class ICListenHFDto extends SerializableModuleDto {
             private String serialNumber;
             @Nullable
             private StatusDto status;
@@ -508,16 +470,10 @@ public class NodeDeviceDTO {
             @Nullable
             private RecordingStatsDto recordingStats;
 
-            public static List<ICListenHFDto> fromPamModules(List<PamModule> pamModules) {
-                return pamModules.stream()
-                        .map(ICListenHFDto::fromPamModule)
-                        .toList();
-            }
-
-            private static ICListenHFDto fromPamModule(PamModule pamModule) {
+            private static ICListenHFDto fromSerializable(SerializableModule serializableModule) {
                 ICListenHFDto dto = new ICListenHFDto();
                 dto.setSerialNumber(ICListenHF.serialNumber);
-                if (pamModule instanceof ICListenHF icListenHF) {
+                if (serializableModule instanceof ICListenHF icListenHF) {
                     if (icListenHF.getStatus() != null) {
                         dto.setStatus(StatusDto.fromStatus(icListenHF.getStatus()));
                     }
@@ -534,7 +490,7 @@ public class NodeDeviceDTO {
                 return dto;
             }
 
-            public PamModule toPamModule() {
+            public SerializableModule toSerializableModule() {
                 ICListenHF module = new ICListenHF();
                 if (this.status != null) {
                     module.setStatus(this.status.toStatus());
@@ -744,5 +700,7 @@ public class NodeDeviceDTO {
                 }
             }
         }
+
     }
+
 }

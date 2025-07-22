@@ -1,6 +1,6 @@
 package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.reportingPeriods;
 
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
+
 import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.operationModes.OperationMode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Getter
-public abstract class ReportingModule extends SerializableModule implements ExtModule {
+public abstract class ReportingModule extends SerializableModule {
     private final byte technologyId; // ID de la tecnología
     private final Map<OperationMode, Short> reportingPeriodsPerOperationMode = new TreeMap<>(Comparator.comparingInt(OperationMode::getId));
 
@@ -74,10 +74,6 @@ public abstract class ReportingModule extends SerializableModule implements ExtM
         };
     }
 
-    @Override
-    public int getFullSize() {
-        return Byte.BYTES + reportingPeriodsPerOperationMode.size() * (Byte.BYTES + Short.BYTES);
-    }
 
     public static int getMinSize() {
         return Byte.BYTES + (Byte.BYTES + Short.BYTES);

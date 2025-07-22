@@ -2,7 +2,7 @@ package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.sto
 
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 
 @Getter
 @Setter
-public class StorageModule extends SerializableModule implements ExtModule {
+public class StorageModule extends SerializableModule  {
     public static final String name = "storage";
     private int storageUsedMegabytes;
     private int storageTotalMegabytes;
@@ -42,11 +42,6 @@ public class StorageModule extends SerializableModule implements ExtModule {
         int storageUsed = buffer.getInt();
         int storageTotal = buffer.getInt();
         return new StorageModule(storageUsed, storageTotal);
-    }
-
-    @Override
-    public int getFullSize() {
-        return getMinSize();
     }
 
     public static int getMinSize() {

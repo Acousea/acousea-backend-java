@@ -31,28 +31,28 @@ public class CommunicationResponseProcessor {
 
     private final Map<ModuleCode, TagProcessor> tagProcessors = Map.ofEntries(
             Map.entry(ModuleCode.BATTERY,
-                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(BatteryModule.name, (BatteryModule) serializableModule)
+                    (nodeDevice, serializableModule) -> nodeDevice.getSerializableModulesMap().put(BatteryModule.name, (BatteryModule) serializableModule)
             ),
             Map.entry(ModuleCode.LOCATION,
-                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(LocationModule.name, (LocationModule) serializableModule)
+                    (nodeDevice, serializableModule) -> nodeDevice.getSerializableModulesMap().put(LocationModule.name, (LocationModule) serializableModule)
             ),
             Map.entry(ModuleCode.AMBIENT,
-                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(AmbientModule.name, (AmbientModule) serializableModule)
+                    (nodeDevice, serializableModule) -> nodeDevice.getSerializableModulesMap().put(AmbientModule.name, (AmbientModule) serializableModule)
             ),
             Map.entry(ModuleCode.NETWORK,
-                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(NetworkModule.name, (NetworkModule) serializableModule)
+                    (nodeDevice, serializableModule) -> nodeDevice.getSerializableModulesMap().put(NetworkModule.name, (NetworkModule) serializableModule)
             ),
             Map.entry(ModuleCode.STORAGE, (nodeDevice, serializableModule) ->
-                    nodeDevice.getExtModules().put(StorageModule.name, (StorageModule) serializableModule)
+                    nodeDevice.getSerializableModulesMap().put(StorageModule.name, (StorageModule) serializableModule)
             ),
             Map.entry(ModuleCode.OPERATION_MODES,
-                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(OperationModesModule.name, (OperationModesModule) serializableModule)
+                    (nodeDevice, serializableModule) -> nodeDevice.getSerializableModulesMap().put(OperationModesModule.name, (OperationModesModule) serializableModule)
             ),
             Map.entry(ModuleCode.OPERATION_MODES_GRAPH,
-                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(OperationModesGraphModule.name, (OperationModesGraphModule) serializableModule)
+                    (nodeDevice, serializableModule) -> nodeDevice.getSerializableModulesMap().put(OperationModesGraphModule.name, (OperationModesGraphModule) serializableModule)
             ),
             Map.entry(ModuleCode.RTC,
-                    (nodeDevice, serializableModule) -> nodeDevice.getExtModules().put(RTCModule.name, ((RTCModule) serializableModule))
+                    (nodeDevice, serializableModule) -> nodeDevice.getSerializableModulesMap().put(RTCModule.name, ((RTCModule) serializableModule))
             ),
             Map.entry(ModuleCode.ICLISTEN_COMPLETE,
                     (nodeDevice, serializableModule) -> {
@@ -74,9 +74,9 @@ public class CommunicationResponseProcessor {
                 ReportingModule reportingModule = ((ReportingModule) serializableModule);
                 switch (reportingModule.getTechnologyId()) {
                     case IridiumReportingModule.TECHNOLOGY_ID ->
-                            nodeDevice.getExtModules().put(IridiumReportingModule.name, reportingModule);
+                            nodeDevice.getSerializableModulesMap().put(IridiumReportingModule.name, reportingModule);
                     case LoRaReportingModule.TECHNOLOGY_ID ->
-                            nodeDevice.getExtModules().put(LoRaReportingModule.name, reportingModule);
+                            nodeDevice.getSerializableModulesMap().put(LoRaReportingModule.name, reportingModule);
                     default -> throw new IllegalArgumentException(
                             ReportingModule.class.getName() + " -> Unknown technology id: " + reportingModule.getTechnologyId());
                 }

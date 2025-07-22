@@ -175,7 +175,7 @@ public class EndToEndRockBlockControllerTest {
         );
 
         NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialAmbientModule));
-        NodeDeviceDTO.ExtModuleDto.AmbientModuleDTO ambientModule = (NodeDeviceDTO.ExtModuleDto.AmbientModuleDTO) nodeDeviceDTO.getExtModules().get(AmbientModule.name);
+        NodeDeviceDTO.SerializableModuleDto.AmbientModuleDTO ambientModule = (NodeDeviceDTO.SerializableModuleDto.AmbientModuleDTO) nodeDeviceDTO.getModules().get(AmbientModule.name);
         assertThat(ambientModule).isNotNull();
         assertThat(ambientModule.getTemperature()).isEqualTo(initialAmbientModule.getTemperature());
         assertThat(ambientModule.getHumidity()).isEqualTo(initialAmbientModule.getHumidity());
@@ -189,7 +189,7 @@ public class EndToEndRockBlockControllerTest {
 
 
         NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialBatteryModule));
-        NodeDeviceDTO.ExtModuleDto.BatteryModuleDto batteryModule = (NodeDeviceDTO.ExtModuleDto.BatteryModuleDto) nodeDeviceDTO.getExtModules().get(BatteryModule.name);
+        NodeDeviceDTO.SerializableModuleDto.BatteryModuleDto batteryModule = (NodeDeviceDTO.SerializableModuleDto.BatteryModuleDto) nodeDeviceDTO.getModules().get(BatteryModule.name);
         assertThat(batteryModule).isNotNull();
         assertThat(batteryModule.getBatteryStatus()).isEqualTo(initialBatteryModule.getBatteryStatus().getValue());
         assertThat(batteryModule.getBatteryPercentage()).isEqualTo(initialBatteryModule.getBatteryPercentage());
@@ -205,7 +205,7 @@ public class EndToEndRockBlockControllerTest {
         NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(
                 List.of(initialLocationModule)
         );
-        NodeDeviceDTO.ExtModuleDto.LocationModuleDto locationModule = (NodeDeviceDTO.ExtModuleDto.LocationModuleDto) nodeDeviceDTO.getExtModules().get(LocationModule.name);
+        NodeDeviceDTO.SerializableModuleDto.LocationModuleDto locationModule = (NodeDeviceDTO.SerializableModuleDto.LocationModuleDto) nodeDeviceDTO.getModules().get(LocationModule.name);
         assertThat(locationModule).isNotNull();
         assertThat(locationModule.getLongitude()).isEqualTo(initialLocationModule.getLongitude());
         assertThat(locationModule.getLatitude()).isEqualTo(initialLocationModule.getLatitude());
@@ -225,8 +225,8 @@ public class EndToEndRockBlockControllerTest {
         NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialNetworkModule));
 
         // Retrieve and validate the NetworkModule DTO from the API response
-        NodeDeviceDTO.ExtModuleDto.NetworkModuleDto networkModuleDto =
-                (NodeDeviceDTO.ExtModuleDto.NetworkModuleDto) nodeDeviceDTO.getExtModules().get(NetworkModule.name);
+        NodeDeviceDTO.SerializableModuleDto.NetworkModuleDto networkModuleDto =
+                (NodeDeviceDTO.SerializableModuleDto.NetworkModuleDto) nodeDeviceDTO.getModules().get(NetworkModule.name);
 
         assertThat(networkModuleDto).isNotNull();
         assertThat(networkModuleDto.getLocalAddress()).isEqualTo(initialNetworkModule.getLocalAddress().getValue());
@@ -264,8 +264,8 @@ public class EndToEndRockBlockControllerTest {
         NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialOperationModesModule));
 
         // Retrieve and validate the OperationModesModule DTO from the API response
-        NodeDeviceDTO.ExtModuleDto.OperationModeModuleDto operationModesModuleDto =
-                (NodeDeviceDTO.ExtModuleDto.OperationModeModuleDto) nodeDeviceDTO.getExtModules().get(OperationModesModule.name);
+        NodeDeviceDTO.SerializableModuleDto.OperationModeModuleDto operationModesModuleDto =
+                (NodeDeviceDTO.SerializableModuleDto.OperationModeModuleDto) nodeDeviceDTO.getModules().get(OperationModesModule.name);
 
         assertThat(operationModesModuleDto).isNotNull();
         assertThat(operationModesModuleDto.getActiveOperationModeIdx()).isEqualTo(activeModeId);
@@ -293,8 +293,8 @@ public class EndToEndRockBlockControllerTest {
         NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialOperationModesGraphModule));
 
         // Retrieve and validate the OperationModesGraphModule DTO from the API response
-        NodeDeviceDTO.ExtModuleDto.OperationModesGraphModuleDto operationModesGraphModuleDto =
-                (NodeDeviceDTO.ExtModuleDto.OperationModesGraphModuleDto) nodeDeviceDTO.getExtModules().get(OperationModesGraphModule.name);
+        NodeDeviceDTO.SerializableModuleDto.OperationModesGraphModuleDto operationModesGraphModuleDto =
+                (NodeDeviceDTO.SerializableModuleDto.OperationModesGraphModuleDto) nodeDeviceDTO.getModules().get(OperationModesGraphModule.name);
 
         assertThat(operationModesGraphModuleDto).isNotNull();
         assertThat(operationModesGraphModuleDto.getGraph()).isNotNull();
@@ -304,7 +304,7 @@ public class EndToEndRockBlockControllerTest {
             assertThat(operationModesGraphModuleDto.getGraph())
                     .containsKey(currentMode);
 
-            NodeDeviceDTO.ExtModuleDto.OperationModesGraphModuleDto.TransitionDto transitionDto =
+            NodeDeviceDTO.SerializableModuleDto.OperationModesGraphModuleDto.TransitionDto transitionDto =
                     operationModesGraphModuleDto.getGraph().get(currentMode);
 
             assertThat(transitionDto.getTargetMode()).isEqualTo(transition.targetMode());
@@ -334,8 +334,8 @@ public class EndToEndRockBlockControllerTest {
         NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialLoRaReportingModule));
 
         // Retrieve and validate the LoRaReportingModule DTO from the API response
-        NodeDeviceDTO.ExtModuleDto.LoRaReportingModuleDto loRaReportingModuleDto =
-                (NodeDeviceDTO.ExtModuleDto.LoRaReportingModuleDto) nodeDeviceDTO.getExtModules().get(LoRaReportingModule.name);
+        NodeDeviceDTO.SerializableModuleDto.LoRaReportingModuleDto loRaReportingModuleDto =
+                (NodeDeviceDTO.SerializableModuleDto.LoRaReportingModuleDto) nodeDeviceDTO.getModules().get(LoRaReportingModule.name);
 
         assertThat(loRaReportingModuleDto).isNotNull();
         assertThat(loRaReportingModuleDto.getTechnologyId()).isEqualTo(LoRaReportingModule.TECHNOLOGY_ID);
@@ -369,8 +369,8 @@ public class EndToEndRockBlockControllerTest {
         NodeDeviceDTO nodeDeviceDTO = testWebHookEndpointWithModule(List.of(initialIridiumReportingModule));
 
         // Retrieve and validate the IridiumReportingModule DTO from the API response
-        NodeDeviceDTO.ExtModuleDto.IridiumReportingModuleDto iridiumReportingModuleDto =
-                (NodeDeviceDTO.ExtModuleDto.IridiumReportingModuleDto) nodeDeviceDTO.getExtModules().get(IridiumReportingModule.name);
+        NodeDeviceDTO.SerializableModuleDto.IridiumReportingModuleDto iridiumReportingModuleDto =
+                (NodeDeviceDTO.SerializableModuleDto.IridiumReportingModuleDto) nodeDeviceDTO.getModules().get(IridiumReportingModule.name);
 
         assertThat(iridiumReportingModuleDto).isNotNull();
         assertThat(iridiumReportingModuleDto.getTechnologyId()).isEqualTo(IridiumReportingModule.TECHNOLOGY_ID);
@@ -392,7 +392,7 @@ public class EndToEndRockBlockControllerTest {
                 List.of(initialRTCModule)
         );
 
-        NodeDeviceDTO.ExtModuleDto.RtcModuleDto rtcModule = (NodeDeviceDTO.ExtModuleDto.RtcModuleDto) nodeDeviceDTO.getExtModules().get(RTCModule.name);
+        NodeDeviceDTO.SerializableModuleDto.RtcModuleDto rtcModule = (NodeDeviceDTO.SerializableModuleDto.RtcModuleDto) nodeDeviceDTO.getModules().get(RTCModule.name);
         assertThat(rtcModule).isNotNull();
         assertThat(LocalDateTime.parse(rtcModule.getCurrentTime())).isEqualTo(initialRTCModule.getCurrentTime());
 
@@ -406,7 +406,7 @@ public class EndToEndRockBlockControllerTest {
                 List.of(initialStorageModule)
         );
 
-        NodeDeviceDTO.ExtModuleDto.StorageModuleDto storageModule = (NodeDeviceDTO.ExtModuleDto.StorageModuleDto) nodeDeviceDTO.getExtModules().get(StorageModule.name);
+        NodeDeviceDTO.SerializableModuleDto.StorageModuleDto storageModule = (NodeDeviceDTO.SerializableModuleDto.StorageModuleDto) nodeDeviceDTO.getModules().get(StorageModule.name);
         assertThat(storageModule).isNotNull();
         assertThat(storageModule.getStorageUsedMegabytes()).isEqualTo(initialStorageModule.getStorageUsedMegabytes());
         assertThat(storageModule.getStorageTotalMegabytes()).isEqualTo(initialStorageModule.getStorageTotalMegabytes());

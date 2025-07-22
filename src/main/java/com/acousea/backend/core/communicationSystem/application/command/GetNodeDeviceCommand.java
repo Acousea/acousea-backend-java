@@ -52,8 +52,8 @@ public class GetNodeDeviceCommand extends Command<GetNodeDeviceCommand.NodeDevic
                 nodeDeviceInfo.get().getId(),
                 nodeDeviceInfo.get().getName(),
                 iconUrl,
-                nodeDeviceInfo.get().getExtModules(),
-                nodeDeviceInfo.get().getPamModules()
+                nodeDeviceInfo.get().getSerializableModulesMap()
+
         );
 
         return ApiResult.success(NodeDeviceDTO.fromNodeDevice(node));

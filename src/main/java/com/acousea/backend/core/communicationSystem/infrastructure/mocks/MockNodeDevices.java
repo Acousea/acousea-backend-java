@@ -80,30 +80,31 @@ public class MockNodeDevices {
                 )
                 , environment.getProperty("drifter.imei"));
 
+        ICListenHF icListenHF = new ICListenHF(
+                ICListenStatus.createDefault(),
+                ICListenLoggingConfig.createDefault(),
+                ICListenStreamingConfig.createDefault(),
+                ICListenRecordingStats.createDefault()
+        );
+
         return List.of(new NodeDevice(
                         UUID.fromString("00000000-0000-0000-0000-000000000001"),
                         "Drifter",
                         "buoy.svg",
-                        new HashMap<>(Map.of(
-                                RTCModule.name, rtcModule,
-                                BatteryModule.name, batteryModule,
-                                LocationModule.name, locationModule,
-                                AmbientModule.name, ambientModule,
-                                StorageModule.name, storageModule,
-                                OperationModesModule.name, operationModesModule,
-                                OperationModesGraphModule.name, graph,
-                                LoRaReportingModule.name, loRaReportingModule,
-                                IridiumReportingModule.name, iridiumReportingModuleDrifter,
-                                NetworkModule.name, networkModule1
-                        )),
-                        new HashMap<>(Map.of(
-                                ICListenHF.name, new ICListenHF(
-                                        ICListenStatus.createDefault(),
-                                        ICListenLoggingConfig.createDefault(),
-                                        ICListenStreamingConfig.createDefault(),
-                                        ICListenRecordingStats.createDefault()
-                                )
+                        new HashMap<>(Map.ofEntries(
+                                Map.entry(RTCModule.name, rtcModule),
+                                Map.entry(BatteryModule.name, batteryModule),
+                                Map.entry(LocationModule.name, locationModule),
+                                Map.entry(AmbientModule.name, ambientModule),
+                                Map.entry(StorageModule.name, storageModule),
+                                Map.entry(OperationModesModule.name, operationModesModule),
+                                Map.entry(OperationModesGraphModule.name, graph),
+                                Map.entry(LoRaReportingModule.name, loRaReportingModule),
+                                Map.entry(IridiumReportingModule.name, iridiumReportingModuleDrifter),
+                                Map.entry(NetworkModule.name, networkModule1),
+                                Map.entry(ICListenHF.name, icListenHF)
                         ))
+
                 ),
                 new NodeDevice(
                         UUID.fromString("00000000-0000-0000-0000-000000000002"),
@@ -120,8 +121,7 @@ public class MockNodeDevices {
                                 LoRaReportingModule.name, loRaReportingModule,
                                 IridiumReportingModule.name, iridiumReportingModuleLocalizer,
                                 NetworkModule.name, networkModule2
-                        )),
-                        Map.of()
+                        ))
                 )
 
         );

@@ -2,7 +2,7 @@ package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.rtc
 
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +12,7 @@ import java.time.ZoneOffset;
 
 @Getter
 @Setter
-public class RTCModule extends SerializableModule implements ExtModule {
+public class RTCModule extends SerializableModule {
     public static final String name = "rtc";
     private LocalDateTime currentTime;
 
@@ -43,10 +43,6 @@ public class RTCModule extends SerializableModule implements ExtModule {
         return new RTCModule(time);
     }
 
-    @Override
-    public int getFullSize() {
-        return getMinSize();
-    }
 
     public static int getMinSize() {
         return Long.BYTES; // 8 bytes for epoch seconds

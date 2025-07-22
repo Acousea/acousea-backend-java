@@ -3,7 +3,7 @@ package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.amb
 
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 
 @Getter
 @Setter
-public class AmbientModule extends SerializableModule implements ExtModule {
+public class AmbientModule extends SerializableModule {
     public static final String name = "ambient";
     private int temperature;
     private int humidity;
@@ -30,10 +30,6 @@ public class AmbientModule extends SerializableModule implements ExtModule {
                 .array();
     }
 
-    @Override
-    public int getFullSize() {
-        return getMinSize();
-    }
 
     public static int getMinSize() {
         return Integer.BYTES * 2;

@@ -3,7 +3,7 @@ package com.acousea.backend.core.communicationSystem.domain.nodes.extModules.net
 import com.acousea.backend.core.communicationSystem.domain.communication.constants.Address;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.SerializableModule;
 import com.acousea.backend.core.communicationSystem.domain.nodes.serialization.ModuleCode;
-import com.acousea.backend.core.communicationSystem.domain.nodes.extModules.ExtModule;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class NetworkModule extends SerializableModule implements ExtModule {
+public class NetworkModule extends SerializableModule  {
     public static final String name = "network";
     private Address localAddress;
     private RoutingTable routingTable;
@@ -27,11 +27,6 @@ public class NetworkModule extends SerializableModule implements ExtModule {
 
     public NetworkModule(int localAddress) {
         this(Address.fromValue(localAddress), new RoutingTable());
-    }
-
-    @Override
-    public int getFullSize() {
-        return Address.getSize() + routingTable.getPeerRoutes().size() * 2 * Byte.BYTES + Byte.BYTES;
     }
 
     public static int getMinSize() {

@@ -20,7 +20,7 @@ public class InMemoryNodeDeviceRepository extends InMemoryIRepository<NodeDevice
     public Optional<NodeDevice> findByNetworkAddress(Address networkAddress) {
         return this.findAll().stream()
                 .filter(
-                        nodeDevice -> ((NetworkModule) nodeDevice.getExtModules().get(NetworkModule.name)).
+                        nodeDevice -> ((NetworkModule) nodeDevice.getSerializableModulesMap().get(NetworkModule.name)).
                                 getLocalAddress().equals(networkAddress))
                 .findFirst();
 
